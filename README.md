@@ -4,10 +4,16 @@
 
 A db migration tool for deno.
 
-## Status
+## Status / Roadmap
 
 * Currently the cli can be used to create a migration file 
 * By using `new Table(config)` you can generate a sql string which you can use to modify your database
+
+* [ ] CLI communicates with db and tracks migrations using a table
+* [ ] CLI can rollback a migration
+* [ ] CLI can migrate and rollback multiple files
+* [ ] Add support for seed files
+* [ ] Rework the codebase to have a cleaner interface and chained opperations
 
 ## Supported databases
 
