@@ -1,6 +1,6 @@
 # Migrating Denosaurs
 
-![ci](https://github.com/halvardssm/migrating-denos/workflows/ci/badge.svg)
+![ci](https://github.com/halvardssm/deno-migrating-denos/workflows/ci/badge.svg)
 
 A db migration tool for deno.
 
