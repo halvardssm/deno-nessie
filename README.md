@@ -4,11 +4,16 @@
 
 A db migration tool for deno.
 
+## Status
+
+* Currently the cli can be used to create a migration file 
+* By using `new Table(config)` you can generate a sql string which you can use to modify your database
+
 ## Supported databases
 
-[-] PostgreSQL - in development
-[ ] MySQL - not started
-[ ] SQLite - not started
+* [ ] PostgreSQL - in development
+* [ ] MySQL - not started
+* [ ] SQLite - not started
 
 If you have a database system you would like to see in this list, feel free to make an issue or create a pr with your implementation.
 
