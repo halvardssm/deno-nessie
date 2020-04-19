@@ -1,13 +1,9 @@
-import {
-  Create,
-  Alter,
-  Drop,
-} from "https://denopkg.com/halvardssm/deno-migrating-denos/mod.ts";
+import { Schema } from "https://denopkg.com/halvardssm/deno-migrating-denos/mod.ts";
 
-export const up = (): string => {
-  return "";
+export const up = (scema: Schema): void => {
+
 };
 
-export const down = (): string => {
-  return "";
+export const down = (schema: Schema): void => {
+
 };

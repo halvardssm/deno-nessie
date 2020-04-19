@@ -1,73 +1,207 @@
-import { Column, ColumnReference, CreateColumnI } from "./Column.ts";
-import { bracket } from "./utils.ts";
+import { Column, ColumnWithInput, ColumnEnum } from './Column.ts';
 
-export interface CreateTableI {
-  name: string;
-  ifNotExists?: boolean;
-  columns?: CreateColumnI[];
+export interface TableConstraints {
+	unique?: string[][];
+	primary?: string[];
+	index?: string[];
 }
-
-export class Constraints {
-}
-
 export class Table {
-  query: string[] = [];
-  script: string = "";
-  name: string;
-  ifNotExists: boolean = false;
-  columns: Column[] = [];
-  constraints: Constraints[] = [];
+	protected tableName: string;
+	protected columns: Column[];
+	protected constraints: TableConstraints = {};
 
-  constructor(config: CreateTableI) {
-    this.name = config.name;
-    if (config.columns) {
-      this.setColumns(config.columns);
-    }
-    this.build();
+	constructor(name: string) {
+		this.tableName = name
+		this.columns = []
+	}
 
-    this.script = this.query.join(" ");
-  }
+	toSql = (): string => {
+		let sql = this.tableName
 
-  build = (): void => {
-    this.query.push("CREATE TABLE");
+		sql += " (" + this.columns.map(el => el.toSql()).join(', ') + ");"
 
-    if (this.ifNotExists) {
-      this.query.push("IF NOT EXISTS");
-    }
+		this.constraints.unique?.forEach((el: string[]) => {
+			let result = el.join(', ')
 
-    this.query.push(this.name);
+			sql += ` ALTER TABLE ${this.tableName} ADD UNIQUE(${result});`
+		})
 
-    this.query.push(this.getColumns());
+		sql += this.constraints.primary
+			? ` ALTER TABLE ${this.tableName} ADD PRIMARY KEY (${this.constraints.primary.join(', ')});`
+			: ''
 
-    this.query.push(this.getComments());
+		this.constraints.index?.forEach(el => {
+			sql += ` CREATE INDEX ON ${this.tableName} (${el})`
+		})
 
-    this.query.push(this.getConstraints());
-  };
+		return sql
+	}
 
-  getConstraints = (): string => {
-    return "";
-  };
+	private pushColumn = <T extends Column>(column: T): T => {
+		this.columns.push(column)
+		return column
+	}
 
-  getComments = (): string => {
-    const comments: string[] = [];
+	unique = (col: string | string[]) => {
+		if (typeof col === "string") col = [col]
+		this.constraints.unique
+			? this.constraints.unique.push(col)
+			: this.constraints.unique = [col]
 
-    this.columns.forEach((el) => {
-      if (el.comment) {
-        comments.push(el.comment(this.name));
-      }
-    });
+		return this
+	}
 
-    return comments.join("; ") + ";";
-  };
+	primary = (col: string) => {
+		this.constraints.primary?.push(col)
+		return this
+	}
 
-  getColumns = (): string => {
-    const cols: string[] = [];
-    this.columns.forEach((el) => cols.push(el.script));
-    return bracket(cols.join(", ")) + ";";
-  };
+	index = (col: string) => {
+		this.constraints.index?.push(col)
+		return this
+	}
 
-  setColumns = (conf: CreateColumnI[]): void =>
-    conf.forEach((el) => this.columns.push(new Column(el)));
+	id = () => {
+		this.bigIncrements('id')
+	}
+
+	bigIncrements = (name: string): Column => {
+		return this.pushColumn(new Column(name, "bigserial"))
+	}
+
+	bigInteger = (name: string): Column => {
+		return this.pushColumn(new Column(name, "bigint"))
+	}
+
+	binary = (name: string): Column => {
+		return this.pushColumn(new Column(name, "bytea"))
+	}
+
+	boolean = (name: string): Column => {
+		return this.pushColumn(new Column(name, "boolean"))
+	}
+
+	char = (name: string, length: number): ColumnWithInput => {
+		return this.pushColumn(new ColumnWithInput(name, "character", length))
+	}
+
+	date = (name: string): Column => {
+		return this.pushColumn(new Column(name, "date"))
+	}
+
+	dateTime = (name: string, length: number = 0): ColumnWithInput => {
+		return this.pushColumn(new ColumnWithInput(name, "timestamp", length))
+	}
+
+	dateTimeTz = (name: string, length: number = 0): ColumnWithInput => {
+		return this.pushColumn(new ColumnWithInput(name, "timestamptz", length))
+	}
+
+	decimal = (name: string, before: number = 8, after: number = 2): ColumnWithInput => {
+		return this.pushColumn(new ColumnWithInput(name, "decimal", before, after))
+	}
+
+	double = (name: string, before: number = 8, after: number = 2): ColumnWithInput => {
+		return this.pushColumn(new ColumnWithInput(name, "float8", before, after))
+	}
+
+	enum = (name: string, array: string[]): ColumnEnum => {
+		return this.pushColumn(new ColumnEnum(name, 'ENUM', array))
+		//TODO Add support for enum
+	}
+
+	float = (name: string, before: number = 8, after: number = 2): ColumnWithInput => {
+		return this.pushColumn(new ColumnWithInput(name, "float8", before, after))
+		//TODO DOUBLE CHECK return THIS WITH POSTGRES
+	}
+
+	increments = (name: string): Column => {
+		return this.pushColumn(new Column(name, "serial"))
+	}
+
+	integer = (name: string): Column => {
+		return this.pushColumn(new Column(name, "integer"))
+	}
+
+	ipAddress = (name: string): Column => {
+		return this.pushColumn(new Column(name, "inet"))
+	}
+
+	json = (name: string): Column => {
+		return this.pushColumn(new Column(name, "json"))
+	}
+
+	jsonb = (name: string): Column => {
+		return this.pushColumn(new Column(name, "jsonb"))
+	}
+
+	macAddress = (name: string): Column => {
+		return this.pushColumn(new Column(name, "macaddr"))
+	}
+
+	macAddress8 = (name: string): Column => {
+		return this.pushColumn(new Column(name, "macaddr8"))
+	}
+
+	point = (name: string): Column => {
+		return this.pushColumn(new Column(name, "point"))
+	}
+
+	polygon = (name: string): Column => {
+		return this.pushColumn(new Column(name, "polygon"))
+	}
+
+	smallIncrements = (name: string): Column => {
+		return this.pushColumn(new Column(name, "smallserial"))
+	}
+
+	smallInteger = (name: string): Column => {
+		return this.pushColumn(new Column(name, "smallint"))
+	}
+
+	string = (name: string, length: number): ColumnWithInput => {
+		return this.pushColumn(new ColumnWithInput(name, "varchar", length))
+	}
+
+	text = (name: string): Column => {
+		return this.pushColumn(new Column(name, "text"))
+	}
+
+	time = (name: string, length: number = 0): ColumnWithInput => {
+		return this.pushColumn(new ColumnWithInput(name, "time", length))
+	}
+
+	timeTz = (name: string, length: number = 0): ColumnWithInput => {
+		return this.pushColumn(new ColumnWithInput(name, "timetz", length))
+	}
+
+	timestamp = (name: string, length: number = 0): ColumnWithInput => {
+		return this.pushColumn(new ColumnWithInput(name, "timestamp", length))
+	}
+
+	timestampTz = (name: string, length: number = 0): ColumnWithInput => {
+		return this.pushColumn(new ColumnWithInput(name, "timestamptz", length))
+	}
+
+	timestamps = (length: number = 0): void => {
+		//TODO Add created_at, updated_at
+		const column1 = new ColumnWithInput("created_at", "timestamp", length)
+		const column2 = new ColumnWithInput("updated_at", "timestamp", length)
+
+		this.columns.push(column1, column2)
+	}
+
+	timestampsTz = (length: number = 0): void => {
+		//TODO Add created_at, updated_at
+		const column1 = new ColumnWithInput("created_at", "timestamptz", length)
+		const column2 = new ColumnWithInput("updated_at", "timestamptz", length)
+
+		this.columns.push(column1, column2)
+	}
+
+	uuid = (name: string): Column => {
+		return this.pushColumn(new Column(name, "uuid"))
+	}
 }
 
-export default { Table };
+export default Table;
