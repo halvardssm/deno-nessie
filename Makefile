@@ -7,3 +7,6 @@ migrate:
 	deno run --allow-net --allow-read cli.ts migrate -p ${MIGRATION_FOLDER} -c ${DB_URL}
 rollback:
 	deno run --allow-net --allow-read cli.ts rollback -p ${MIGRATION_FOLDER} -c ${DB_URL}
+
+test:
+	deno test tests

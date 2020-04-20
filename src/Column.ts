@@ -92,7 +92,7 @@ export class ColumnWithInput extends Column {
 	toSql = (): string => {
 		let sql = `${this.columnName} ${this.columnType}`
 
-		sql += ` (${this.columnInput1}${this.columnInput2 ? `, ${this.columnInput2}` : ''}) `
+		sql += ` (${this.columnInput1}${this.columnInput2 ? `, ${this.columnInput2}` : ''})`
 
 		sql = this.addAttributes(sql)
 
@@ -100,11 +100,4 @@ export class ColumnWithInput extends Column {
 	}
 }
 
-export class ColumnEnum extends ColumnWithInput {
-	constructor(name: string, type: columnTypes | string, input1: number | string[], input2?: number) {
-		super(name, type, input1, input2)
-
-	}
-}
-
-export default { Column, ColumnWithInput, ColumnEnum }
+export default { Column, ColumnWithInput }

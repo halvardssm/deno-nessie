@@ -1,4 +1,4 @@
-import { Column, ColumnWithInput, ColumnEnum } from './Column.ts';
+import { Column, ColumnWithInput } from './Column.ts';
 
 export interface EnumColumn {
 	name: string;
@@ -41,7 +41,8 @@ export class Table {
 
 		sql += " ("
 			+ this.columns.map(el => el.toSql()).join(', ')
-			+ (this.customColumns ? `, ${this.customColumns?.join(', ')}` : '')
+			+ (this.columns.length > 0 && this.customColumns ? ', ' : '')
+			+ (this.customColumns ? `${this.customColumns?.join(', ')}` : '')
 			+ ");"
 
 		this.constraints.unique.forEach((el: string[]) => {
@@ -87,13 +88,17 @@ export class Table {
 		return this
 	}
 
-	primary = (col: string) => {
-		this.constraints.primary?.push(col)
+	primary = (...col: string[]) => {
+		this.constraints.primary = col
+
 		return this
 	}
 
-	index = (col: string) => {
-		this.constraints.index?.push(col)
+	index = (...col: string[]) => {
+		this.constraints.index
+			? this.constraints.index.push(...col)
+			: this.constraints.index = col
+
 		return this
 	}
 
@@ -126,7 +131,7 @@ export class Table {
 	}
 
 	createdAtTz = () => {
-		this.timestamp('created_at').default('now()')
+		this.timestampTz('created_at').default('now()')
 	}
 
 	date = (name: string): Column => {
@@ -146,21 +151,21 @@ export class Table {
 	}
 
 	double = (name: string, before: number = 8, after: number = 2): ColumnWithInput => {
-		return this.pushColumn(new ColumnWithInput(name, "float8", before, after))
+		return this.float(name, before, after)
 	}
 
-	enum = (name: string, typeName: string = name, array: string[]): ColumnEnum => {
+	enum = (name: string, array: string[], typeName: string = name): ColumnWithInput => {
 		const newEnum: EnumColumn = { name: typeName, columns: array }
 		if (!this.constraints.enums) {
 			this.constraints.enums = [newEnum]
 		}
 		this.constraints.enums?.push(newEnum)
 
-		return this.pushColumn(new ColumnEnum(name, typeName, array))
+		return this.pushColumn(new ColumnWithInput(name, typeName, array))
 	}
 
 	float = (name: string, before: number = 8, after: number = 2): ColumnWithInput => {
-		return this.double(name, before, after)
+		return this.pushColumn(new ColumnWithInput(name, "float8", before, after))
 	}
 
 	increments = (name: string): Column => {
@@ -231,12 +236,12 @@ export class Table {
 		return this.pushColumn(new ColumnWithInput(name, "timestamptz", length))
 	}
 
-	timestamps = (length: number = 0): void => {
+	timestamps = (): void => {
 		this.createdAt()
 		this.updatedAt()
 	}
 
-	timestampsTz = (length: number = 0): void => {
+	timestampsTz = (): void => {
 		this.createdAtTz()
 		this.updatedAtTz()
 	}
