@@ -67,7 +67,7 @@ const queryHandler = async (client: Client, query: string) => {
 	return results
 }
 
-const makeMigration = async (client: Client) => {
+const makeMigration = async () => {
 	await Deno.mkdir(path, { recursive: true });
 
 	const fileName = `${Date.now()}-${program.make}.ts`
@@ -201,24 +201,26 @@ const rollback = async (client: Client) => {
 }
 
 const run = async () => {
-	const client = new Client(program.connection);
-
 	try {
-		await client.connect();
-
 		if (program.make) {
-			await makeMigration(client)
+			await makeMigration()
 
-		} else if (program.migrate) {
-			if (!program.connection) throw new Error('Required option [connection] not specified')
-			await migrate(client)
+		} else {
+			const client = new Client(program.connection);
+			await client.connect();
 
-		} else if (program.rollback) {
-			if (!program.connection) throw new Error('Required option [connection] not specified')
-			await rollback(client)
+			if (program.migrate) {
+				if (!program.connection) throw new Error('Required option [connection] not specified')
+				await migrate(client)
+
+			} else if (program.rollback) {
+				if (!program.connection) throw new Error('Required option [connection] not specified')
+				await rollback(client)
+			}
+
+			await client.end()
 		}
 
-		await client.end()
 	} catch (e) {
 		console.error(e)
 	}

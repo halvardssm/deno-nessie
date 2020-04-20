@@ -30,15 +30,15 @@ If you have a database system you would like to see in this list, feel free to m
 
 * Create migration
 
-```deno run --allow-write --allow-read https://denopkg.com/halvardssm/deno-nessie/cli.ts make create_users -p migrations```
+```deno run --allow-write --allow-read https://deno.land/x/nessie/cli.ts make create_users -p migrations```
 
 * Run migration (under construction, feel free to file any bugs you encounter)
 
-```deno run --allow-read --allow-net https://denopkg.com/halvardssm/deno-nessie/cli.ts migrate -p migrations -c postgres://root:pwd@localhost:5000/nessie```
+```deno run --allow-read --allow-net https://deno.land/x/nessie/cli.ts migrate -p migrations -c postgres://root:pwd@localhost:5000/nessie```
 
 * Rollback (under construction, feel free to file any bugs you encounter)
 
-```deno run --allow-net --allow-read https://denopkg.com/halvardssm/deno-nessie/cli.ts migrate -p migrations -c postgres://root:pwd@localhost:5000/nessie```
+```deno run --allow-net --allow-read https://deno.land/x/nessie/cli.ts migrate -p migrations -c postgres://root:pwd@localhost:5000/nessie```
 
 ## Contributing
 
@@ -51,4 +51,24 @@ I am looking for someone to help me out with this project, so feel free to make 
 
 ## Examples
 
-See example folder
+Minimal example for a migration file
+
+```js
+import { Schema } from "../mod.ts";
+
+export const up = (scema: Schema): void => {
+	scema.create('users', table => {
+		table.id()
+		table.string('name', 100).nullable()
+		table.boolean('isTrue').default('false')
+		table.custom('custom_column int default 1')
+		table.timestamps()
+	})
+};
+
+export const down = (schema: Schema): void => {
+	schema.drop('users')
+};
+```
+
+See example folder for more (under development)
