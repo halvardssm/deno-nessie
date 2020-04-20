@@ -1,34 +1,50 @@
-import { Table } from './Table.ts'
+import { Table } from "./Table.ts";
+
+export type dbDialects = "pg" | "mysql" | "sqlite";
 
 export class Schema {
-	query: string = '';
+  query: string = "";
 
-	create = (name: string, createfn: (table: Table) => void): string => {
-		const table = new Table(name)
+  create = (
+    name: string,
+    createfn: (table: Table) => void,
+    dialect: dbDialects = "pg",
+  ): string => {
+    const table = new Table(name, dialect);
 
-		createfn(table)
+    createfn(table);
 
-		const sql = `CREATE TABLE ${table.toSql()}`;
+    const sql = table.toSql();
 
-		this.query += sql
+    this.query += sql;
 
-		return sql
-	}
+    return sql;
+  };
 
-	drop = (name: string | string[], ifExists: boolean = false, cascade: boolean = false) => {
-		if (typeof name === "string") name = [name]
+  queryString = (queryString: string) => {
+    this.query += queryString;
+  };
 
-		const sql = `DROP TABLE${ifExists ? ' IF EXISTS' : ''} ${name.join(', ')}${cascade ? ' CASCADE' : ''};`
+  drop = (
+    name: string | string[],
+    ifExists: boolean = false,
+    cascade: boolean = false,
+  ) => {
+    if (typeof name === "string") name = [name];
 
-		this.query += sql
+    const sql = `DROP TABLE${ifExists ? " IF EXISTS" : ""} ${name.join(
+      ", ",
+    )}${cascade ? " CASCADE" : ""};`;
 
-		return sql
-	}
+    this.query += sql;
 
-	// TODO Add Has table
-	static hasTable = (name: string) => {
-		return `SELECT to_regclass('${name}');`
-	}
+    return sql;
+  };
+
+  // TODO Add Has table
+  static hasTable = (name: string) => {
+    return `SELECT to_regclass('${name}');`;
+  };
 }
 
-export default Schema
+export default Schema;
