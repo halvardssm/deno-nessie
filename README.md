@@ -51,4 +51,4 @@ I am looking for someone to help me out with this project, so feel free to make 
 
 ## Examples
 
-
+See example folder

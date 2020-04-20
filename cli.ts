@@ -1,7 +1,7 @@
 import Denomander from "https://deno.land/x/denomander/mod.ts";
 import { Client } from "https://deno.land/x/postgres/mod.ts";
 import { Schema } from './mod.ts';
-
+import { QueryResult } from "https://deno.land/x/postgres/query.ts";
 const TABLE_NAME_MIGRATIONS = 'nessie_migrations';
 const COL_FILE_NAME = 'file_name';
 const COL_CREATED_AT = 'created_at';
@@ -45,9 +45,29 @@ const path: string = !program.path
 
 outputDebug(path, 'Path')
 
-const client = new Client(program.connection);
+const queryHandler = async (client: Client, query: string) => {
+	const queries = query.trim().split(';')
 
-const makeMigration = async () => {
+	if (queries[queries.length - 1] === "") queries.pop()
+
+	if (queries.length === 1) return await client.query(query)
+
+	const results: QueryResult[] = []
+
+	for (const el of queries) {
+		outputDebug(el, 'Query')
+
+		const result = await client.query(el + ';')
+
+		results.push(result)
+	}
+
+	outputDebug(results, 'Query result')
+
+	return results
+}
+
+const makeMigration = async (client: Client) => {
 	await Deno.mkdir(path, { recursive: true });
 
 	const fileName = `${Date.now()}-${program.make}.ts`
@@ -62,7 +82,7 @@ const makeMigration = async () => {
 	console.info(`Created migration ${fileName} at ${path}`)
 }
 
-const createMigrationTable = async () => {
+const createMigrationTable = async (client: Client) => {
 	const hasTableString = Schema.hasTable(TABLE_NAME_MIGRATIONS)
 
 	const hasMigrationTable = await client.query(hasTableString)
@@ -95,7 +115,7 @@ const createMigrationTable = async () => {
 		// TO account 
 		// DO INSTEAD SELECT enforce_soft_delete();`
 
-		const result = await client.query(sql)
+		const result = await queryHandler(client, sql)
 
 		console.info('Created migration table')
 
@@ -103,12 +123,12 @@ const createMigrationTable = async () => {
 	}
 }
 
-const migrate = async () => {
+const migrate = async (client: Client) => {
 	const files = Array.from(Deno.readdirSync(path));
 
 	outputDebug(files, 'Files in migration folder')
 
-	await createMigrationTable()
+	await createMigrationTable(client)
 
 	const result = await client.query(`select ${COL_FILE_NAME} from ${TABLE_NAME_MIGRATIONS} order by ${COL_CREATED_AT} desc limit 1`)
 
@@ -125,7 +145,7 @@ const migrate = async () => {
 	outputDebug(files, 'Files after filter and sort')
 
 	if (files.length > 0) {
-		files.forEach(async file => {
+		for (const file of files) {
 			let { up } = await import(`${path}/${file.name}`);
 
 			const schema = new Schema()
@@ -138,12 +158,12 @@ const migrate = async () => {
 
 			outputDebug(query, 'Migration query')
 
-			const result = await client.query(query);
+			const result = await queryHandler(client, query);
 
 			console.info(`Migrated ${file.name}`)
 
 			outputDebug(result, 'Migration table creation')
-		})
+		}
 
 		console.info('Migration complete')
 
@@ -152,7 +172,7 @@ const migrate = async () => {
 	}
 }
 
-const rollback = async () => {
+const rollback = async (client: Client) => {
 	const result = await client.query(`select ${COL_FILE_NAME} from ${TABLE_NAME_MIGRATIONS} order by ${COL_CREATED_AT} desc limit 1`)
 
 	outputDebug(result, 'Latest migration')
@@ -174,28 +194,28 @@ const rollback = async () => {
 
 		query += ` DELETE FROM ${TABLE_NAME_MIGRATIONS} WHERE ${COL_FILE_NAME} = '${fileName}';`
 
-		await client.query(query);
+		await queryHandler(client, query);
 
 		console.info(`Rolled back ${fileName}`)
 	}
 }
 
 const run = async () => {
+	const client = new Client(program.connection);
+
 	try {
 		await client.connect();
 
 		if (program.make) {
-			makeMigration()
-		}
+			await makeMigration(client)
 
-		if (program.migrate) {
+		} else if (program.migrate) {
 			if (!program.connection) throw new Error('Required option [connection] not specified')
-			migrate()
-		}
+			await migrate(client)
 
-		if (program.rollback) {
+		} else if (program.rollback) {
 			if (!program.connection) throw new Error('Required option [connection] not specified')
-			rollback()
+			await rollback(client)
 		}
 
 		await client.end()

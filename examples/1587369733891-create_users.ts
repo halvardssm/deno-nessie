@@ -1,7 +1,7 @@
 import { Schema } from "../mod.ts";
 
 export const up = (scema: Schema): void => {
-	scema.create('some_table', table => {
+	scema.create('users', table => {
 		table.id()
 		table.string('name', 100).nullable()
 		table.boolean('isTrue').default('false')
@@ -11,5 +11,5 @@ export const up = (scema: Schema): void => {
 };
 
 export const down = (schema: Schema): void => {
-	schema.drop('some_table')
+	schema.drop('users')
 };
