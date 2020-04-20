@@ -16,7 +16,7 @@ A db migration tool for deno.
 * [x] Rework the codebase to have a cleaner interface and chained opperations
 * [ ] Add support for soft deletes
 * [ ] Add support for env or settings file
-* [ ] Add tests
+* [x] Add tests
 
 ## Supported databases
 
