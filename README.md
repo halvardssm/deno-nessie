@@ -28,21 +28,26 @@ If you have a database system you would like to see in this list, feel free to m
 
 ## Usage
 
-* Create migration
+* `make`: Create migration
 
-```deno run --allow-write --allow-read https://deno.land/x/nessie/cli.ts make create_users -p migrations```
+```deno run --allow-read --allow-write https://deno.land/x/nessie/cli.ts make create_users -p migrations```
 
-* Run migration (under construction, feel free to file any bugs you encounter)
-
-```deno run --allow-read --allow-net https://deno.land/x/nessie/cli.ts migrate -p migrations -c postgres://root:pwd@localhost:5000/nessie```
-
-* Rollback (under construction, feel free to file any bugs you encounter)
+* `migrate`: Run migration - will migrate all migrations in your migration folder newer than the latest migration in your db
 
 ```deno run --allow-net --allow-read https://deno.land/x/nessie/cli.ts migrate -p migrations -c postgres://root:pwd@localhost:5000/nessie```
 
+* `rollback`: Rollback - will rollback the latest migration
+
+```deno run --allow-net --allow-read https://deno.land/x/nessie/cli.ts migrate -p migrations -c postgres://root:pwd@localhost:5000/nessie```
+
+### Flags
+
+* `-p, --path`: path to migration folder
+* `-c, --connection`: db connection url
+
 ## Contributing
 
-I am looking for someone to help me out with this project, so feel free to make pr's or create an issue!
+Feel free to make pr's or create an issue!
 
 ## Uses
 
@@ -51,7 +56,7 @@ I am looking for someone to help me out with this project, so feel free to make 
 
 ## Examples
 
-Minimal example for a migration file
+Minimal example of a migration file
 
 ```js
 import { Schema } from "../mod.ts";
@@ -72,3 +77,6 @@ export const down = (schema: Schema): void => {
 ```
 
 See example folder for more (under development)
+
+### Column types
+* 
