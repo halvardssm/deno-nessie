@@ -1,8 +1,7 @@
 import Denomander from "https://deno.land/x/denomander/mod.ts";
 import { Client } from "https://deno.land/x/postgres/mod.ts";
-import Schema from './src/Schema.ts';
+import { Schema } from './mod.ts';
 
-const dbSetting = `postgres://root:pwd@localhost:5000/test`
 const TABLE_NAME_MIGRATIONS = 'nessie_migrations';
 const COL_FILE_NAME = 'file_name';
 const COL_CREATED_AT = 'created_at';
@@ -18,6 +17,7 @@ const program = new Denomander(
 );
 
 program.option("-p --path", "Path to migration folder")
+	.option("-c --connection", "DB connection url, e.g. postgres://root:pwd@localhost:5000/nessie")
 	.command("make [migrationName]", "Creates a migration file with the name")
 	.command("migrate", "Migrates one migration")
 	.command("rollback", "Rolls back one migration");
@@ -50,13 +50,30 @@ const createMigrationTable = async (client: Client): Promise<void> => {
 	if (hasMigrationTable.rows[0][0] !== TABLE_NAME_MIGRATIONS) {
 		const schema = new Schema()
 
-		const sql = schema.create(TABLE_NAME_MIGRATIONS, (table) => {
+		let sql = schema.create(TABLE_NAME_MIGRATIONS, (table) => {
 			table.id()
 			table.string('file_name', 100)
 			table.timestamp(COL_CREATED_AT)
 
 			table.unique('file_name')
 		})
+
+		sql += `CREATE OR REPLACE FUNCTION trigger_set_timestamp()
+		RETURNS TRIGGER AS $$
+		BEGIN
+		  NEW.updated_at = NOW();
+		  RETURN NEW;
+		END;
+		$$ LANGUAGE plpgsql;`
+
+		//TODO Add soft delete
+		// sql += ` CREATE OR REPLACE FUNCTION soft_delete() RETURNS VOID AS $$ 
+		// BEGIN 
+		// RAISE EXCEPTION 'only soft deletes allowed'; 
+		// END; 
+		// CREATE OR REPLACE RULE prevent_account_deletion AS ON DELETE 
+		// TO account 
+		// DO INSTEAD SELECT enforce_soft_delete();`
 
 		await client.query(sql)
 	}
@@ -74,7 +91,7 @@ const filterMigrations = (file: Deno.DirEntry, time: number): boolean => {
 const migrate = async () => {
 	const files = Array.from(Deno.readdirSync(path));
 
-	const client = new Client(dbSetting);
+	const client = new Client(program.connection);
 	await client.connect();
 
 	await createMigrationTable(client)
@@ -110,11 +127,12 @@ const migrate = async () => {
 }
 
 if (program.migrate) {
+	if (!program.connection) throw new Error('Required option [connection] not specified')
 	migrate()
 }
 
 const rollback = async () => {
-	const client = new Client(dbSetting);
+	const client = new Client(program.connection);
 	await client.connect();
 
 	const result = await client.query(`select ${COL_FILE_NAME} from ${TABLE_NAME_MIGRATIONS} order by ${COL_CREATED_AT} desc limit 1`)
@@ -141,6 +159,7 @@ const rollback = async () => {
 }
 
 if (program.rollback) {
+	if (!program.connection) throw new Error('Required option [connection] not specified')
 	rollback()
 }
 

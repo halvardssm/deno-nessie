@@ -1,14 +1,28 @@
 import { Column, ColumnWithInput, ColumnEnum } from './Column.ts';
 
-export interface TableConstraints {
-	unique?: string[][];
-	primary?: string[];
-	index?: string[];
+export interface EnumColumn {
+	name: string;
+	columns: string[];
 }
+
+export interface TableConstraints {
+	unique: string[][];
+	primary?: string[];
+	index: string[];
+	enums: EnumColumn[];
+	updatedAt: string[]
+}
+
 export class Table {
 	protected tableName: string;
 	protected columns: Column[];
-	protected constraints: TableConstraints = {};
+	protected customColumns?: string[]
+	protected constraints: TableConstraints = {
+		unique: [],
+		index: [],
+		enums: [],
+		updatedAt: []
+	};
 
 	constructor(name: string) {
 		this.tableName = name
@@ -16,11 +30,21 @@ export class Table {
 	}
 
 	toSql = (): string => {
-		let sql = this.tableName
+		let sql = ''
 
-		sql += " (" + this.columns.map(el => el.toSql()).join(', ') + ");"
+		this.constraints.enums.forEach(enumCol => {
+			sql += `CREATE TYPE ${enumCol.name} AS ENUM (${enumCol.columns.join(', ')}); `
+		})
 
-		this.constraints.unique?.forEach((el: string[]) => {
+
+		sql += this.tableName
+
+		sql += " ("
+			+ this.columns.map(el => el.toSql()).join(', ')
+			+ this.customColumns?.join(', ')
+			+ ");"
+
+		this.constraints.unique.forEach((el: string[]) => {
 			let result = el.join(', ')
 
 			sql += ` ALTER TABLE ${this.tableName} ADD UNIQUE(${result});`
@@ -30,8 +54,15 @@ export class Table {
 			? ` ALTER TABLE ${this.tableName} ADD PRIMARY KEY (${this.constraints.primary.join(', ')});`
 			: ''
 
-		this.constraints.index?.forEach(el => {
-			sql += ` CREATE INDEX ON ${this.tableName} (${el})`
+		this.constraints.index.forEach(el => {
+			sql += ` CREATE INDEX ON ${this.tableName} (${el});`
+		})
+
+		this.constraints.updatedAt.forEach(el => {
+			sql += ` CREATE TRIGGER set_timestamp
+			BEFORE UPDATE ON ${el}
+			FOR EACH ROW
+			EXECUTE PROCEDURE trigger_set_timestamp();`
 		})
 
 		return sql
@@ -40,6 +71,14 @@ export class Table {
 	private pushColumn = <T extends Column>(column: T): T => {
 		this.columns.push(column)
 		return column
+	}
+
+	custom = (string: string) => {
+		if (!this.customColumns) {
+			this.customColumns = [string]
+		} else {
+			this.customColumns.push(string)
+		}
 	}
 
 	unique = (col: string | string[]) => {
@@ -85,16 +124,24 @@ export class Table {
 		return this.pushColumn(new ColumnWithInput(name, "character", length))
 	}
 
+	createdAt = () => {
+		this.timestamp('created_at')
+	}
+
+	createdAtTz = () => {
+		this.timestamp('created_at')
+	}
+
 	date = (name: string): Column => {
 		return this.pushColumn(new Column(name, "date"))
 	}
 
 	dateTime = (name: string, length: number = 0): ColumnWithInput => {
-		return this.pushColumn(new ColumnWithInput(name, "timestamp", length))
+		return this.timestamp(name, length)
 	}
 
 	dateTimeTz = (name: string, length: number = 0): ColumnWithInput => {
-		return this.pushColumn(new ColumnWithInput(name, "timestamptz", length))
+		return this.timestampTz(name, length)
 	}
 
 	decimal = (name: string, before: number = 8, after: number = 2): ColumnWithInput => {
@@ -105,14 +152,18 @@ export class Table {
 		return this.pushColumn(new ColumnWithInput(name, "float8", before, after))
 	}
 
-	enum = (name: string, array: string[]): ColumnEnum => {
-		return this.pushColumn(new ColumnEnum(name, 'ENUM', array))
-		//TODO Add support for enum
+	enum = (name: string, typeName: string = name, array: string[]): ColumnEnum => {
+		const newEnum: EnumColumn = { name: typeName, columns: array }
+		if (!this.constraints.enums) {
+			this.constraints.enums = [newEnum]
+		}
+		this.constraints.enums?.push(newEnum)
+
+		return this.pushColumn(new ColumnEnum(name, typeName, array))
 	}
 
 	float = (name: string, before: number = 8, after: number = 2): ColumnWithInput => {
-		return this.pushColumn(new ColumnWithInput(name, "float8", before, after))
-		//TODO DOUBLE CHECK return THIS WITH POSTGRES
+		return this.double(name, before, after)
 	}
 
 	increments = (name: string): Column => {
@@ -135,12 +186,12 @@ export class Table {
 		return this.pushColumn(new Column(name, "jsonb"))
 	}
 
-	macAddress = (name: string): Column => {
-		return this.pushColumn(new Column(name, "macaddr"))
+	macAddress = (name: string, isMacAddress8: boolean = false): Column => {
+		return this.pushColumn(new Column(name, `macaddr${isMacAddress8 ? '8' : ''}`))
 	}
 
 	macAddress8 = (name: string): Column => {
-		return this.pushColumn(new Column(name, "macaddr8"))
+		return this.macAddress(name, true)
 	}
 
 	point = (name: string): Column => {
@@ -184,19 +235,23 @@ export class Table {
 	}
 
 	timestamps = (length: number = 0): void => {
-		//TODO Add created_at, updated_at
-		const column1 = new ColumnWithInput("created_at", "timestamp", length)
-		const column2 = new ColumnWithInput("updated_at", "timestamp", length)
-
-		this.columns.push(column1, column2)
+		this.createdAt()
+		this.updatedAt()
 	}
 
 	timestampsTz = (length: number = 0): void => {
-		//TODO Add created_at, updated_at
-		const column1 = new ColumnWithInput("created_at", "timestamptz", length)
-		const column2 = new ColumnWithInput("updated_at", "timestamptz", length)
+		this.createdAtTz()
+		this.updatedAtTz()
+	}
 
-		this.columns.push(column1, column2)
+	updatedAt = () => {
+		this.timestamp('updated_at')
+		this.constraints.updatedAt.push('updated_at')
+	}
+
+	updatedAtTz = () => {
+		this.timestampTz('updated_at')
+		this.constraints.updatedAt.push('updated_at')
 	}
 
 	uuid = (name: string): Column => {

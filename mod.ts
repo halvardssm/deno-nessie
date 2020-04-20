@@ -1,3 +1,3 @@
-export * as Table from "./src/Table.ts";
-export * as Schema from "./src/Schema.ts";
-export * as Column from "./src/Column.ts";
+export * from "./src/Table.ts";
+export * from "./src/Schema.ts";
+export * from "./src/Column.ts";
