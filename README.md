@@ -43,3 +43,12 @@ If you have a database system you would like to see in this list, feel free to m
 ## Contributing
 
 I am looking for someone to help me out with this project, so feel free to make pr's or create an issue!
+
+## Uses
+
+* [Denomander](https://deno.land/x/denomander/mod.ts)
+* [Deno Postgres](https://deno.land/x/postgres/mod.ts)
+
+## Examples
+
+

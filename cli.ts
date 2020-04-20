@@ -16,13 +16,24 @@ const program = new Denomander(
 	},
 );
 
-program.option("-p --path", "Path to migration folder")
+const outputDebug = (output: any, title?: string) => {
+	if (program.debug) {
+		title ? console.log(title + ': ') : null
+		console.log(output)
+	}
+}
+
+program
+	.option("-d --debug", "Enables verbose output")
+	.option("-p --path", "Path to migration folder")
 	.option("-c --connection", "DB connection url, e.g. postgres://root:pwd@localhost:5000/nessie")
 	.command("make [migrationName]", "Creates a migration file with the name")
 	.command("migrate", "Migrates one migration")
 	.command("rollback", "Rolls back one migration");
 
 program.parse(Deno.args);
+
+outputDebug(program, 'Config')
 
 const path: string = !program.path
 	? `${Deno.cwd()}/migrations`
@@ -32,22 +43,37 @@ const path: string = !program.path
 			? `${Deno.cwd()}/${program.path.substring(2)}`
 			: `${Deno.cwd()}/${program.path}`;
 
-if (program.make) {
+outputDebug(path, 'Path')
+
+const client = new Client(program.connection);
+
+const makeMigration = async () => {
 	await Deno.mkdir(path, { recursive: true });
+
+	const fileName = `${Date.now()}-${program.make}.ts`
+
+	outputDebug(program, 'Config')
 
 	await Deno.copyFile(
 		"./src/templates/migration.ts",
-		`${path}/${Date.now()}-${program.make}.ts`,
+		`${path}/${fileName}`,
 	);
+
+	console.info(`Created migration ${fileName} at ${path}`)
 }
 
-const createMigrationTable = async (client: Client): Promise<void> => {
+const createMigrationTable = async () => {
 	const hasTableString = Schema.hasTable(TABLE_NAME_MIGRATIONS)
-	// const hasTableString = Schema.hasTable('tablename')
 
 	const hasMigrationTable = await client.query(hasTableString)
 
-	if (hasMigrationTable.rows[0][0] !== TABLE_NAME_MIGRATIONS) {
+	outputDebug(hasMigrationTable, 'Has migration table')
+
+	const migrationTableExists = hasMigrationTable.rows[0][0] !== TABLE_NAME_MIGRATIONS
+
+	outputDebug(migrationTableExists, 'Migration table exsists')
+
+	if (migrationTableExists) {
 		const schema = new Schema()
 
 		let sql = schema.create(TABLE_NAME_MIGRATIONS, (table) => {
@@ -58,13 +84,7 @@ const createMigrationTable = async (client: Client): Promise<void> => {
 			table.unique('file_name')
 		})
 
-		sql += `CREATE OR REPLACE FUNCTION trigger_set_timestamp()
-		RETURNS TRIGGER AS $$
-		BEGIN
-		  NEW.updated_at = NOW();
-		  RETURN NEW;
-		END;
-		$$ LANGUAGE plpgsql;`
+		sql += 'CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$BEGIN NEW.updated_at = NOW();RETURN NEW;END;$$ LANGUAGE plpgsql;'
 
 		//TODO Add soft delete
 		// sql += ` CREATE OR REPLACE FUNCTION soft_delete() RETURNS VOID AS $$ 
@@ -75,28 +95,24 @@ const createMigrationTable = async (client: Client): Promise<void> => {
 		// TO account 
 		// DO INSTEAD SELECT enforce_soft_delete();`
 
-		await client.query(sql)
+		const result = await client.query(sql)
+
+		console.info('Created migration table')
+
+		outputDebug(result, 'Migration table creation')
 	}
-}
-
-const filterMigrations = (file: Deno.DirEntry, time: number): boolean => {
-
-	const fileTime = parseInt(file.name.split('-')[0])
-
-	if (fileTime < time) return false
-
-	return true
 }
 
 const migrate = async () => {
 	const files = Array.from(Deno.readdirSync(path));
 
-	const client = new Client(program.connection);
-	await client.connect();
+	outputDebug(files, 'Files in migration folder')
 
-	await createMigrationTable(client)
+	await createMigrationTable()
 
 	const result = await client.query(`select ${COL_FILE_NAME} from ${TABLE_NAME_MIGRATIONS} order by ${COL_CREATED_AT} desc limit 1`)
+
+	outputDebug(result, 'Latest migration')
 
 	files
 		.filter((file: Deno.DirEntry): boolean => {
@@ -105,6 +121,8 @@ const migrate = async () => {
 			return parseInt(file.name.split('-')[0]) > new Date(result.rows[0][0]).getTime()
 		})
 		.sort((a, b) => parseInt(b?.name ?? "0") - parseInt(a?.name ?? "0"));
+
+	outputDebug(files, 'Files after filter and sort')
 
 	if (files.length > 0) {
 		files.forEach(async file => {
@@ -116,29 +134,31 @@ const migrate = async () => {
 
 			let query = schema.query
 
-			query += `INSERT INTO ${TABLE_NAME_MIGRATIONS} (${COL_FILE_NAME}, ${COL_CREATED_AT}) VALUES ('${file.name}',now())`
+			query += `INSERT INTO ${TABLE_NAME_MIGRATIONS} (${COL_FILE_NAME}, ${COL_CREATED_AT}) VALUES ('${file.name}', now());`
 
-			await client.query(query);
+			outputDebug(query, 'Migration query')
 
-			await client.end()
+			const result = await client.query(query);
+
+			console.info(`Migrated ${file.name}`)
+
+			outputDebug(result, 'Migration table creation')
 		})
 
+		console.info('Migration complete')
+
+	} else {
+		console.info('Nothing to migrate')
 	}
 }
 
-if (program.migrate) {
-	if (!program.connection) throw new Error('Required option [connection] not specified')
-	migrate()
-}
-
 const rollback = async () => {
-	const client = new Client(program.connection);
-	await client.connect();
-
 	const result = await client.query(`select ${COL_FILE_NAME} from ${TABLE_NAME_MIGRATIONS} order by ${COL_CREATED_AT} desc limit 1`)
 
+	outputDebug(result, 'Latest migration')
+
 	if (result.rows[0] === undefined || result.rows[0][0] === undefined) {
-		console.log('Nothing to rollback')
+		console.info('Nothing to rollback')
 
 	} else {
 		const fileName = result.rows[0][0]
@@ -150,17 +170,38 @@ const rollback = async () => {
 
 		let query = schema.query
 
+		outputDebug(query, 'Rollback query')
+
 		query += ` DELETE FROM ${TABLE_NAME_MIGRATIONS} WHERE ${COL_FILE_NAME} = '${fileName}';`
 
 		await client.query(query);
 
-		await client.end()
+		console.info(`Rolled back ${fileName}`)
 	}
 }
 
-if (program.rollback) {
-	if (!program.connection) throw new Error('Required option [connection] not specified')
-	rollback()
+const run = async () => {
+	try {
+		await client.connect();
+
+		if (program.make) {
+			makeMigration()
+		}
+
+		if (program.migrate) {
+			if (!program.connection) throw new Error('Required option [connection] not specified')
+			migrate()
+		}
+
+		if (program.rollback) {
+			if (!program.connection) throw new Error('Required option [connection] not specified')
+			rollback()
+		}
+
+		await client.end()
+	} catch (e) {
+		console.error(e)
+	}
 }
 
-
+run()

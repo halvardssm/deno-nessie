@@ -10,7 +10,7 @@ export interface TableConstraints {
 	primary?: string[];
 	index: string[];
 	enums: EnumColumn[];
-	updatedAt: string[]
+	updatedAt: boolean;
 }
 
 export class Table {
@@ -21,7 +21,7 @@ export class Table {
 		unique: [],
 		index: [],
 		enums: [],
-		updatedAt: []
+		updatedAt: false
 	};
 
 	constructor(name: string) {
@@ -41,7 +41,7 @@ export class Table {
 
 		sql += " ("
 			+ this.columns.map(el => el.toSql()).join(', ')
-			+ this.customColumns?.join(', ')
+			+ (this.customColumns ? `, ${this.customColumns?.join(', ')}` : '')
 			+ ");"
 
 		this.constraints.unique.forEach((el: string[]) => {
@@ -58,12 +58,9 @@ export class Table {
 			sql += ` CREATE INDEX ON ${this.tableName} (${el});`
 		})
 
-		this.constraints.updatedAt.forEach(el => {
-			sql += ` CREATE TRIGGER set_timestamp
-			BEFORE UPDATE ON ${el}
-			FOR EACH ROW
-			EXECUTE PROCEDURE trigger_set_timestamp();`
-		})
+		sql += this.constraints.updatedAt
+			? ` DROP TRIGGER IF EXISTS set_timestamp on some_table; CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.${this.tableName} FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();`
+			: ''
 
 		return sql
 	}
@@ -125,11 +122,11 @@ export class Table {
 	}
 
 	createdAt = () => {
-		this.timestamp('created_at')
+		this.timestamp('created_at').default('now()')
 	}
 
 	createdAtTz = () => {
-		this.timestamp('created_at')
+		this.timestamp('created_at').default('now()')
 	}
 
 	date = (name: string): Column => {
@@ -245,13 +242,13 @@ export class Table {
 	}
 
 	updatedAt = () => {
-		this.timestamp('updated_at')
-		this.constraints.updatedAt.push('updated_at')
+		this.timestamp('updated_at').default('now()')
+		this.constraints.updatedAt = true
 	}
 
 	updatedAtTz = () => {
-		this.timestampTz('updated_at')
-		this.constraints.updatedAt.push('updated_at')
+		this.timestampTz('updated_at').default('now()')
+		this.constraints.updatedAt = true
 	}
 
 	uuid = (name: string): Column => {
