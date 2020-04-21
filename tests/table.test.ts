@@ -1,5 +1,5 @@
-import { Table } from "../mod.ts";
 import { assertEquals } from "https://deno.land/std@v0.34.0/testing/asserts.ts";
+import { Table } from "../mod.ts";
 
 const strings = [
   {
@@ -236,7 +236,7 @@ const strings = [
       table.float("testCol");
       return table.toSql();
     })(),
-    solution: "CREATE TABLE testName (testCol float8 (8, 2));",
+    solution: "CREATE TABLE testName (testCol float4 (8, 2));",
   },
   {
     name: "Table with increments",

@@ -2,9 +2,14 @@ import { Table } from "./Table.ts";
 
 export type dbDialects = "pg" | "mysql" | "sqlite";
 
+/** The schema class exposed in the `up()` and `down()` methods in the migration files.
+ * 
+ * By using this exposed class, you can generate sql strings via the helper methods`.
+ */
 export class Schema {
   query: string = "";
 
+  /** Method for exposing a Table instance for creating a table with columns */
   create(
     name: string,
     createfn: (table: Table) => void,
@@ -21,10 +26,12 @@ export class Schema {
     return sql;
   }
 
+  /** Adds a custom query string to the migration */
   queryString(queryString: string) {
     this.query += queryString;
   }
 
+  /** Drops a table */
   drop(
     name: string | string[],
     ifExists: boolean = false,
@@ -41,7 +48,7 @@ export class Schema {
     return sql;
   }
 
-  // TODO Add Has table
+  /** Generates a string for checking if a table exists */
   static hasTable(name: string) {
     return `SELECT to_regclass('${name}');`;
   }

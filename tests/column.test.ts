@@ -1,5 +1,5 @@
-import { Column, ColumnWithInput } from "../mod.ts";
 import { assertEquals } from "https://deno.land/std@v0.34.0/testing/asserts.ts";
+import { Column, ColumnWithInput } from "../mod.ts";
 
 const strings = [
   {
@@ -16,11 +16,26 @@ const strings = [
     solution: "testName testType default testDefault",
   },
   {
+    name: "Column with not nullable",
+    string: new Column("testName", "testType")
+      .notNullable()
+      .toSql(),
+    solution: "testName testType not null",
+  },
+  {
+    name: "Column with default and not nullable",
+    string: new Column("testName", "testType")
+      .default("testDefault")
+      .notNullable()
+      .toSql(),
+    solution: "testName testType default testDefault not null",
+  },
+  {
     name: "Column with nullable",
     string: new Column("testName", "testType")
       .nullable()
       .toSql(),
-    solution: "testName testType not null",
+    solution: "testName testType",
   },
   {
     name: "Column with default and nullable",
@@ -28,13 +43,13 @@ const strings = [
       .default("testDefault")
       .nullable()
       .toSql(),
-    solution: "testName testType default testDefault not null",
+    solution: "testName testType default testDefault",
   },
   {
     name: "ColumnWithInput 1 input",
     string: new ColumnWithInput("testName", "testType", 1)
       .default("testDefault")
-      .nullable()
+      .notNullable()
       .toSql(),
     solution: "testName testType (1) default testDefault not null",
   },
@@ -42,7 +57,7 @@ const strings = [
     name: "ColumnWithInput 2 input",
     string: new ColumnWithInput("testName", "testType", 1, 2)
       .default("testDefault")
-      .nullable()
+      .notNullable()
       .toSql(),
     solution: "testName testType (1, 2) default testDefault not null",
   },
@@ -50,7 +65,7 @@ const strings = [
     name: "Column with default and nullable",
     string: new ColumnWithInput("testName", "testType", ["one", "two", "three"])
       .default("testDefault")
-      .nullable()
+      .notNullable()
       .toSql(),
     solution: "testName testType (one,two,three) default testDefault not null",
   },

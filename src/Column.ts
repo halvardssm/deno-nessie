@@ -85,15 +85,12 @@ export type columnTypePostgres =
 
 export type columnTypes = columnTypeSql | columnTypePostgres;
 
-export interface ColumnAttributes {
-  default?: string;
-  nullable?: boolean;
-}
-
+/** The column class which stores the column information of a table class. */
 export class Column {
   protected columnName: string;
   protected columnType: columnTypes | string;
-  private attributes: ColumnAttributes = {};
+  private isNullable: boolean = true;
+  private defaultValue?: string;
   private customCol?: string;
 
   constructor(name: string, type: columnTypes | string) {
@@ -101,6 +98,7 @@ export class Column {
     this.columnType = type;
   }
 
+  /** Generates a sql representation of a column */
   toSql(): string {
     let sql = `${this.columnName} ${this.columnType}`;
 
@@ -109,12 +107,13 @@ export class Column {
     return sql;
   }
 
+  /** Helper method for adding attributes to the column string */
   protected _addAttributes(string: string): string {
-    if (this.attributes.default) {
-      string += ` default ${this.attributes.default}`;
+    if (this.defaultValue) {
+      string += ` default ${this.defaultValue}`;
     }
 
-    if (this.attributes.nullable) {
+    if (!this.isNullable) {
       string += " not null";
     }
 
@@ -125,24 +124,34 @@ export class Column {
     return string;
   }
 
+  /** Adds custom attributes to the column string */
   custom(str: string) {
     this.customCol = str;
   }
 
+  /** Adds a default value to the column */
   default(value: string) {
-    this.attributes.default = value;
+    this.defaultValue = value;
     return this;
   }
 
-  nullable(value = true) {
-    this.attributes.nullable = value;
+  /** Makes the column nullable */
+  nullable() {
+    this.isNullable = true;
+    return this;
+  }
+
+  /** Makes the column not nullable */
+  notNullable() {
+    this.isNullable = false;
     return this;
   }
 }
 
+/** The column class with input, which stores the column information of a table class. */
 export class ColumnWithInput extends Column {
-  protected columnInput1: number | string[];
-  protected columnInput2?: number;
+  private columnInput1: number | string[];
+  private columnInput2?: number;
 
   constructor(
     name: string,
@@ -155,6 +164,7 @@ export class ColumnWithInput extends Column {
     this.columnInput2 = input2;
   }
 
+  /** Generates a sql representation of a column */
   toSql(): string {
     let sql = `${this.columnName} ${this.columnType}`;
 
