@@ -16,12 +16,16 @@ export interface TableConstraints {
   isTemporary?: boolean;
 }
 
+/** The table class exposed in the `up()` and `down()` methods in the migration files.
+ * 
+ * By using this exposed class, you can add columns and return it as a sql string using `toSql()`.
+ */
 export class Table {
   private dialect: dbDialects;
-  protected tableName: string;
-  protected columns: Column[];
-  protected customColumns?: string[];
-  protected constraints: TableConstraints = {
+  private tableName: string;
+  private columns: Column[];
+  private customColumns?: string[];
+  private constraints: TableConstraints = {
     unique: [],
     index: [],
     enums: [],
@@ -34,7 +38,7 @@ export class Table {
     this.dialect = dbDialect;
   }
 
-  toSql = (): string => {
+  toSql(): string {
     let sql = "";
 
     this.constraints.enums.forEach((enumCol) => {
@@ -58,14 +62,14 @@ export class Table {
     sql += this._updatedAtHandler();
 
     return sql;
-  };
+  }
 
-  private _pushColumn = <T extends Column>(column: T): T => {
+  private _pushColumn<T extends Column>(column: T): T {
     this.columns.push(column);
     return column;
-  };
+  }
 
-  private _tableHandler = () => {
+  private _tableHandler() {
     switch (this.dialect) {
       case "mysql":
       case "pg":
@@ -76,9 +80,9 @@ export class Table {
           ? " IF NOT EXISTS"
           : ""} ${this.tableName}`;
     }
-  };
+  }
 
-  private _columnHandler = () => {
+  private _columnHandler() {
     const allColumns = [...this.columns.map((el) => el.toSql())];
 
     if (this.customColumns) allColumns.push(...this.customColumns);
@@ -89,9 +93,9 @@ export class Table {
       default:
         return ` (${allColumns.join(", ")});`;
     }
-  };
+  }
 
-  private _enumHandler = (enumCol: EnumColumn): string => {
+  private _enumHandler(enumCol: EnumColumn): string {
     switch (this.dialect) {
       case "mysql":
         return "";
@@ -101,9 +105,9 @@ export class Table {
           ", ",
         )});`;
     }
-  };
+  }
 
-  private _uniqueHandler = (uniqueArray?: string[]) => {
+  private _uniqueHandler(uniqueArray?: string[]) {
     const uniqueType = uniqueArray ? "UNIQUE" : "PRIMARY KEY";
     const uniqueString = uniqueArray
       ? uniqueArray.join(", ")
@@ -117,18 +121,18 @@ export class Table {
       default:
         return ` ALTER TABLE ${this.tableName} ADD ${uniqueType} (${uniqueString});`;
     }
-  };
+  }
 
-  private _indexHandler = (index: string) => {
+  private _indexHandler(index: string) {
     switch (this.dialect) {
       case "mysql":
       case "pg":
       default:
         return ` CREATE INDEX ON ${this.tableName} (${index});`;
     }
-  };
+  }
 
-  private _updatedAtHandler = () => {
+  private _updatedAtHandler() {
     if (!this.constraints.updatedAt) return "";
 
     switch (this.dialect) {
@@ -138,9 +142,9 @@ export class Table {
       default:
         return ` DROP TRIGGER IF EXISTS set_timestamp on some_table; CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.${this.tableName} FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();`;
     }
-  };
+  }
 
-  private _getUpdatedAtString = () => {
+  private _getUpdatedAtString() {
     switch (this.dialect) {
       case "mysql":
         return "on update current_timestamp";
@@ -148,106 +152,106 @@ export class Table {
       default:
         return "";
     }
-  };
+  }
 
-  custom = (string: string) => {
+  custom(string: string) {
     if (!this.customColumns) {
       this.customColumns = [string];
     } else {
       this.customColumns.push(string);
     }
-  };
+  }
 
-  unique = (col: string | string[]) => {
+  unique(col: string | string[]) {
     if (typeof col === "string") col = [col];
     this.constraints.unique
       ? this.constraints.unique.push(col)
       : this.constraints.unique = [col];
 
     return this;
-  };
+  }
 
-  primary = (...col: string[]) => {
+  primary(...col: string[]) {
     this.constraints.primary = col;
 
     return this;
-  };
+  }
 
-  index = (...col: string[]) => {
+  index(...col: string[]) {
     this.constraints.index
       ? this.constraints.index.push(...col)
       : this.constraints.index = col;
 
     return this;
-  };
+  }
 
-  id = () => {
+  id() {
     this.bigIncrements("id");
-  };
+  }
 
-  bigIncrements = (name: string): Column => {
+  bigIncrements(name: string): Column {
     return this._pushColumn(new Column(name, "bigserial"));
-  };
+  }
 
-  bigInteger = (name: string): Column => {
+  bigInteger(name: string): Column {
     return this._pushColumn(new Column(name, "bigint"));
-  };
+  }
 
-  binary = (name: string): Column => {
+  binary(name: string): Column {
     return this._pushColumn(new Column(name, "bytea"));
-  };
+  }
 
-  boolean = (name: string): Column => {
+  boolean(name: string): Column {
     return this._pushColumn(new Column(name, "boolean"));
-  };
+  }
 
-  char = (name: string, length: number): ColumnWithInput => {
+  char(name: string, length: number): ColumnWithInput {
     return this._pushColumn(new ColumnWithInput(name, "character", length));
-  };
+  }
 
-  createdAt = () => {
+  createdAt() {
     this.timestamp("created_at").default("current_timestamp");
-  };
+  }
 
-  createdAtTz = () => {
+  createdAtTz() {
     this.timestampTz("created_at").default("current_timestamp");
-  };
+  }
 
-  date = (name: string): Column => {
+  date(name: string): Column {
     return this._pushColumn(new Column(name, "date"));
-  };
+  }
 
-  dateTime = (name: string, length: number = 0): ColumnWithInput => {
+  dateTime(name: string, length: number = 0): ColumnWithInput {
     return this.timestamp(name, length);
-  };
+  }
 
-  dateTimeTz = (name: string, length: number = 0): ColumnWithInput => {
+  dateTimeTz(name: string, length: number = 0): ColumnWithInput {
     return this.timestampTz(name, length);
-  };
+  }
 
-  decimal = (
+  decimal(
     name: string,
     before: number = 8,
     after: number = 2,
-  ): ColumnWithInput => {
+  ): ColumnWithInput {
     return this._pushColumn(
       new ColumnWithInput(name, "decimal", before, after),
     );
-  };
+  }
 
-  double = (
+  double(
     name: string,
     before: number = 8,
     after: number = 2,
-  ): ColumnWithInput => {
+  ): ColumnWithInput {
     return this.float(name, before, after);
-  };
+  }
 
-  enum = (
+  enum(
     name: string,
     array: string[],
     typeName: string = name,
-  ): ColumnWithInput => {
+  ): ColumnWithInput {
     const newEnum: EnumColumn = { name: typeName, columns: array };
     if (!this.constraints.enums) {
       this.constraints.enums = [newEnum];
@@ -255,113 +259,113 @@ export class Table {
     this.constraints.enums?.push(newEnum);
 
     return this._pushColumn(new ColumnWithInput(name, typeName, array));
-  };
+  }
 
-  float = (
+  float(
     name: string,
     before: number = 8,
     after: number = 2,
-  ): ColumnWithInput => {
+  ): ColumnWithInput {
     return this._pushColumn(new ColumnWithInput(name, "float8", before, after));
-  };
+  }
 
-  increments = (name: string): Column => {
+  increments(name: string): Column {
     return this._pushColumn(new Column(name, "serial"));
-  };
+  }
 
-  integer = (name: string): Column => {
+  integer(name: string): Column {
     return this._pushColumn(new Column(name, "integer"));
-  };
+  }
 
-  ipAddress = (name: string): Column => {
+  ipAddress(name: string): Column {
     return this._pushColumn(new Column(name, "inet"));
-  };
+  }
 
-  json = (name: string): Column => {
+  json(name: string): Column {
     return this._pushColumn(new Column(name, "json"));
-  };
+  }
 
-  jsonb = (name: string): Column => {
+  jsonb(name: string): Column {
     return this._pushColumn(new Column(name, "jsonb"));
-  };
+  }
 
-  macAddress = (name: string, isMacAddress8: boolean = false): Column => {
+  macAddress(name: string, isMacAddress8: boolean = false): Column {
     return this._pushColumn(
       new Column(name, `macaddr${isMacAddress8 ? "8" : ""}`),
     );
-  };
+  }
 
-  macAddress8 = (name: string): Column => {
+  macAddress8(name: string): Column {
     return this.macAddress(name, true);
-  };
+  }
 
-  point = (name: string): Column => {
+  point(name: string): Column {
     return this._pushColumn(new Column(name, "point"));
-  };
+  }
 
-  polygon = (name: string): Column => {
+  polygon(name: string): Column {
     return this._pushColumn(new Column(name, "polygon"));
-  };
+  }
 
-  smallIncrements = (name: string): Column => {
+  smallIncrements(name: string): Column {
     return this._pushColumn(new Column(name, "smallserial"));
-  };
+  }
 
-  smallInteger = (name: string): Column => {
+  smallInteger(name: string): Column {
     return this._pushColumn(new Column(name, "smallint"));
-  };
+  }
 
-  string = (name: string, length: number): ColumnWithInput => {
+  string(name: string, length: number): ColumnWithInput {
     return this._pushColumn(new ColumnWithInput(name, "varchar", length));
-  };
+  }
 
-  text = (name: string): Column => {
+  text(name: string): Column {
     return this._pushColumn(new Column(name, "text"));
-  };
+  }
 
-  time = (name: string, length: number = 0): ColumnWithInput => {
+  time(name: string, length: number = 0): ColumnWithInput {
     return this._pushColumn(new ColumnWithInput(name, "time", length));
-  };
+  }
 
-  timeTz = (name: string, length: number = 0): ColumnWithInput => {
+  timeTz(name: string, length: number = 0): ColumnWithInput {
     return this._pushColumn(new ColumnWithInput(name, "timetz", length));
-  };
+  }
 
-  timestamp = (name: string, length: number = 0): ColumnWithInput => {
+  timestamp(name: string, length: number = 0): ColumnWithInput {
     return this._pushColumn(new ColumnWithInput(name, "timestamp", length));
-  };
+  }
 
-  timestampTz = (name: string, length: number = 0): ColumnWithInput => {
+  timestampTz(name: string, length: number = 0): ColumnWithInput {
     return this._pushColumn(new ColumnWithInput(name, "timestamptz", length));
-  };
+  }
 
-  timestamps = (): void => {
+  timestamps(): void {
     this.createdAt();
     this.updatedAt();
-  };
+  }
 
-  timestampsTz = (): void => {
+  timestampsTz(): void {
     this.createdAtTz();
     this.updatedAtTz();
-  };
+  }
 
-  updatedAt = () => {
+  updatedAt() {
     this.timestamp("updated_at").default("current_timestamp").custom(
       this._getUpdatedAtString(),
     );
     this.constraints.updatedAt = true;
-  };
+  }
 
-  updatedAtTz = () => {
+  updatedAtTz() {
     this.timestampTz("updated_at").default("current_timestamp").custom(
       this._getUpdatedAtString(),
     );
     this.constraints.updatedAt = true;
-  };
+  }
 
-  uuid = (name: string): Column => {
+  uuid(name: string): Column {
     return this._pushColumn(new Column(name, "uuid"));
-  };
+  }
 }
 
 export default Table;

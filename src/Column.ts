@@ -93,23 +93,23 @@ export interface ColumnAttributes {
 export class Column {
   protected columnName: string;
   protected columnType: columnTypes | string;
-  protected attributes: ColumnAttributes = {};
-  protected customCol?: string;
+  private attributes: ColumnAttributes = {};
+  private customCol?: string;
 
   constructor(name: string, type: columnTypes | string) {
     this.columnName = name;
     this.columnType = type;
   }
 
-  toSql = (): string => {
+  toSql(): string {
     let sql = `${this.columnName} ${this.columnType}`;
 
-    sql = this.addAttributes(sql);
+    sql = this._addAttributes(sql);
 
     return sql;
-  };
+  }
 
-  protected addAttributes = (string: string): string => {
+  protected _addAttributes(string: string): string {
     if (this.attributes.default) {
       string += ` default ${this.attributes.default}`;
     }
@@ -123,21 +123,21 @@ export class Column {
     }
 
     return string;
-  };
+  }
 
-  custom = (str: string) => {
+  custom(str: string) {
     this.customCol = str;
-  };
+  }
 
-  default = (value: string) => {
+  default(value: string) {
     this.attributes.default = value;
     return this;
-  };
+  }
 
-  nullable = (value = true) => {
+  nullable(value = true) {
     this.attributes.nullable = value;
     return this;
-  };
+  }
 }
 
 export class ColumnWithInput extends Column {
@@ -155,17 +155,17 @@ export class ColumnWithInput extends Column {
     this.columnInput2 = input2;
   }
 
-  toSql = (): string => {
+  toSql(): string {
     let sql = `${this.columnName} ${this.columnType}`;
 
     sql += ` (${this.columnInput1}${this.columnInput2
       ? `, ${this.columnInput2}`
       : ""})`;
 
-    sql = this.addAttributes(sql);
+    sql = this._addAttributes(sql);
 
     return sql.trimEnd();
-  };
+  }
 }
 
 export default { Column, ColumnWithInput };

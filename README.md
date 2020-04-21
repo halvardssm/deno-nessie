@@ -1,8 +1,9 @@
 # Nessie
 
 ![ci](https://github.com/halvardssm/deno-nessie/workflows/ci/badge.svg)
+[![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https/deno.land/x/nessie/mod.ts)
 
-A db migration tool for deno.
+A database migration tool for [deno](https://deno.land). Supports PostgreSQL, and soon: MySQL and SQLite. See [documentation](https://doc.deno.land/https/deno.land/x/nessie/mod.ts).
 
 ## Status / Roadmap
 
@@ -20,8 +21,8 @@ A db migration tool for deno.
 
 ## Supported databases
 
-* [x] PostgreSQL - in development
-* [ ] MySQL - not started
+* [x] PostgreSQL - in beta
+* [x] MySQL - in alpha
 * [ ] SQLite - not started
 
 If you have a database system you would like to see in this list, feel free to make an issue or create a pr with your implementation.

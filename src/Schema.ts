@@ -5,11 +5,11 @@ export type dbDialects = "pg" | "mysql" | "sqlite";
 export class Schema {
   query: string = "";
 
-  create = (
+  create(
     name: string,
     createfn: (table: Table) => void,
     dialect: dbDialects = "pg",
-  ): string => {
+  ): string {
     const table = new Table(name, dialect);
 
     createfn(table);
@@ -19,17 +19,17 @@ export class Schema {
     this.query += sql;
 
     return sql;
-  };
+  }
 
-  queryString = (queryString: string) => {
+  queryString(queryString: string) {
     this.query += queryString;
-  };
+  }
 
-  drop = (
+  drop(
     name: string | string[],
     ifExists: boolean = false,
     cascade: boolean = false,
-  ) => {
+  ) {
     if (typeof name === "string") name = [name];
 
     const sql = `DROP TABLE${ifExists ? " IF EXISTS" : ""} ${name.join(
@@ -39,12 +39,12 @@ export class Schema {
     this.query += sql;
 
     return sql;
-  };
+  }
 
   // TODO Add Has table
-  static hasTable = (name: string) => {
+  static hasTable(name: string) {
     return `SELECT to_regclass('${name}');`;
-  };
+  }
 }
 
 export default Schema;
