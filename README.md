@@ -16,7 +16,7 @@ A database migration tool for [deno](https://deno.land). Supports PostgreSQL, an
 * [ ] Add support for seed files
 * [x] Rework the codebase to have a cleaner interface and chained opperations
 * [ ] Add support for soft deletes
-* [ ] Add support for env or settings file
+* [x] Add support for env or settings file
 * [x] Add tests
 
 ## Supported databases
@@ -59,31 +59,41 @@ Feel free to make pr's or create an issue!
 
 `nessie.config.json`
 
-```json
-{
-	"migrationFolder": "./tests/migrations",
-	"dbDialect": "pg", // pg | mysql | sqlite, if not given, it will parse the cunnectionUrl
-	"connectionUrl": "postgres://root:pwd@localhost:5000/nessie"
-}
+```ts
+import { nessieConfigType } from "https://deno.land/x/nessie/mod.ts";
+
+const config: nessieConfigType = {
+  migrationFolder: "./migrations",
+  connection: {
+    host: "localhost",
+    port: 5432,
+    user: "root",
+    password: "pwd",
+    name: "nessie",
+    dialect: "pg",
+  },
+};
+
+export default config;
 ```
 
 Minimal example of a migration file
 
-```js
-import { Schema } from "../mod.ts";
+```ts
+import { Schema } from "https://deno.land/x/nessie/mod.ts";
 
 export const up = (scema: Schema): void => {
-	scema.create('users', table => {
-		table.id()
-		table.string('name', 100).nullable()
-		table.boolean('isTrue').default('false')
-		table.custom('custom_column int default 1')
-		table.timestamps()
-	})
+  scema.create("users", (table) => {
+    table.id();
+    table.string("name", 100).nullable();
+    table.boolean("isTrue").default("false");
+    table.custom("custom_column int default 1");
+    table.timestamps();
+  });
 };
 
 export const down = (schema: Schema): void => {
-	schema.drop('users')
+  schema.drop("users");
 };
 ```
 

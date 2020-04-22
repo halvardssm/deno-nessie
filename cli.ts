@@ -1,12 +1,15 @@
 import Denomander from "https://deno.land/x/denomander/mod.ts";
-import { Client } from "https://deno.land/x/postgres/mod.ts";
+import { Client as MySQLClient } from "https://deno.land/x/mysql/mod.ts";
+import { Client as PGClient } from "https://deno.land/x/postgres/mod.ts";
 import { QueryResult } from "https://deno.land/x/postgres/query.ts";
 import { Schema } from "./mod.ts";
-import { _nessieConfigType } from "./nessie.config.ts";
-
+import { nessieConfigType, _nessieConfigType } from "./nessie.config.ts";
 const TABLE_NAME_MIGRATIONS = "nessie_migrations";
 const COL_FILE_NAME = "file_name";
 const COL_CREATED_AT = "created_at";
+type ClientTypes = PGClient | MySQLClient;
+let Client: ClientTypes;
+
 const program = new Denomander(
   {
     app_name: "Nessie Migrations",
@@ -15,8 +18,6 @@ const program = new Denomander(
     app_version: "0.1.0",
   },
 );
-
-let config: _nessieConfigType;
 
 const outputDebug = (output: any, title?: string) => {
   if (program.debug) {
@@ -27,14 +28,9 @@ const outputDebug = (output: any, title?: string) => {
 
 program
   .option("-d --debug", "Enables verbose output")
-  .option("-p --path", "Path to migration folder, defaults to ./migrations")
   .option(
-    "--config",
+    "-c --config",
     "Path to config file, will default to ./nessie.config.json",
-  )
-  .option(
-    "-c --connection",
-    "DB connection url, e.g. postgres://root:pwd@localhost:5000/nessie",
   )
   .command("make [migrationName]", "Creates a migration file with the name")
   .command("migrate", "Migrates one migration")
@@ -42,28 +38,52 @@ program
 
 program.parse(Deno.args);
 
-let configFile;
+const configHandler = async (): Promise<_nessieConfigType> => {
+  let configContent: nessieConfigType;
+  let result: _nessieConfigType;
+  let configFile;
 
-try {
-  configFile = await import(program.config || `${Deno.cwd()}/nessie.config.ts`);
-} catch (e) {
-  configFile = await import("./nessie.config.ts");
-} finally {
-  config = configFile.default;
-  outputDebug(config, "Config");
-}
+  try {
+    configFile = await import(
+      program.config || `${Deno.cwd()}/nessie.config.ts`
+    );
+  } catch (e) {
+    configFile = await import("./nessie.config.ts");
+  } finally {
+    configContent = configFile.default;
 
-config.migrationFolder = !config.migrationFolder
-  ? `${Deno.cwd()}/migrations`
-  : config.migrationFolder?.startsWith("/")
-    ? config.migrationFolder
-    : config.migrationFolder.startsWith("./")
-      ? `${Deno.cwd()}${config.migrationFolder.substring(1)}`
-      : `${Deno.cwd()}/${config.migrationFolder}`;
+    outputDebug(configContent, "Incoming config");
+
+    result = {
+      migrationFolder: "",
+      connection: {
+        ...configContent.connection,
+        dialect: configContent.connection.dialect
+          ? configContent.connection.dialect
+          : "pg",
+        port: `${configContent.connection.port}`,
+      },
+      args: configContent.args,
+    };
+
+    result.migrationFolder = !configContent.migrationFolder
+      ? `${Deno.cwd()}/migrations`
+      : configContent.migrationFolder?.startsWith("/")
+        ? configContent.migrationFolder
+        : configContent.migrationFolder.startsWith("./")
+          ? `${Deno.cwd()}${configContent.migrationFolder.substring(1)}`
+          : `${Deno.cwd()}/${configContent.migrationFolder}`;
+  }
+
+  return result;
+};
+
+let config = await configHandler();
+outputDebug(config, "Parsed config");
 
 outputDebug(config.migrationFolder, "Path");
 
-const queryHandler = async (client: Client, query: string) => {
+const queryHandler = async (client: ClientTypes, query: string) => {
   const queries = query.trim().split(";");
 
   if (queries[queries.length - 1] === "") queries.pop();
@@ -98,7 +118,7 @@ const makeMigration = async () => {
   console.info(`Created migration ${fileName} at ${config.migrationFolder}`);
 };
 
-const createMigrationTable = async (client: Client) => {
+const createMigrationTable = async (client: ClientTypes) => {
   const hasTableString = Schema.hasTable(TABLE_NAME_MIGRATIONS);
 
   const hasMigrationTable = await client.query(hasTableString);
@@ -122,7 +142,7 @@ const createMigrationTable = async (client: Client) => {
     });
 
     sql +=
-      "CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$BEGIN NEW.updated_at = NOW();RETURN NEW;END;$$ LANGUAGE plpgsql;";
+      "CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$BEGIN NEW.updated_at = NOW() RETURN NEW END $$ LANGUAGE plpgsql;";
 
     //TODO Add soft delete
     // sql += ` CREATE OR REPLACE FUNCTION soft_delete() RETURNS VOID AS $$
@@ -141,7 +161,7 @@ const createMigrationTable = async (client: Client) => {
   }
 };
 
-const migrate = async (client: Client) => {
+const migrate = async (client: ClientTypes) => {
   const files = Array.from(Deno.readdirSync(config.migrationFolder));
 
   outputDebug(files, "Files in migration folder");
@@ -193,7 +213,7 @@ const migrate = async (client: Client) => {
   }
 };
 
-const rollback = async (client: Client) => {
+const rollback = async (client: ClientTypes) => {
   const result = await client.query(
     `select ${COL_FILE_NAME} from ${TABLE_NAME_MIGRATIONS} order by ${COL_CREATED_AT} desc limit 1`,
   );
@@ -223,27 +243,55 @@ const rollback = async (client: Client) => {
   }
 };
 
+const initClient = async (): Promise<ClientTypes> => {
+  if (config.connection.dialect === "mysql") {
+    const client = await new MySQLClient().connect({
+      hostname: config.connection.host,
+      username: config.connection.user,
+      db: config.connection.name,
+      password: config.connection.password,
+      port: parseInt(config.connection.port),
+      ...config.args,
+    });
+
+    return client;
+  } else {
+    const client = new PGClient({
+      user: config.connection.user,
+      database: config.connection.name,
+      host: config.connection.host,
+      port: config.connection.port,
+      password: config.connection.password,
+      ...config.args,
+    });
+    await client.connect();
+
+    return client;
+  }
+};
+
+const endClient = async (client: ClientTypes): Promise<void> => {
+  if (config.connection.dialect === "mysql") {
+    await (client as MySQLClient).close();
+  } else {
+    await (client as PGClient).end();
+  }
+};
+
 const run = async () => {
   try {
     if (program.make) {
       await makeMigration();
     } else {
-      const client = new Client(program.connection);
-      await client.connect();
+      const client = await initClient();
 
       if (program.migrate) {
-        if (!program.connection) {
-          throw new Error("Required option [connection] not specified");
-        }
         await migrate(client);
       } else if (program.rollback) {
-        if (!program.connection) {
-          throw new Error("Required option [connection] not specified");
-        }
         await rollback(client);
       }
 
-      await client.end();
+      await endClient(client);
     }
   } catch (e) {
     console.error(e);
