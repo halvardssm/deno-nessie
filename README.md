@@ -57,6 +57,16 @@ Feel free to make pr's or create an issue!
 
 ## Examples
 
+`nessie.config.json`
+
+```json
+{
+	"migrationFolder": "./tests/migrations",
+	"dbDialect": "pg", // pg | mysql | sqlite, if not given, it will parse the cunnectionUrl
+	"connectionUrl": "postgres://root:pwd@localhost:5000/nessie"
+}
+```
+
 Minimal example of a migration file
 
 ```js

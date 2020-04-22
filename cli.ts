@@ -2,10 +2,11 @@ import Denomander from "https://deno.land/x/denomander/mod.ts";
 import { Client } from "https://deno.land/x/postgres/mod.ts";
 import { QueryResult } from "https://deno.land/x/postgres/query.ts";
 import { Schema } from "./mod.ts";
+import { _nessieConfigType } from "./nessie.config.ts";
+
 const TABLE_NAME_MIGRATIONS = "nessie_migrations";
 const COL_FILE_NAME = "file_name";
 const COL_CREATED_AT = "created_at";
-
 const program = new Denomander(
   {
     app_name: "Nessie Migrations",
@@ -14,6 +15,8 @@ const program = new Denomander(
     app_version: "0.1.0",
   },
 );
+
+let config: _nessieConfigType;
 
 const outputDebug = (output: any, title?: string) => {
   if (program.debug) {
@@ -24,7 +27,7 @@ const outputDebug = (output: any, title?: string) => {
 
 program
   .option("-d --debug", "Enables verbose output")
-  .option("-p --path", "Path to migration folder")
+  .option("-p --path", "Path to migration folder, defaults to ./migrations")
   .option(
     "--config",
     "Path to config file, will default to ./nessie.config.json",
@@ -39,17 +42,26 @@ program
 
 program.parse(Deno.args);
 
-outputDebug(program, "Config");
+let configFile;
 
-const path: string = !program.path
+try {
+  configFile = await import(program.config || `${Deno.cwd()}/nessie.config.ts`);
+} catch (e) {
+  configFile = await import("./nessie.config.ts");
+} finally {
+  config = configFile.default;
+  outputDebug(config, "Config");
+}
+
+config.migrationFolder = !config.migrationFolder
   ? `${Deno.cwd()}/migrations`
-  : program.path?.startsWith("/")
-    ? program.path
-    : program.path.startsWith("./")
-      ? `${Deno.cwd()}/${program.path.substring(2)}`
-      : `${Deno.cwd()}/${program.path}`;
+  : config.migrationFolder?.startsWith("/")
+    ? config.migrationFolder
+    : config.migrationFolder.startsWith("./")
+      ? `${Deno.cwd()}${config.migrationFolder.substring(1)}`
+      : `${Deno.cwd()}/${config.migrationFolder}`;
 
-outputDebug(path, "Path");
+outputDebug(config.migrationFolder, "Path");
 
 const queryHandler = async (client: Client, query: string) => {
   const queries = query.trim().split(";");
@@ -74,18 +86,16 @@ const queryHandler = async (client: Client, query: string) => {
 };
 
 const makeMigration = async () => {
-  await Deno.mkdir(path, { recursive: true });
+  await Deno.mkdir(config.migrationFolder, { recursive: true });
 
   const fileName = `${Date.now()}-${program.make}.ts`;
 
-  outputDebug(program, "Config");
-
   await Deno.copyFile(
     "./src/templates/migration.ts",
-    `${path}/${fileName}`,
+    `${config.migrationFolder}/${fileName}`,
   );
 
-  console.info(`Created migration ${fileName} at ${path}`);
+  console.info(`Created migration ${fileName} at ${config.migrationFolder}`);
 };
 
 const createMigrationTable = async (client: Client) => {
@@ -132,7 +142,7 @@ const createMigrationTable = async (client: Client) => {
 };
 
 const migrate = async (client: Client) => {
-  const files = Array.from(Deno.readdirSync(path));
+  const files = Array.from(Deno.readdirSync(config.migrationFolder));
 
   outputDebug(files, "Files in migration folder");
 
@@ -157,7 +167,7 @@ const migrate = async (client: Client) => {
 
   if (files.length > 0) {
     for await (const file of files) {
-      let { up } = await import(`${path}/${file.name}`);
+      let { up } = await import(`${config.migrationFolder}/${file.name}`);
 
       const schema = new Schema();
 
@@ -194,7 +204,7 @@ const rollback = async (client: Client) => {
     console.info("Nothing to rollback");
   } else {
     const fileName = result.rows[0][0];
-    let { down } = await import(`${path}/${fileName}`);
+    let { down } = await import(`${config.migrationFolder}/${fileName}`);
 
     const schema = new Schema();
 
