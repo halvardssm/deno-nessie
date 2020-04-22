@@ -3,7 +3,7 @@
 ![ci](https://github.com/halvardssm/deno-nessie/workflows/ci/badge.svg)
 [![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https/deno.land/x/nessie/mod.ts)
 
-A database migration tool for [deno](https://deno.land). Supports PostgreSQL, and soon: MySQL and SQLite. See [documentation](https://doc.deno.land/https/deno.land/x/nessie/mod.ts).
+A database migration tool for [deno](https://deno.land). Supports PostgreSQL and  MySQL, soon: SQLite. See [documentation](https://doc.deno.land/https/deno.land/x/nessie/mod.ts).
 
 ## Status / Roadmap
 
