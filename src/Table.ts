@@ -1,5 +1,6 @@
-import { Column, ColumnWithInput } from "./Column.ts";
+import { Column } from "./Column.ts";
 import { dbDialects } from "./Schema.ts";
+import { columnTypes, typeMap, typeMapEl } from "./TypeUtils.ts";
 
 export interface EnumColumn {
   name: string;
@@ -66,7 +67,23 @@ export class Table {
   }
 
   /** Helper method for pushing to column. */
-  private _pushColumn<T extends Column>(column: T): T {
+  private _pushColumn(
+    name: string,
+    type: columnTypes | string | typeMapEl,
+    input1?: number | string[],
+    input2?: number,
+    columnfn?: (column: Column) => Column | void,
+  ): Column {
+    if (typeof type !== "string") {
+      type = type[this.dialect];
+    }
+
+    const column = new Column(name, type, input1, input2, this.dialect);
+
+    if (columnfn) {
+      columnfn(column);
+    }
+
     this.columns.push(column);
     return column;
   }
@@ -165,11 +182,9 @@ export class Table {
 
   /** Adds a custom column to the table. */
   custom(string: string) {
-    if (!this.customColumns) {
-      this.customColumns = [string];
-    } else {
-      this.customColumns.push(string);
-    }
+    this.customColumns
+      ? this.customColumns.push(string)
+      : this.customColumns = [string];
   }
 
   /** Adds unique column(s) to the table. */
@@ -198,6 +213,8 @@ export class Table {
     return this;
   }
 
+  // ******* Integers *******
+
   /** Adds an `id` column to the table. Id is a bigint column with auto increment.*/
   id() {
     this.bigIncrements("id");
@@ -205,28 +222,129 @@ export class Table {
 
   /** Adds bigint column with auto increment to the table. */
   bigIncrements(name: string): Column {
-    return this._pushColumn(new Column(name, "bigserial"));
+    return this._pushColumn(
+      name,
+      typeMap.bigIncrements,
+      undefined,
+      undefined,
+      (col) => col.autoIncrement(),
+    );
   }
 
   /** Adds a bigint column to the table. */
   bigInteger(name: string): Column {
-    return this._pushColumn(new Column(name, "bigint"));
+    return this._pushColumn(name, typeMap.bigInteger);
   }
 
   /** Adds a binary column to the table. */
   binary(name: string): Column {
-    return this._pushColumn(new Column(name, "bytea"));
+    return this._pushColumn(name, typeMap.binary);
   }
 
-  /** Adds a boolean column to the table. */
-  boolean(name: string): Column {
-    return this._pushColumn(new Column(name, "boolean"));
+  /** Adds a bit column to the table. */
+  bit(name: string): Column {
+    return this._pushColumn(name, typeMap.bit);
   }
+
+  /** Adds a increments column to the table. */
+  increments(name: string): Column {
+    return this._pushColumn(
+      name,
+      typeMap.increments,
+      undefined,
+      undefined,
+      (col) => col.autoIncrement(),
+    );
+  }
+
+  /** Adds an integer column to the table. */
+  integer(name: string): Column {
+    return this._pushColumn(name, typeMap.integer);
+  }
+
+  /** Adds a small int column with auto increment to the table. */
+  smallIncrements(name: string): Column {
+    return this._pushColumn(
+      name,
+      typeMap.smallIncrements,
+      undefined,
+      undefined,
+      (col) => col.autoIncrement(),
+    );
+  }
+
+  /** Adds a small int column to the table. */
+  smallInteger(name: string): Column {
+    return this._pushColumn(name, typeMap.smallInteger);
+  }
+
+  // ******* Doubles *******
+
+  /** Adds a decimal column to the table. */
+  decimal(
+    name: string,
+    before: number = 8,
+    after: number = 2,
+  ): Column {
+    return this._pushColumn(
+      name,
+      typeMap.decimal,
+      before,
+      after,
+    );
+  }
+
+  /** Adds a double or 8-bit float column to the table. */
+  double(
+    name: string,
+    before: number = 8,
+    after: number = 2,
+  ): Column {
+    return this._pushColumn(
+      name,
+      typeMap.double,
+      before,
+      after,
+    );
+  }
+
+  /** Adds a real or 4-bit float column to the table. */
+  real(
+    name: string,
+    before: number = 8,
+    after: number = 2,
+  ): Column {
+    return this._pushColumn(
+      name,
+      typeMap.real,
+      before,
+      after,
+    );
+  }
+
+  /** Adds a money or decimal column to the table. */
+  money(name: string): Column {
+    return this._pushColumn(name, typeMap.money);
+  }
+
+  // ******* Strings *******
 
   /** Adds a char column with length to the table. */
-  char(name: string, length: number): ColumnWithInput {
-    return this._pushColumn(new ColumnWithInput(name, "character", length));
+  char(name: string, length: number): Column {
+    return this._pushColumn(name, typeMap.char, length);
   }
+
+  /** Adds a varchar column with length to the table. */
+  string(name: string, length: number): Column {
+    return this._pushColumn(name, typeMap.string, length);
+  }
+
+  /** Adds a text column to the table. */
+  text(name: string): Column {
+    return this._pushColumn(name, typeMap.text);
+  }
+
+  // ******* Dates *******
 
   /** Adds a `created_at` column to the table. */
   createdAt() {
@@ -240,14 +358,14 @@ export class Table {
 
   /** Adds a date column to the table. */
   date(name: string): Column {
-    return this._pushColumn(new Column(name, "date"));
+    return this._pushColumn(name, typeMap.date);
   }
 
   /** Adds a datetime column to the table. 
    * Postgres: timestamp
    * MySQL: datetime TODO
    */
-  dateTime(name: string, length: number = 0): ColumnWithInput {
+  dateTime(name: string, length: number = 0): Column {
     return this.timestamp(name, length);
   }
 
@@ -255,146 +373,35 @@ export class Table {
    * Postgres: timestamp
    * MySQL: datetime TODO
    */
-  dateTimeTz(name: string, length: number = 0): ColumnWithInput {
+  dateTimeTz(name: string, length: number = 0): Column {
     return this.timestampTz(name, length);
   }
 
-  /** Adds a decimal column to the table. */
-  decimal(
-    name: string,
-    before: number = 8,
-    after: number = 2,
-  ): ColumnWithInput {
-    return this._pushColumn(
-      new ColumnWithInput(name, "decimal", before, after),
-    );
-  }
-
-  /** Adds a double or 8-bit float column to the table. */
-  double(
-    name: string,
-    before: number = 8,
-    after: number = 2,
-  ): ColumnWithInput {
-    return this._pushColumn(new ColumnWithInput(name, "float8", before, after));
-  }
-
-  /** Adds an enum column to the table. */
-  enum(
-    name: string,
-    array: string[],
-    typeName: string = name,
-  ): ColumnWithInput {
-    const newEnum: EnumColumn = { name: typeName, columns: array };
-    if (!this.constraints.enums) {
-      this.constraints.enums = [newEnum];
-    }
-    this.constraints.enums?.push(newEnum);
-
-    return this._pushColumn(new ColumnWithInput(name, typeName, array));
-  }
-
-  /** Adds a real or 4-bit float column to the table. */
-  float( //TODO
-    name: string,
-    before: number = 8,
-    after: number = 2,
-  ): ColumnWithInput {
-    return this._pushColumn(new ColumnWithInput(name, "float4", before, after));
-  }
-
-  /** Adds a date column to the table. */
-  increments(name: string): Column {
-    return this._pushColumn(new Column(name, "serial"));
-  }
-
-  /** Adds an integer column to the table. */
-  integer(name: string): Column {
-    return this._pushColumn(new Column(name, "integer"));
-  }
-
-  /** Adds an ip address column to the table. */
-  ipAddress(name: string): Column {
-    return this._pushColumn(new Column(name, "inet"));
-  }
-
-  /** Adds a json column to the table. */
-  json(name: string): Column {
-    return this._pushColumn(new Column(name, "json"));
-  }
-
-  /** Adds a jsonb column to the table. */
-  jsonb(name: string): Column {
-    return this._pushColumn(new Column(name, "jsonb"));
-  }
-
-  /** Adds a mac address(8) column to the table. */
-  macAddress(name: string, isMacAddress8: boolean = false): Column {
-    return this._pushColumn(
-      new Column(name, `macaddr${isMacAddress8 ? "8" : ""}`),
-    );
-  }
-
-  /** Adds a mac address 8 column to the table. */
-  macAddress8(name: string): Column {
-    return this.macAddress(name, true);
-  }
-
-  /** Adds a point column to the table. */
-  point(name: string): Column {
-    return this._pushColumn(new Column(name, "point"));
-  }
-
-  /** Adds a polygon column to the table. */
-  polygon(name: string): Column {
-    return this._pushColumn(new Column(name, "polygon"));
-  }
-
-  /** Adds a small int column with auto increment to the table. */
-  smallIncrements(name: string): Column {
-    return this._pushColumn(new Column(name, "smallserial"));
-  }
-
-  /** Adds a small int column to the table. */
-  smallInteger(name: string): Column {
-    return this._pushColumn(new Column(name, "smallint"));
-  }
-
-  /** Adds a varchar column with length to the table. */
-  string(name: string, length: number): ColumnWithInput {
-    return this._pushColumn(new ColumnWithInput(name, "varchar", length));
-  }
-
-  /** Adds a text column to the table. */
-  text(name: string): Column {
-    return this._pushColumn(new Column(name, "text"));
-  }
-
   /** Adds a time column to the table. */
-  time(name: string, length: number = 0): ColumnWithInput {
-    return this._pushColumn(new ColumnWithInput(name, "time", length));
+  time(name: string, length: number = 0): Column {
+    return this._pushColumn(name, typeMap.time, length);
   }
 
   /** Adds a time column with timezone to the table. */
-  timeTz(name: string, length: number = 0): ColumnWithInput {
-    return this._pushColumn(new ColumnWithInput(name, "timetz", length));
+  timeTz(name: string, length: number = 0): Column {
+    return this._pushColumn(name, "timetz", length);
   }
 
   /** Adds a timestamp column to the table. */
-  timestamp(name: string, length: number = 0): ColumnWithInput {
-    return this._pushColumn(new ColumnWithInput(name, "timestamp", length));
+  timestamp(name: string, length: number = 0): Column {
+    return this._pushColumn(name, typeMap.timestamp, length);
   }
 
   /** Adds a timestamp column with timezone to the table. */
-  timestampTz(name: string, length: number = 0): ColumnWithInput {
-    return this._pushColumn(new ColumnWithInput(name, "timestamptz", length));
+  timestampTz(name: string, length: number = 0): Column {
+    return this._pushColumn(name, "timestamptz", length);
   }
 
   /** Adds timestamps columns to the table. 
-   * 
-   * Creates created_at and updated_at with defaults, 
-   * and updated_at with auto updating of current timestamp
-  */
+	   * 
+	   * Creates created_at and updated_at with defaults, 
+	   * and updated_at with auto updating of current timestamp
+	  */
   timestamps(): void {
     this.createdAt();
     this.updatedAt();
@@ -426,9 +433,81 @@ export class Table {
     this.constraints.updatedAt = true;
   }
 
+  // ******* Mathematical *******
+
+  /** Adds a point column to the table. */
+  point(name: string): Column {
+    return this._pushColumn(name, "point");
+  }
+
+  /** Adds a polygon column to the table. */
+  polygon(name: string): Column {
+    return this._pushColumn(name, "polygon");
+  }
+
+  // ******* Other *******
+
+  /** Adds a boolean column to the table. */
+  boolean(name: string): Column {
+    return this._pushColumn(
+      name,
+      typeMap.boolean,
+      this.dialect === "mysql" ? 1 : undefined,
+    );
+  }
+
+  /** Adds an enum column to the table. */
+  enum(
+    name: string,
+    array: string[],
+    typeName: string = name,
+  ): Column {
+    const newEnum: EnumColumn = { name: typeName, columns: array };
+    if (!this.constraints.enums) {
+      this.constraints.enums = [newEnum];
+    }
+    this.constraints.enums.push(newEnum);
+
+    return this._pushColumn(
+      name,
+      typeName,
+      undefined,
+      undefined,
+      (col) =>
+        this.dialect === "mysql"
+          ? col.custom(`ENUM(${array.join(", ")})`)
+          : col,
+    );
+  }
+
+  /** Adds an ip address column to the table. */
+  ipAddress(name: string): Column {
+    return this._pushColumn(name, "inet");
+  }
+
+  /** Adds a json column to the table. */
+  json(name: string): Column {
+    return this._pushColumn(name, "json");
+  }
+
+  /** Adds a jsonb column to the table. */
+  jsonb(name: string): Column {
+    return this._pushColumn(name, "jsonb");
+  }
+
+  /** Adds a mac address(8) column to the table. */
+  macAddress(name: string, isMacAddress8: boolean = false): Column {
+    return this._pushColumn(name, `macaddr${isMacAddress8 ? "8" : ""}`);
+  }
+
+  /** Adds a mac address 8 column to the table. */
+  macAddress8(name: string): Column {
+    return this.macAddress(name, true);
+  }
+
   /** Adds an uuid column to the table. */
   uuid(name: string): Column {
-    return this._pushColumn(new Column(name, "uuid"));
+    return this._pushColumn(name, "uuid");
   }
 }
 

@@ -1,5 +1,5 @@
 import { assertEquals } from "https://deno.land/std@v0.34.0/testing/asserts.ts";
-import { Column, ColumnWithInput } from "../mod.ts";
+import { Column } from "../mod.ts";
 
 const strings = [
   {
@@ -46,16 +46,16 @@ const strings = [
     solution: "testName testType default testDefault",
   },
   {
-    name: "ColumnWithInput 1 input",
-    string: new ColumnWithInput("testName", "testType", 1)
+    name: "Column 1 input",
+    string: new Column("testName", "testType", 1)
       .default("testDefault")
       .notNullable()
       .toSql(),
     solution: "testName testType (1) default testDefault not null",
   },
   {
-    name: "ColumnWithInput 2 input",
-    string: new ColumnWithInput("testName", "testType", 1, 2)
+    name: "Column 2 input",
+    string: new Column("testName", "testType", 1, 2)
       .default("testDefault")
       .notNullable()
       .toSql(),
@@ -63,7 +63,7 @@ const strings = [
   },
   {
     name: "Column with default and nullable",
-    string: new ColumnWithInput("testName", "testType", ["one", "two", "three"])
+    string: new Column("testName", "testType", ["one", "two", "three"])
       .default("testDefault")
       .notNullable()
       .toSql(),

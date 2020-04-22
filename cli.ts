@@ -1,18 +1,17 @@
 import Denomander from "https://deno.land/x/denomander/mod.ts";
 import { Client } from "https://deno.land/x/postgres/mod.ts";
-import { Schema } from "./mod.ts";
 import { QueryResult } from "https://deno.land/x/postgres/query.ts";
+import { Schema } from "./mod.ts";
 const TABLE_NAME_MIGRATIONS = "nessie_migrations";
 const COL_FILE_NAME = "file_name";
 const COL_CREATED_AT = "created_at";
-import { Client as msql } from "https://deno.land/x/mysql/mod.ts";
 
 const program = new Denomander(
   {
-    app_name: "Migrating Denosaurs",
+    app_name: "Nessie Migrations",
     app_description:
-      "A micro database migration tool for deno. Currently only support for PostgreSQL",
-    app_version: "0.0.1",
+      "A micro database migration tool for deno. Currently can only migrate to Postgres",
+    app_version: "0.1.0",
   },
 );
 
@@ -157,7 +156,7 @@ const migrate = async (client: Client) => {
   outputDebug(files, "Files after filter and sort");
 
   if (files.length > 0) {
-    for (const file of files) {
+    for await (const file of files) {
       let { up } = await import(`${path}/${file.name}`);
 
       const schema = new Schema();

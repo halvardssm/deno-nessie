@@ -1,7 +1,7 @@
 import { assertEquals } from "https://deno.land/std@v0.34.0/testing/asserts.ts";
 import { Table } from "../mod.ts";
 
-const strings = [
+const pgStrings = [
   {
     name: "Standard Table",
     string: new Table("testName")
@@ -152,7 +152,7 @@ const strings = [
       table.char("testCol", 1);
       return table.toSql();
     })(),
-    solution: "CREATE TABLE testName (testCol character (1));",
+    solution: "CREATE TABLE testName (testCol char (1));",
   },
   {
     name: "Table with createdAt",
@@ -193,15 +193,6 @@ const strings = [
     solution: "CREATE TABLE testName (testCol timestamp (0));",
   },
   {
-    name: "Table with dateTimeTz",
-    string: (() => {
-      const table = new Table("testName");
-      table.dateTimeTz("testCol");
-      return table.toSql();
-    })(),
-    solution: "CREATE TABLE testName (testCol timestamptz (0));",
-  },
-  {
     name: "Table with decimal",
     string: (() => {
       const table = new Table("testName");
@@ -227,16 +218,16 @@ const strings = [
       return table.toSql();
     })(),
     solution:
-      "CREATE TYPE testCol AS ENUM (one, two, three);CREATE TABLE testName (testCol testCol (one,two,three));",
+      "CREATE TYPE testCol AS ENUM (one, two, three);CREATE TABLE testName (testCol testCol);",
   },
   {
     name: "Table with float",
     string: (() => {
       const table = new Table("testName");
-      table.float("testCol");
+      table.real("testCol");
       return table.toSql();
     })(),
-    solution: "CREATE TABLE testName (testCol float4 (8, 2));",
+    solution: "CREATE TABLE testName (testCol real (8, 2));",
   },
   {
     name: "Table with increments",
@@ -452,9 +443,9 @@ const strings = [
   },
 ];
 
-strings.forEach(({ name, string, solution }) =>
+pgStrings.forEach(({ name, string, solution }) =>
   Deno.test({
-    name: name || "Empty",
+    name: "PG: " + (name || "Empty"),
     fn(): void {
       assertEquals(string, solution);
     },
