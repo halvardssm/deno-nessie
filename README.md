@@ -12,12 +12,19 @@ A database migration tool for [deno](https://deno.land) inspired by [Laravel](ht
 
 * [x] CLI communicates with db and tracks migrations using a table
 * [x] CLI can rollback a migration
-* [ ] CLI can migrate and rollback multiple files (currently only migrate multiple files)
-* [ ] Add support for seed files
 * [x] Rework the codebase to have a cleaner interface and chained opperations
-* [ ] Add support for soft deletes
 * [x] Add support for env or settings file
 * [x] Add tests
+* [ ] CLI can migrate and rollback multiple files (currently only migrate multiple files)
+* [ ] Add support for seed files
+* [ ] Add support for soft deletes
+* [ ] Add rename method for table
+* [ ] Add rename method for column
+* [ ] Add drop method for column
+* [ ] Add unsigned method for integers
+* [ ] Add alter method for schema
+* [ ] Add support for foreign key contraints
+* [ ] Add integration test with databases
 
 ## Supported databases
 
