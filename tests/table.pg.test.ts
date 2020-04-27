@@ -116,7 +116,7 @@ const pgStrings = [
       table.id();
       return table.toSql();
     })(),
-    solution: "CREATE TABLE testName (id bigserial);",
+    solution: "CREATE TABLE testName (id bigserial PRIMARY KEY);",
   },
   {
     name: "Table with bigIncrements",

@@ -116,7 +116,7 @@ const mySqlStrings = [
       table.id();
       return table.toSql();
     })(),
-    solution: "CREATE TABLE testName (id bigint AUTO_INCREMENT);",
+    solution: "CREATE TABLE testName (id bigint AUTO_INCREMENT PRIMARY KEY);",
   },
   {
     name: "Table with bigIncrements",

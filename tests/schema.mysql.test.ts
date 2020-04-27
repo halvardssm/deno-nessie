@@ -12,7 +12,7 @@ const strings = [
       });
     })(),
     solution:
-      "CREATE TABLE testTable (id bigint AUTO_INCREMENT, created_at timestamp (0) default current_timestamp, updated_at timestamp (0) default current_timestamp on update current_timestamp);",
+      "CREATE TABLE testTable (id bigint AUTO_INCREMENT PRIMARY KEY, created_at timestamp (0) default current_timestamp, updated_at timestamp (0) default current_timestamp on update current_timestamp);",
   },
   {
     name: "Schema drop",
