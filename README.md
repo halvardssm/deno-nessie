@@ -8,7 +8,7 @@ A database migration tool for [deno](https://deno.land) inspired by [Laravel](ht
 ## Supported databases
 
 * [x] PostgreSQL
-* [x] MySQL
+* [x] MySQL - See [Deno MySQL](https://deno.land/x/mysql/) for version support
 * [ ] SQLite - in progress
 
 If you have a database system you would like to see in this list, feel free to make an issue or create a pr with your implementation.

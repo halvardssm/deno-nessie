@@ -1,20 +1,18 @@
 import {
-	TABLE_MIGRATIONS,
 	ClientI,
-	QUERY_GET_LATEST,
-	filterAndSortFiles,
 	traverseAndMigrateFiles,
 	traverseAndRollbackFiles,
+	QUERY_GET_LATEST,
+	filterAndSortFiles,
+	TABLE_MIGRATIONS,
 	queryHandler,
+	COL_FILE_NAME,
 } from "./utils.ts";
-import Schema from "../src/Schema.ts";
-import { Client } from "https://deno.land/x/postgres/client.ts";
 import { State } from "./state.ts";
+import { Client } from "https://deno.land/x/mysql/src/client.ts";
+import Schema from "../src/Schema.ts";
 
-const QUERY_TRIGGER_UPDATE_AT =
-	"CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now(); RETURN NEW; END; $$ language 'plpgsql';";
-
-export class PGSQL implements ClientI {
+export class MySQL implements ClientI {
 	private state: State;
 	private client: Client;
 
@@ -52,7 +50,7 @@ export class PGSQL implements ClientI {
 
 		await traverseAndRollbackFiles(
 			this.state,
-			result.rows?.[0]?.[0],
+			result[0][COL_FILE_NAME],
 			async (query) =>
 				await queryHandler(
 					query,
@@ -63,27 +61,24 @@ export class PGSQL implements ClientI {
 	}
 
 	async close() {
-		await this.client.end();
+		await this.client.close();
 	}
 
 	private async _setupDatabase() {
-		const hasTableString = new Schema(this.state.dialect).hasTable(
-			TABLE_MIGRATIONS,
-		);
+		const hasTableString = new Schema(this.state.dialect)
+			.hasTable(TABLE_MIGRATIONS);
+		this.state.debug(hasTableString, "Has migration table result");
 
 		const hasMigrationTable = await this.client.query(hasTableString);
 
 		this.state.debug(hasMigrationTable, "Has migration table result");
 
-		const migrationTableExists =
-			hasMigrationTable.rows[0][0] === TABLE_MIGRATIONS;
+		const migrationTableExists = hasMigrationTable.rows?.[0] !== null;
 
 		this.state.debug(migrationTableExists, "Migration table exsists");
 
 		if (!migrationTableExists) {
 			const schema = new Schema(this.state.dialect);
-
-			await this.client.query(QUERY_TRIGGER_UPDATE_AT);
 
 			let sql = schema.create(TABLE_MIGRATIONS, (table) => {
 				table.id();
