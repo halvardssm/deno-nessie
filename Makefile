@@ -15,7 +15,7 @@ rollback:
 	deno run --allow-net --allow-read cli.ts rollback -c ${CONFIG_FILE}
 
 test:
-	deno test tests
+	deno test --allow-write --allow-run
 
 db-all-restart: db-all-stop db-all-start
 db-all-start: db-pg-start db-mysql-start db-sqlite-start
@@ -31,6 +31,6 @@ db-mysql-stop:
 	docker kill ${DB_NAME}-mysql
 	rm -rf tests/data/mysql
 db-sqlite-start:
-	touch tests/data/sqlite.db
+	mkdir -p tests/data && touch tests/data/sqlite.db
 db-sqlite-stop:
 	rm -rf tests/data/sqlite.db

@@ -30,6 +30,7 @@ const runner = async (type: string) => {
 
   if (code === 0) {
     const rawOutput = await r.output();
+    r.close();
     return decoder.decode(rawOutput);
   } else {
     return `Code was ${code}`;
