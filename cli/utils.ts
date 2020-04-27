@@ -13,124 +13,124 @@ export const REGEX_MIGRATION_FILE_NAME = /^\d{10,14}-.+.ts$/;
 let regexFileName = new RegExp(REGEX_MIGRATION_FILE_NAME);
 
 export const QUERY_GET_LATEST =
-	`select ${COL_FILE_NAME} from ${TABLE_MIGRATIONS} order by ${COL_CREATED_AT} desc limit 1`;
+  `select ${COL_FILE_NAME} from ${TABLE_MIGRATIONS} order by ${COL_CREATED_AT} desc limit 1`;
 export const QUERY_INSERT = (fileName: string) =>
-	`INSERT INTO ${TABLE_MIGRATIONS} (${COL_FILE_NAME}) VALUES ('${fileName}');`;
+  `INSERT INTO ${TABLE_MIGRATIONS} (${COL_FILE_NAME}) VALUES ('${fileName}');`;
 export const QUERY_DELETE = (fileName: string) =>
-	`DELETE FROM ${TABLE_MIGRATIONS} WHERE ${COL_FILE_NAME} = '${fileName}';`;
+  `DELETE FROM ${TABLE_MIGRATIONS} WHERE ${COL_FILE_NAME} = '${fileName}';`;
 
 export interface ClientI {
-	rollback: () => void;
-	migrate: () => void;
-	close: () => void;
+  rollback: () => void;
+  migrate: () => void;
+  close: () => void;
 }
 
 export type ClientTypes = {
-	pg?: PGClient;
-	mysql?: MySQLClient;
-	sqlite?: SQLiteClient;
+  pg?: PGClient;
+  mysql?: MySQLClient;
+  sqlite?: SQLiteClient;
 };
 
 export const filterAndSortFiles = (
-	files: Deno.DirEntry[],
-	queryResult: any[],
+  files: Deno.DirEntry[],
+  queryResult: any[],
 ): Deno.DirEntry[] => {
-	return files.filter((file: Deno.DirEntry): boolean => {
-		if (!regexFileName.test(file.name)) return false;
+  return files.filter((file: Deno.DirEntry): boolean => {
+    if (!regexFileName.test(file.name)) return false;
 
-		if (queryResult === undefined || queryResult[0] === undefined) return true;
+    if (queryResult === undefined || queryResult[0] === undefined) return true;
 
-		return parseInt(file.name.split("-")[0]) >
-			new Date(queryResult[0][0]).getTime();
-	})
-		.sort((a, b) => parseInt(b?.name ?? "0") - parseInt(a?.name ?? "0"));
+    return parseInt(file.name.split("-")[0]) >
+      new Date(queryResult[0][0]).getTime();
+  })
+    .sort((a, b) => parseInt(b?.name ?? "0") - parseInt(a?.name ?? "0"));
 };
 
 export const traverseAndMigrateFiles = async (
-	state: State,
-	files: Deno.DirEntry[],
-	queryfn: (query: string) => any,
+  state: State,
+  files: Deno.DirEntry[],
+  queryfn: (query: string) => any,
 ) => {
-	if (files.length > 0) {
-		for await (const file of files) {
-			let { up } = await import(`${state.migrationFolder}/${file.name}`);
+  if (files.length > 0) {
+    for await (const file of files) {
+      let { up } = await import(`${state.migrationFolder}/${file.name}`);
 
-			const schema = new Schema(state.dialect);
+      const schema = new Schema(state.dialect);
 
-			await up(schema);
+      await up(schema);
 
-			let query = schema.query;
+      let query = schema.query;
 
-			query += QUERY_INSERT(file.name);
+      query += QUERY_INSERT(file.name);
 
-			state.debug(query, "Migration query");
+      state.debug(query, "Migration query");
 
-			const result = await queryHandler(
-				query,
-				state,
-				async (query) => await queryfn(query),
-			);
+      const result = await queryHandler(
+        query,
+        state,
+        async (query) => await queryfn(query),
+      );
 
-			console.info(`Migrated ${file.name}`);
+      console.info(`Migrated ${file.name}`);
 
-			state.debug(result, "Migrations");
-		}
+      state.debug(result, "Migrations");
+    }
 
-		console.info("Migration complete");
-	} else {
-		console.info("Nothing to migrate");
-	}
+    console.info("Migration complete");
+  } else {
+    console.info("Nothing to migrate");
+  }
 };
 
 export const traverseAndRollbackFiles = async (
-	state: State,
-	fileName: string | undefined,
-	queryfn: (query: string) => any,
+  state: State,
+  fileName: string | undefined,
+  queryfn: (query: string) => any,
 ) => {
-	if (typeof fileName === "string") {
-		let { down } = await import(`${state.migrationFolder}/${fileName}`);
+  if (typeof fileName === "string") {
+    let { down } = await import(`${state.migrationFolder}/${fileName}`);
 
-		const schema = new Schema(state.dialect);
+    const schema = new Schema(state.dialect);
 
-		await down(schema);
+    await down(schema);
 
-		let query = schema.query;
+    let query = schema.query;
 
-		state.debug(query, "Rollback query");
+    state.debug(query, "Rollback query");
 
-		query += QUERY_DELETE(fileName);
+    query += QUERY_DELETE(fileName);
 
-		await queryfn(query);
+    await queryfn(query);
 
-		console.info(`Rolled back ${fileName}`);
-	} else {
-		console.info("Nothing to rollback");
-	}
+    console.info(`Rolled back ${fileName}`);
+  } else {
+    console.info("Nothing to rollback");
+  }
 };
 
 export const queryHandler = async (
-	queryString: string,
-	state: State,
-	queryfn: (query: string) => any,
+  queryString: string,
+  state: State,
+  queryfn: (query: string) => any,
 ) => {
-	const queries = queryString.trim().split(";");
+  const queries = queryString.trim().split(";");
 
-	if (queries[queries.length - 1]?.trim() === "") queries.pop();
+  if (queries[queries.length - 1]?.trim() === "") queries.pop();
 
-	state.debug(queries, "Queries");
+  state.debug(queries, "Queries");
 
-	const results = [];
+  const results = [];
 
-	for (let query of queries) {
-		query = query.trim();
-		state.debug(query, "Query");
+  for (let query of queries) {
+    query = query.trim();
+    state.debug(query, "Query");
 
-		const result = await queryfn(query + ";");
+    const result = await queryfn(query + ";");
 
-		results.push(result);
-	}
+    results.push(result);
+  }
 
-	state.debug(results, "Query result");
+  state.debug(results, "Query result");
 
-	return results;
+  return results;
 };
