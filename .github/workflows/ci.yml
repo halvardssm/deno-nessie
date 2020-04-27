@@ -6,15 +6,45 @@ jobs:
   test:
     name: test migrating denosaurs on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
+
+	services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: pwd
+          POSTGRES_DB: nessie
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5000:5432
+      mysql:
+        image: mysql
+        env:
+          MYSQL_ROOT_PASSWORD: pwd
+          MYSQL_DATABASE: nessie
+        options: >-
+		  --health-cmd="mysqladmin ping"
+		  --health-interval=10s
+		  --health-timeout=5s
+		  --health-retries=3
+        ports:
+          - 5001:3306
+
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     steps:
-      - name: clone repo
+      - name: Clone repo
         uses: actions/checkout@master
-      - name: install deno
+      - name: Install deno
         uses: denolib/setup-deno@master
       - name: Check formatting
         run: deno fmt --check
-      - name: run tests
-        run: deno test
+	  - name: Create SQLite db
+	  	run: make db-sqlite-start
+      - name: Run tests
+        run: deno test --allow-write --allow-run
