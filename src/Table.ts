@@ -139,6 +139,8 @@ export class Table {
     if (!uniqueString) return "";
 
     switch (this.dialect) {
+      case "sqlite":
+        return "";
       case "mysql":
       case "pg":
       default:
@@ -163,9 +165,11 @@ export class Table {
     switch (this.dialect) {
       case "mysql":
         return "";
+      case "sqlite":
+        return ` DROP TRIGGER IF EXISTS set_timestamp; CREATE TRIGGER set_timestamp BEFORE UPDATE ON ${this.tableName} FOR EACH ROW BEGIN UPDATE ${this.tableName} SET updated_at = CURRENT_TIMESTAMP WHERE id=OLD.id\\; END;`;
       case "pg":
       default:
-        return ` DROP TRIGGER IF EXISTS set_timestamp on some_table; CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.${this.tableName} FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();`;
+        return ` DROP TRIGGER IF EXISTS set_timestamp on public.${this.tableName}; CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.${this.tableName} FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();`;
     }
   }
 
@@ -362,17 +366,17 @@ export class Table {
   }
 
   /** Adds a datetime column to the table. 
-	 * Postgres: timestamp
-	 * MySQL: datetime TODO
-	 */
+	   * Postgres: timestamp
+	   * MySQL: datetime
+	   */
   dateTime(name: string, length: number = 0): Column {
     return this.timestamp(name, length);
   }
 
   /** Adds a datetime column with timezone to the table. 
-	 * Postgres: timestamp
-	 * MySQL: datetime TODO
-	 */
+	   * Postgres: timestamp
+	   * MySQL: datetime
+	   */
   dateTimeTz(name: string, length: number = 0): Column {
     return this.timestampTz(name, length);
   }
@@ -398,20 +402,20 @@ export class Table {
   }
 
   /** Adds timestamps columns to the table. 
-		 * 
-		 * Creates created_at and updated_at with defaults, 
-		 * and updated_at with auto updating of current timestamp
-		*/
+	   * 
+	   * Creates created_at and updated_at with defaults, 
+	   * and updated_at with auto updating of current timestamp
+	   */
   timestamps(): void {
     this.createdAt();
     this.updatedAt();
   }
 
   /** Adds timestamps columns with timezone to the table. 
-	 * 
-	 * Creates created_at and updated_at with defaults, 
-	 * and updated_at with auto updating of current timestamp
-	*/
+	   * 
+	   * Creates created_at and updated_at with defaults, 
+	   * and updated_at with auto updating of current timestamp
+	   */
   timestampsTz(): void {
     this.createdAtTz();
     this.updatedAtTz();

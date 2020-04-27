@@ -11,6 +11,7 @@ import { IConnectionParams } from "https://deno.land/x/postgres/connection_param
 import { PGSQL } from "./pgsql.ts";
 import { ClientTypes, ClientI } from "./utils.ts";
 import { MySQL } from "./mysql.ts";
+import { SQLite } from "./sqlite.ts";
 
 export class State {
   private enableDebug: boolean;
@@ -81,6 +82,7 @@ export class State {
 
       case "sqlite":
         client = await open((this.connection as string));
+        this.client = new SQLite(this, client);
         break;
 
       case "pg":

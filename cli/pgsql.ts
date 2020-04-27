@@ -34,7 +34,7 @@ export class PGSQL implements ClientI {
 
     this.state.debug(result, "Latest migration");
 
-    files = filterAndSortFiles(files, result.rows);
+    files = filterAndSortFiles(files, result.rows?.[0]);
 
     this.state.debug(files, "Files after filter and sort");
 

@@ -33,15 +33,15 @@ export type ClientTypes = {
 
 export const filterAndSortFiles = (
   files: Deno.DirEntry[],
-  queryResult: any[],
+  queryResult: string | undefined,
 ): Deno.DirEntry[] => {
   return files.filter((file: Deno.DirEntry): boolean => {
     if (!regexFileName.test(file.name)) return false;
 
-    if (queryResult === undefined || queryResult[0] === undefined) return true;
+    if (queryResult === undefined) return true;
 
     return parseInt(file.name.split("-")[0]) >
-      new Date(queryResult[0][0]).getTime();
+      new Date(queryResult).getTime();
   })
     .sort((a, b) => parseInt(b?.name ?? "0") - parseInt(a?.name ?? "0"));
 };
@@ -113,7 +113,7 @@ export const queryHandler = async (
   state: State,
   queryfn: (query: string) => any,
 ) => {
-  const queries = queryString.trim().split(";");
+  const queries = queryString.trim().split(/(?<!\\);/);
 
   if (queries[queries.length - 1]?.trim() === "") queries.pop();
 
@@ -122,7 +122,7 @@ export const queryHandler = async (
   const results = [];
 
   for (let query of queries) {
-    query = query.trim();
+    query = query.trim().replace("\\;", ";");
     state.debug(query, "Query");
 
     const result = await queryfn(query + ";");
