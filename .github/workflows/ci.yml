@@ -14,5 +14,7 @@ jobs:
         uses: actions/checkout@master
       - name: install deno
         uses: denolib/setup-deno@master
+      - name: Check formatting
+        run: deno fmt --check
       - name: run tests
         run: deno test
