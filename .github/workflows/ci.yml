@@ -7,7 +7,7 @@ jobs:
     name: test migrating denosaurs on ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
 
-	services:
+    services:
       postgres:
         image: postgres
         env:
@@ -27,10 +27,10 @@ jobs:
           MYSQL_ROOT_PASSWORD: pwd
           MYSQL_DATABASE: nessie
         options: >-
-		  --health-cmd="mysqladmin ping"
-		  --health-interval=10s
-		  --health-timeout=5s
-		  --health-retries=3
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
         ports:
           - 5001:3306
 
@@ -44,7 +44,7 @@ jobs:
         uses: denolib/setup-deno@master
       - name: Check formatting
         run: deno fmt --check
-	  - name: Create SQLite db
-	  	run: make db-sqlite-start
+      - name: Create SQLite db
+        run: make db-sqlite-start
       - name: Run tests
         run: deno test --allow-write --allow-run
