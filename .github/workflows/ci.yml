@@ -1,18 +1,47 @@
 name: ci
 
-on: [push, pull_request, release]
+on: [ pull_request, release ]
 
 jobs:
   test:
-    name: test migrating denosaurs on ${{ matrix.os }}
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+    name: Nessie Migrations CI
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: pwd
+          POSTGRES_DB: nessie
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5000:5432
+      mysql:
+        image: mysql
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: true
+          MYSQL_DATABASE: nessie
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        ports:
+          - 5001:3306
+
     steps:
-      - name: clone repo
+      - name: Clone repo
         uses: actions/checkout@master
-      - name: install deno
+      - name: Install deno
         uses: denolib/setup-deno@master
-      - name: run tests
-        run: deno test
+      - name: Check formatting
+        run: deno fmt --check
+      - name: Create SQLite db
+        run: make db-sqlite-start
+      - name: Run tests
+        run: make test

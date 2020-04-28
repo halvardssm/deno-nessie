@@ -12,6 +12,8 @@ export class Column {
   private defaultValue?: string;
   private customCol?: string;
   private isAutoIncrement: boolean = false;
+  private isPrimary: boolean = false;
+  private isUnique: boolean = false;
 
   constructor(
     name: string,
@@ -56,11 +58,29 @@ export class Column {
       string += " AUTO_INCREMENT";
     }
 
+    if (this.isPrimary) {
+      string += " PRIMARY KEY";
+    }
+
+    if (this.isUnique) {
+      string += " UNIQUE";
+    }
+
     if (this.customCol) {
       string += ` ${this.customCol}`;
     }
 
     return string;
+  }
+
+  /** Adds primary key to the column string */
+  primary() {
+    this.isPrimary = true;
+  }
+
+  /** Adds unique constraint to the column string */
+  unique() {
+    this.isUnique = true;
   }
 
   /** Adds custom attributes to the column string */

@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std@v0.34.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
 import { Table } from "../mod.ts";
 
 const mySqlStrings = [
@@ -116,7 +116,7 @@ const mySqlStrings = [
       table.id();
       return table.toSql();
     })(),
-    solution: "CREATE TABLE testName (id bigint AUTO_INCREMENT);",
+    solution: "CREATE TABLE testName (id bigint AUTO_INCREMENT PRIMARY KEY);",
   },
   {
     name: "Table with bigIncrements",

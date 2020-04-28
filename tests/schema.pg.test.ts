@@ -1,5 +1,5 @@
 import { Schema } from "../mod.ts";
-import { assertEquals } from "https://deno.land/std@v0.34.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
 
 const strings = [
   {
@@ -12,7 +12,7 @@ const strings = [
       });
     })(),
     solution:
-      "CREATE TABLE testTable (id bigserial, created_at timestamp (0) default current_timestamp, updated_at timestamp (0) default current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on some_table; CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.testTable FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
+      "CREATE TABLE testTable (id bigserial PRIMARY KEY, created_at timestamp (0) default current_timestamp, updated_at timestamp (0) default current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on public.testTable; CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.testTable FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
   },
   {
     name: "Schema drop",
@@ -48,14 +48,14 @@ const strings = [
   },
   {
     name: "Schema hasTable",
-    string: Schema.hasTable("testTable"),
+    string: new Schema().hasTable("testTable"),
     solution: "SELECT to_regclass('testTable');",
   },
 ];
 
 strings.forEach(({ name, string, solution }) =>
   Deno.test({
-    name: name || "Empty",
+    name: "PG: " + (name || "Empty"),
     fn(): void {
       assertEquals(string, solution);
     },

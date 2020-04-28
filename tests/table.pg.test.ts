@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std@v0.34.0/testing/asserts.ts";
+import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
 import { Table } from "../mod.ts";
 
 const pgStrings = [
@@ -116,7 +116,7 @@ const pgStrings = [
       table.id();
       return table.toSql();
     })(),
-    solution: "CREATE TABLE testName (id bigserial);",
+    solution: "CREATE TABLE testName (id bigserial PRIMARY KEY);",
   },
   {
     name: "Table with bigIncrements",
@@ -390,7 +390,7 @@ const pgStrings = [
       return table.toSql();
     })(),
     solution:
-      "CREATE TABLE testName (created_at timestamp (0) default current_timestamp, updated_at timestamp (0) default current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on some_table; CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.testName FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
+      "CREATE TABLE testName (created_at timestamp (0) default current_timestamp, updated_at timestamp (0) default current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on public.testName; CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.testName FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
   },
   {
     name: "Table with timestampsTz",
@@ -400,7 +400,7 @@ const pgStrings = [
       return table.toSql();
     })(),
     solution:
-      "CREATE TABLE testName (created_at timestamptz (0) default current_timestamp, updated_at timestamptz (0) default current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on some_table; CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.testName FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
+      "CREATE TABLE testName (created_at timestamptz (0) default current_timestamp, updated_at timestamptz (0) default current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on public.testName; CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.testName FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
   },
   {
     name: "Table with updatedAt",
@@ -410,17 +410,7 @@ const pgStrings = [
       return table.toSql();
     })(),
     solution:
-      "CREATE TABLE testName (updated_at timestamp (0) default current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on some_table; CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.testName FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
-  },
-  {
-    name: "Table with updatedAt mysql",
-    string: (() => {
-      const table = new Table("testName", "mysql");
-      table.updatedAt();
-      return table.toSql();
-    })(),
-    solution:
-      "CREATE TABLE testName (updated_at timestamp (0) default current_timestamp on update current_timestamp);",
+      "CREATE TABLE testName (updated_at timestamp (0) default current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on public.testName; CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.testName FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
   },
   {
     name: "Table with updatedAtTz",
@@ -430,7 +420,7 @@ const pgStrings = [
       return table.toSql();
     })(),
     solution:
-      "CREATE TABLE testName (updated_at timestamptz (0) default current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on some_table; CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.testName FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
+      "CREATE TABLE testName (updated_at timestamptz (0) default current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on public.testName; CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.testName FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
   },
   {
     name: "Table with text",

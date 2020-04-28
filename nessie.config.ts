@@ -1,43 +1,59 @@
 import { dbDialects } from "./mod.ts";
+import { IConnectionParams } from "https://deno.land/x/postgres/connection_params.ts";
+import { ClientConfig } from "https://deno.land/x/mysql/src/client.ts";
 
-export type nessieConnectionType = {
+export interface nessieConnection {
   host: string | "localhost" | "127.0.0.1";
   port: string | number;
   name: string;
   user: string;
   password?: string;
-  dialect?: dbDialects;
-};
-export type _nessieConnectionType = {
-  host: string | "localhost" | "127.0.0.1";
-  port: string;
-  name: string;
-  user: string;
-  password?: string;
-  dialect: dbDialects;
-};
-export type nessieConfigType = {
+}
+
+export interface nessieConfig {
+  connection: IConnectionParams | string | ClientConfig;
   migrationFolder?: string;
-  connection: nessieConnectionType;
-  args?: object;
-};
+  dialect?: dbDialects;
+}
 
-export type _nessieConfigType = {
+export interface _nessieConfig {
   migrationFolder: string;
-  connection: _nessieConnectionType;
-  args?: object;
-};
+  dialect: dbDialects;
+  connection: {
+    pg?: IConnectionParams | string;
+    mysql?: ClientConfig;
+    sqlite?: string;
+  };
+}
 
-const config: nessieConfigType = {
-  migrationFolder: `${Deno.cwd()}/migrations`,
+const configPg: nessieConfig = {
+  migrationFolder: `${Deno.cwd()}/tests/migrations`,
   connection: {
     host: "localhost",
-    port: 5000,
+    port: "5000",
     user: "root",
     password: "pwd",
-    name: "nessie",
-    dialect: "pg",
+    database: "nessie",
   },
+  dialect: "pg",
 };
 
-export default config;
+const configMySql: nessieConfig = {
+  migrationFolder: `${Deno.cwd()}/tests/migrations`,
+  connection: {
+    hostname: "localhost",
+    port: 5001,
+    username: "root",
+    // password: "pwd", // uncomment this line for <8
+    db: "nessie",
+  },
+  dialect: "mysql",
+};
+
+const configSqLite: nessieConfig = {
+  migrationFolder: `${Deno.cwd()}/tests/migrations`,
+  connection: `tests/data/sqlite.db`,
+  dialect: "sqlite",
+};
+
+export default configPg;
