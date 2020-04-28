@@ -1,7 +1,7 @@
 import { nessieConfig } from "../../nessie.config.ts";
 
 const configPg: nessieConfig = {
-  migrationFolder: `${Deno.cwd()}/../migrations`,
+  migrationFolder: `${Deno.cwd()}/tests/migrations`,
   connection: {
     host: "localhost",
     port: "5000",

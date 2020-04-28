@@ -4,18 +4,21 @@ DB_USER=root
 DB_PWD=pwd
 DB_NAME=nessie
 
-CONFIG_FILE=./nessie.config.ts
+CONFIG_FILE=./tests/config/mysql.config.ts
 DB_URL=postgres://${DB_USER}:${DB_PWD@localhost:${DB_PG_PORT}/${DB_NAME}
 
 migration-%:
 	deno run --allow-write --allow-read cli.ts make $* -c ${CONFIG_FILE}
 migrate:
-	deno run --allow-net --allow-read cli.ts migrate -c ${CONFIG_FILE}
+	deno run --allow-net --allow-read cli.ts migrate -c ${CONFIG_FILE} -d
 rollback:
 	deno run --allow-net --allow-read cli.ts rollback -c ${CONFIG_FILE}
 
 test:
 	deno test --allow-write --allow-run
+test-clean: db-all-restart sleeper test
+sleeper:
+	sleep 30s
 
 db-all-restart: db-all-stop db-all-start
 db-all-start: db-pg-start db-mysql-start db-sqlite-start
@@ -26,7 +29,8 @@ db-pg-stop:
 	docker kill ${DB_NAME}-pg
 	rm -rf tests/data/pg
 db-mysql-start:
-	docker run -d -p $(DB_MYSQL_PORT):3306 -e MYSQL_ROOT_PASSWORD=$(DB_PWD) -e MYSQL_DATABASE=${DB_NAME} -v `pwd`/tests/data/mysql:/var/lib/mysql --rm --name $(DB_NAME)-mysql mysql:5
+	# docker run -d -p $(DB_MYSQL_PORT):3306 -e MYSQL_ROOT_PASSWORD=$(DB_PWD) -e MYSQL_DATABASE=${DB_NAME} -v `pwd`/tests/data/mysql:/var/lib/mysql --rm --name $(DB_NAME)-mysql mysql:5
+	docker run -d -p $(DB_MYSQL_PORT):3306 -e MYSQL_ALLOW_EMPTY_PASSWORD=true -e MYSQL_DATABASE=${DB_NAME} -v `pwd`/tests/data/mysql:/var/lib/mysql --rm --name $(DB_NAME)-mysql mysql:latest
 db-mysql-stop:
 	docker kill ${DB_NAME}-mysql
 	rm -rf tests/data/mysql

@@ -32,7 +32,7 @@ export class MySQL implements ClientI {
 
     this.state.debug(result, "Latest migration");
 
-    files = filterAndSortFiles(files, result.rows);
+    files = filterAndSortFiles(files, result[0]?.[COL_FILE_NAME]);
 
     this.state.debug(files, "Files after filter and sort");
 
@@ -50,7 +50,7 @@ export class MySQL implements ClientI {
 
     await traverseAndRollbackFiles(
       this.state,
-      result[0][COL_FILE_NAME],
+      result[0]?.[COL_FILE_NAME],
       async (query) =>
         await queryHandler(
           query,
@@ -73,7 +73,7 @@ export class MySQL implements ClientI {
 
     this.state.debug(hasMigrationTable, "Has migration table result");
 
-    const migrationTableExists = hasMigrationTable.rows?.[0] !== null;
+    const migrationTableExists = hasMigrationTable.length > 0;
 
     this.state.debug(migrationTableExists, "Migration table exsists");
 

@@ -4,7 +4,7 @@ on: [ pull_request, release ]
 
 jobs:
   test:
-    name: test migrating denosaurs on ${{ matrix.os }}
+    name: Nessie Migrations CI
     runs-on: ubuntu-latest
 
     services:
@@ -24,7 +24,7 @@ jobs:
       mysql:
         image: mysql
         env:
-          MYSQL_ROOT_PASSWORD: pwd
+          MYSQL_ALLOW_EMPTY_PASSWORD: true
           MYSQL_DATABASE: nessie
         options: >-
           --health-cmd="mysqladmin ping"
@@ -44,4 +44,4 @@ jobs:
       - name: Create SQLite db
         run: make db-sqlite-start
       - name: Run tests
-        run: deno test --allow-write --allow-run
+        run: make test

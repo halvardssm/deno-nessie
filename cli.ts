@@ -2,27 +2,31 @@ import Denomander from "https://deno.land/x/denomander/mod.ts";
 import { _nessieConfig } from "./nessie.config.ts";
 import { State } from "./cli/state.ts";
 
-const program = new Denomander(
-  {
+const initDenomander = () => {
+  const program = new Denomander({
     app_name: "Nessie Migrations",
     app_description: "A database migration tool for Deno.",
     app_version: "0.1.0",
-  },
-);
+  });
 
-program
-  .option("-d --debug", "Enables verbose output")
-  .option(
-    "-c --config",
-    "Path to config file, will default to ./nessie.config.json",
-  )
-  .command("make [migrationName]", "Creates a migration file with the name")
-  .command("migrate", "Migrates one migration")
-  .command("rollback", "Rolls back one migration");
+  program
+    .option("-d --debug", "Enables verbose output")
+    .option(
+      "-c --config",
+      "Path to config file, will default to ./nessie.config.json",
+    )
+    .command("make [migrationName]", "Creates a migration file with the name")
+    .command("migrate", "Migrates one migration")
+    .command("rollback", "Rolls back one migration");
 
-program.parse(Deno.args);
+  program.parse(Deno.args);
 
-const run = async (prog: Denomander) => {
+  return program;
+};
+
+const run = async () => {
+  const prog = initDenomander();
+
   const state = await new State(prog).init();
 
   try {
@@ -39,9 +43,11 @@ const run = async (prog: Denomander) => {
 
       await state.client!.close();
     }
+    Deno.exit();
   } catch (e) {
     console.error(e);
+    Deno.exit(1);
   }
 };
 
-run(program);
+run();

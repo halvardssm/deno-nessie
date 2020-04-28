@@ -35,7 +35,7 @@ export class State {
 
     try {
       configFile = await import(
-        this.configFile || `${Deno.cwd()}/nessie.config.ts`
+        this._parsePath(this.configFile, "nessie.config.ts")
       );
     } catch (e) {
       configFile = await import("../nessie.config.ts");
@@ -44,7 +44,10 @@ export class State {
 
       this.debug(config, "Config");
 
-      this.migrationFolder = this._parseMigrationFolder(config.migrationFolder);
+      this.migrationFolder = this._parsePath(
+        config.migrationFolder,
+        "migrations",
+      );
       this.connection = config.connection;
       this.dialect = config.dialect || "pg";
 
@@ -103,13 +106,13 @@ export class State {
     }
   }
 
-  private _parseMigrationFolder(migrationFolder: string | undefined): string {
-    return !migrationFolder
-      ? `${Deno.cwd()}/migrations`
-      : migrationFolder?.startsWith("/")
-        ? migrationFolder
-        : migrationFolder.startsWith("./")
-          ? `${Deno.cwd()}${migrationFolder.substring(1)}`
-          : `${Deno.cwd()}/${migrationFolder}`;
+  private _parsePath(path: string | undefined, defaultFolder?: string): string {
+    return !path
+      ? `${Deno.cwd()}${defaultFolder ? `/${defaultFolder}` : ""}`
+      : path?.startsWith("/")
+        ? path
+        : path.startsWith("./")
+          ? `${Deno.cwd()}${path.substring(1)}`
+          : `${Deno.cwd()}/${path}`;
   }
 }

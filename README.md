@@ -8,7 +8,7 @@ A database migration tool for [deno](https://deno.land) inspired by [Laravel](ht
 ## Supported databases
 
 * [x] PostgreSQL
-* [x] MySQL - See [Deno MySQL](https://deno.land/x/mysql/) for version support
+* [x] MySQL - Currently it works with password for 5.*, but for >=8 you have to send a blank password, see [Deno MySQL](https://deno.land/x/mysql/) for version support
 * [ ] SQLite - in progress
 
 If you have a database system you would like to see in this list, feel free to make an issue or create a pr with your implementation.
@@ -17,15 +17,16 @@ If you have a database system you would like to see in this list, feel free to m
 
 * `make [name]`: Create migration
 
-```deno run --allow-read --allow-write https://deno.land/x/nessie/cli.ts make create_users -p migrations```
+```deno run --allow-read --allow-write https://deno.land/x/nessie/cli.ts make create_users```
 
 * `migrate`: Run migration - will migrate all migrations in your migration folder (sorted by timestamp) newer than the latest migration in your db
 
-```deno run --allow-net --allow-read https://deno.land/x/nessie/cli.ts migrate -p migrations -c postgres://root:pwd@localhost:5000/nessie```
+```deno run --allow-net --allow-read https://deno.land/x/nessie/cli.ts migrate```
+```deno run --allow-net --allow-read https://deno.land/x/nessie/cli.ts migrate -c ./nessie.config.ts```
 
 * `rollback`: Rollback - will rollback the latest migration
 
-```deno run --allow-net --allow-read https://deno.land/x/nessie/cli.ts migrate -p migrations -c postgres://root:pwd@localhost:5000/nessie```
+```deno run --allow-net --allow-read https://deno.land/x/nessie/cli.ts rollback```
 
 ### Flags
 

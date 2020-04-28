@@ -44,7 +44,7 @@ const configMySql: nessieConfig = {
     hostname: "localhost",
     port: 5001,
     username: "root",
-    password: "pwd",
+    // password: "pwd", // uncomment this line for <8
     db: "nessie",
   },
   dialect: "mysql",
@@ -56,4 +56,4 @@ const configSqLite: nessieConfig = {
   dialect: "sqlite",
 };
 
-export default configSqLite;
+export default configPg;
