@@ -9,7 +9,7 @@ A database migration tool for [deno](https://deno.land) inspired by [Laravel](ht
 
 * [x] PostgreSQL
 * [x] MySQL - Currently it works with password for 5.*, but for >=8 you have to send a blank password, see [Deno MySQL](https://deno.land/x/mysql/) for version support
-* [ ] SQLite - in progress
+* [x] SQLite
 
 If you have a database system you would like to see in this list, feel free to make an issue or create a pr with your implementation.
 
@@ -53,14 +53,14 @@ import { nessieConfigType } from "https://deno.land/x/nessie/mod.ts";
 
 const config: nessieConfigType = {
   migrationFolder: "./migrations",
-  connection: {
+  connection: { // These are the connection option from their respective db clients, will differ
     host: "localhost",
     port: 5432,
     user: "root",
     password: "pwd",
     name: "nessie",
-    dialect: "pg",
   },
+  dialect: "pg",
 };
 
 export default config;
