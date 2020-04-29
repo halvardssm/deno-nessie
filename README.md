@@ -1,7 +1,9 @@
+<img align="right" alt="ci" src="https://github.com/halvardssm/deno-nessie/workflows/ci/badge.svg"> 
+<a href="https://doc.deno.land/https/deno.land/x/nessie/mod.ts"><img align="right" src="https://doc.deno.land/badge.svg" alt="deno doc"></a>
+
 # Nessie
 
-![ci](https://github.com/halvardssm/deno-nessie/workflows/ci/badge.svg)
-[![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https/deno.land/x/nessie/mod.ts)
+<p align="center"><img src="./.github/logo.png" alt="Nessie logo" width="200" height="200"></p>
 
 A database migration tool for [deno](https://deno.land) inspired by [Laravel](https://github.com/laravel/laravel). Supports PostgreSQL and  MySQL, soon: SQLite. See [documentation](https://doc.deno.land/https/deno.land/x/nessie/mod.ts).
 
