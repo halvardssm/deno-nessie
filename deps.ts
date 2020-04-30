@@ -1,6 +1,7 @@
 import Denomander from "https://deno.land/x/denomander@0.5.1/mod.ts";
+import stdConfig from "https://deno.land/x/nessie/nessie.config.ts";
 
-export { Denomander };
+export { Denomander, stdConfig };
 export {
   Client as MySQLClient,
   ClientConfig,

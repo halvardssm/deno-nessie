@@ -8,7 +8,7 @@ CONFIG_FILE=./tests/config/mysql.config.ts
 DB_URL=postgres://${DB_USER}:${DB_PWD@localhost:${DB_PG_PORT}/${DB_NAME}
 
 migration-%:
-	deno run --allow-write --allow-read cli.ts make $* -c ${CONFIG_FILE}
+	deno run --allow-write --allow-read --allow-net cli.ts make $* -c ${CONFIG_FILE}
 migrate:
 	deno run --allow-net --allow-read cli.ts migrate -c ${CONFIG_FILE}
 rollback:
