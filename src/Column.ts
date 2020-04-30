@@ -41,9 +41,9 @@ export class Column {
   /** Helper method for adding attributes to the column string */
   private _addAttributes(string: string): string {
     if (this.columnInput1 !== undefined) {
-      string += ` (${this.columnInput1}${this.columnInput2
-        ? `, ${this.columnInput2}`
-        : ""})`;
+      string += ` (${this.columnInput1}${
+        this.columnInput2 ? `, ${this.columnInput2}` : ""
+      })`;
     }
 
     if (this.defaultValue) {

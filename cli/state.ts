@@ -110,9 +110,9 @@ export class State {
     return !path
       ? `${Deno.cwd()}${defaultFolder ? `/${defaultFolder}` : ""}`
       : path?.startsWith("/")
-        ? path
-        : path.startsWith("./")
-          ? `${Deno.cwd()}${path.substring(1)}`
-          : `${Deno.cwd()}/${path}`;
+      ? path
+      : path.startsWith("./")
+      ? `${Deno.cwd()}${path.substring(1)}`
+      : `${Deno.cwd()}/${path}`;
   }
 }
