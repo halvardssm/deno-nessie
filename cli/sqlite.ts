@@ -8,7 +8,7 @@ import {
   queryHandler,
 } from "./utils.ts";
 import Schema from "../src/Schema.ts";
-import { DB, save } from "https://deno.land/x/sqlite/mod.ts";
+import { DB, save } from "sqlite";
 import { State } from "./state.ts";
 
 export class SQLite implements ClientI {
@@ -23,7 +23,7 @@ export class SQLite implements ClientI {
   }
 
   async migrate() {
-    let files = Array.from(Deno.readdirSync(this.state.migrationFolder));
+    let files = Array.from(Deno.readDirSync(this.state.migrationFolder));
 
     this.state.debug(files, "Files in migration folder");
 

@@ -3,11 +3,11 @@ import Denomander from "https://deno.land/x/denomander/mod.ts";
 import {
   Client as MySQLClient,
   ClientConfig,
-} from "https://deno.land/x/mysql/mod.ts";
-import { Client as PGClient } from "https://deno.land/x/postgres/mod.ts";
-import { open } from "https://deno.land/x/sqlite/mod.ts";
+} from "mysql";
+import { Client as PGClient } from "postgres";
+import { open } from "sqlite";
 import { dbDialects } from "../mod.ts";
-import { IConnectionParams } from "https://deno.land/x/postgres/connection_params.ts";
+import { IConnectionParams } from "postgres/connection_params.ts";
 import { PGSQL } from "./pgsql.ts";
 import { ClientTypes, ClientI } from "./utils.ts";
 import { MySQL } from "./mysql.ts";

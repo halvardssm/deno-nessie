@@ -1,4 +1,4 @@
-import Denomander from "https://deno.land/x/denomander/mod.ts";
+import Denomander from "denomander";
 import { _nessieConfig } from "./nessie.config.ts";
 import { State } from "./cli/state.ts";
 

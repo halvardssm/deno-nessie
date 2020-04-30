@@ -1,0 +1,10 @@
+{
+	"imports": {
+	   "mysql": "https://deno.land/x/mysql/mod.ts",
+	   "postgres": "https://deno.land/x/postgres/mod.ts",
+	   "postgres/": "https://deno.land/x/postgres/",
+	   "sqlite": "https://deno.land/x/sqlite/mod.ts",
+	   "std/":"https://deno.land/std/",
+	   "denomander":"https://deno.land/x/denomander/mod.ts"
+	}
+ }
