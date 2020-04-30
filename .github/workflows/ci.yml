@@ -39,6 +39,8 @@ jobs:
         uses: actions/checkout@master
       - name: Install deno
         uses: denolib/setup-deno@master
+        with: 
+          deno-version: 0.42.0
       - name: Check formatting
         run: deno fmt --check
       - name: Create SQLite db

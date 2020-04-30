@@ -43,9 +43,11 @@ export class Schema {
   ) {
     if (typeof name === "string") name = [name];
 
-    const sql = `DROP TABLE${ifExists ? " IF EXISTS" : ""} ${name.join(
-      ", ",
-    )}${cascade ? " CASCADE" : ""};`;
+    const sql = `DROP TABLE${ifExists ? " IF EXISTS" : ""} ${
+      name.join(
+        ", ",
+      )
+    }${cascade ? " CASCADE" : ""};`;
 
     this.query += sql;
 

@@ -94,11 +94,11 @@ export class Table {
       case "mysql":
       case "pg":
       default:
-        return `CREATE${this.constraints.isTemporary
-          ? " TEMPORARY"
-          : ""} TABLE${this.constraints.ifNotExists
-          ? " IF NOT EXISTS"
-          : ""} ${this.tableName}`;
+        return `CREATE${
+          this.constraints.isTemporary ? " TEMPORARY" : ""
+        } TABLE${
+          this.constraints.ifNotExists ? " IF NOT EXISTS" : ""
+        } ${this.tableName}`;
     }
   }
 
@@ -123,9 +123,11 @@ export class Table {
         return "";
       case "pg":
       default:
-        return `CREATE TYPE ${enumCol.name} AS ENUM (${enumCol.columns.join(
-          ", ",
-        )});`;
+        return `CREATE TYPE ${enumCol.name} AS ENUM (${
+          enumCol.columns.join(
+            ", ",
+          )
+        });`;
     }
   }
 

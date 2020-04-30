@@ -1,6 +1,6 @@
 import { dbDialects } from "./mod.ts";
-import { IConnectionParams } from "https://deno.land/x/postgres/connection_params.ts";
-import { ClientConfig } from "https://deno.land/x/mysql/src/client.ts";
+import { IConnectionParams } from "postgres/connection_params.ts";
+import { ClientConfig } from "mysql";
 
 export interface nessieConnection {
   host: string | "localhost" | "127.0.0.1";

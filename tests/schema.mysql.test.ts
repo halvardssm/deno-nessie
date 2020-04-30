@@ -1,5 +1,5 @@
 import { Schema } from "../mod.ts";
-import { assertEquals } from "https://deno.land/std/testing/asserts.ts";
+import { assertEquals } from "std/testing/asserts.ts";
 
 const strings = [
   {

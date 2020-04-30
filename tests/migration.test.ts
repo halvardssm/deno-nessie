@@ -1,7 +1,7 @@
 import {
   assert,
   assertArrayContains,
-} from "https://deno.land/std/testing/asserts.ts";
+} from "std/testing/asserts.ts";
 import {
   runner,
   TYPE_MIGRATE,
