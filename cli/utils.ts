@@ -1,7 +1,5 @@
 import { _nessieConfig } from "../nessie.config.ts";
-import { Client as MySQLClient } from "mysql";
-import { Client as PGClient } from "postgres";
-import { DB as SQLiteClient } from "sqlite";
+import { MySQLClient, PGClient, SQLiteClient } from "../deps.ts";
 import Schema from "../src/Schema.ts";
 import { State } from "./state.ts";
 

@@ -1,13 +1,13 @@
 import { _nessieConfig, nessieConfig } from "../nessie.config.ts";
-import Denomander from "denomander";
+import { Denomander } from "../deps.ts";
 import {
-  Client as MySQLClient,
+  MySQLClient,
   ClientConfig,
-} from "mysql";
-import { Client as PGClient } from "postgres";
-import { open } from "sqlite";
+  PGClient,
+  open,
+  IConnectionParams,
+} from "../deps.ts";
 import { dbDialects } from "../mod.ts";
-import { IConnectionParams } from "postgres/connection_params.ts";
 import { PGSQL } from "./pgsql.ts";
 import { ClientTypes, ClientI } from "./utils.ts";
 import { MySQL } from "./mysql.ts";

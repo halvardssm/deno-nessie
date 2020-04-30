@@ -1,7 +1,4 @@
-import {
-  assert,
-  assertArrayContains,
-} from "std/testing/asserts.ts";
+import { assert, assertArrayContains } from "../deps.ts";
 import {
   runner,
   TYPE_MIGRATE,

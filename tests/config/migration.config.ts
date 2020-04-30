@@ -13,8 +13,6 @@ export const runner = async (type: string, dialect: string) => {
     cmd: [
       "deno",
       "run",
-      "--unstable",
-      "--importmap=import_map.json",
       "--allow-net",
       "--allow-read",
       "--allow-write",
