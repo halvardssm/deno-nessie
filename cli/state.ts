@@ -1,5 +1,5 @@
 import { _nessieConfig, nessieConfig } from "../nessie.config.ts";
-import Denomander from "https://deno.land/x/denomander/mod.ts";
+import Denomander from "denomander";
 import {
   Client as MySQLClient,
   ClientConfig,
