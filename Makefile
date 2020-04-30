@@ -6,16 +6,17 @@ DB_NAME=nessie
 
 CONFIG_FILE=./tests/config/mysql.config.ts
 DB_URL=postgres://${DB_USER}:${DB_PWD@localhost:${DB_PG_PORT}/${DB_NAME}
+IMPORT_MAP=--unstable --importmap=import_map.json
 
 migration-%:
-	deno run --allow-write --allow-read cli.ts make $* -c ${CONFIG_FILE}
+	deno run ${IMPORT_MAP} --allow-write --allow-read cli.ts make $* -c ${CONFIG_FILE}
 migrate:
-	deno run --allow-net --allow-read cli.ts migrate -c ${CONFIG_FILE} -d
+	deno run ${IMPORT_MAP} --allow-net --allow-read cli.ts migrate -c ${CONFIG_FILE}
 rollback:
-	deno run --allow-net --allow-read cli.ts rollback -c ${CONFIG_FILE}
+	deno run ${IMPORT_MAP} --allow-net --allow-read cli.ts rollback -c ${CONFIG_FILE}
 
 test:
-	deno test --allow-write --allow-run
+	deno test ${IMPORT_MAP} --allow-write --allow-run 
 test-clean: db-all-restart sleeper test
 sleeper:
 	sleep 30s
