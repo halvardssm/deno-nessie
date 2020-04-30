@@ -12,6 +12,7 @@ import { PGSQL } from "./pgsql.ts";
 import { ClientTypes, ClientI } from "./utils.ts";
 import { MySQL } from "./mysql.ts";
 import { SQLite } from "./sqlite.ts";
+import StdConfig from "../nessie.config.ts";
 
 export class State {
   private enableDebug: boolean;
@@ -31,17 +32,17 @@ export class State {
   }
 
   async init() {
-    let configFile;
+    let config: nessieConfig = StdConfig;
 
     try {
-      configFile = await import(
+      const rawConfig = await import(
         this._parsePath(this.configFile, "nessie.config.ts")
       );
-    } catch (e) {
-      configFile = await import("../nessie.config.ts");
-    } finally {
-      const config: nessieConfig = configFile.default;
 
+      config = rawConfig.default;
+    } catch (e) {
+      this.debug("Using standard config");
+    } finally {
       this.debug(config, "Config");
 
       this.migrationFolder = this._parsePath(
