@@ -26,13 +26,13 @@ db-all-stop: db-pg-stop db-mysql-stop db-sqlite-stop
 db-pg-start:
 	docker run -d -p $(DB_PG_PORT):5432 -e POSTGRES_USER=$(DB_USER) -e POSTGRES_PASSWORD=$(DB_PWD) -e POSTGRES_DB=${DB_NAME} -v `pwd`/tests/data/pg:/var/lib/postgresql/data --rm --name $(DB_NAME)-pg postgres:latest
 db-pg-stop:
-	docker kill ${DB_NAME}-pg
+	docker kill ${DB_NAME}-pg | true
 	rm -rf tests/data/pg
 db-mysql-start:
 	# docker run -d -p $(DB_MYSQL_PORT):3306 -e MYSQL_ROOT_PASSWORD=$(DB_PWD) -e MYSQL_DATABASE=${DB_NAME} -v `pwd`/tests/data/mysql:/var/lib/mysql --rm --name $(DB_NAME)-mysql mysql:5
 	docker run -d -p $(DB_MYSQL_PORT):3306 -e MYSQL_ALLOW_EMPTY_PASSWORD=true -e MYSQL_DATABASE=${DB_NAME} -v `pwd`/tests/data/mysql:/var/lib/mysql --rm --name $(DB_NAME)-mysql mysql:latest
 db-mysql-stop:
-	docker kill ${DB_NAME}-mysql
+	docker kill ${DB_NAME}-mysql | true
 	rm -rf tests/data/mysql
 db-sqlite-start:
 	mkdir -p tests/data && touch tests/data/sqlite.db
