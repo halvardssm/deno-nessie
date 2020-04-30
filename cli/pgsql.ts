@@ -8,7 +8,7 @@ import {
   queryHandler,
 } from "./utils.ts";
 import Schema from "../src/Schema.ts";
-import { Client } from "postgres";
+import { PGClient } from "../deps.ts";
 import { State } from "./state.ts";
 
 const QUERY_TRIGGER_UPDATE_AT =
@@ -16,9 +16,9 @@ const QUERY_TRIGGER_UPDATE_AT =
 
 export class PGSQL implements ClientI {
   private state: State;
-  private client: Client;
+  private client: PGClient;
 
-  constructor(state: State, client: Client) {
+  constructor(state: State, client: PGClient) {
     this.state = state;
     this.client = client;
   }

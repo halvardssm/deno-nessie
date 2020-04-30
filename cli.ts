@@ -1,4 +1,4 @@
-import Denomander from "denomander";
+import { Denomander } from "./deps.ts";
 import { _nessieConfig } from "./nessie.config.ts";
 import { State } from "./cli/state.ts";
 

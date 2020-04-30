@@ -9,14 +9,14 @@ import {
   COL_FILE_NAME,
 } from "./utils.ts";
 import { State } from "./state.ts";
-import { Client } from "mysql";
+import { MySQLClient } from "../deps.ts";
 import Schema from "../src/Schema.ts";
 
 export class MySQL implements ClientI {
   private state: State;
-  private client: Client;
+  private client: MySQLClient;
 
-  constructor(state: State, client: Client) {
+  constructor(state: State, client: MySQLClient) {
     this.state = state;
     this.client = client;
   }
