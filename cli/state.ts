@@ -1,18 +1,18 @@
 import { _nessieConfig, nessieConfig } from "../nessie.config.ts";
-import { Denomander } from "../deps.ts";
 import {
   MySQLClient,
   ClientConfig,
   PGClient,
   open,
   IConnectionParams,
+  stdConfig,
+  Denomander,
 } from "../deps.ts";
 import { dbDialects } from "../mod.ts";
 import { PGSQL } from "./pgsql.ts";
 import { ClientTypes, ClientI } from "./utils.ts";
 import { MySQL } from "./mysql.ts";
 import { SQLite } from "./sqlite.ts";
-import StdConfig from "../nessie.config.ts";
 
 export class State {
   private enableDebug: boolean;
@@ -32,7 +32,7 @@ export class State {
   }
 
   async init() {
-    let config: nessieConfig = StdConfig;
+    let config: nessieConfig = stdConfig;
 
     try {
       const rawConfig = await import(
@@ -65,9 +65,13 @@ export class State {
 
     await Deno.mkdir(this.migrationFolder, { recursive: true });
 
-    await Deno.copyFile(
-      "./src/templates/migration.ts",
+    const responseFile = await fetch(
+      "https://deno.land/x/nessie/cli/templates/migration.ts",
+    );
+
+    await Deno.writeTextFile(
       `${this.migrationFolder}/${fileName}`,
+      await responseFile.text(),
     );
 
     console.info(`Created migration ${fileName} at ${this.migrationFolder}`);

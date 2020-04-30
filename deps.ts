@@ -1,6 +1,7 @@
 import Denomander from "https://deno.land/x/denomander@0.5.1/mod.ts";
+import stdConfig from "https://deno.land/x/nessie/nessie.config.ts";
 
-export { Denomander };
+export { Denomander, stdConfig };
 export {
   Client as MySQLClient,
   ClientConfig,
@@ -11,7 +12,7 @@ export {
   DB as SQLiteClient,
   save,
   open,
-} from "https://deno.land/x/sqlite/mod.ts";
+} from "https://deno.land/x/sqlite@v0.1.0/mod.ts";
 export {
   assertEquals,
   assert,

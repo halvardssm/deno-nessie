@@ -26,7 +26,7 @@ export interface _nessieConfig {
 }
 
 const configPg: nessieConfig = {
-  migrationFolder: `${Deno.cwd()}/tests/migrations`,
+  migrationFolder: `${Deno.cwd()}/migrations`,
   connection: {
     host: "localhost",
     port: "5000",
@@ -38,7 +38,7 @@ const configPg: nessieConfig = {
 };
 
 const configMySql: nessieConfig = {
-  migrationFolder: `${Deno.cwd()}/tests/migrations`,
+  migrationFolder: `${Deno.cwd()}/migrations`,
   connection: {
     hostname: "localhost",
     port: 5001,
@@ -50,8 +50,8 @@ const configMySql: nessieConfig = {
 };
 
 const configSqLite: nessieConfig = {
-  migrationFolder: `${Deno.cwd()}/tests/migrations`,
-  connection: `tests/data/sqlite.db`,
+  migrationFolder: `${Deno.cwd()}/migrations`,
+  connection: "sqlite.db",
   dialect: "sqlite",
 };
 
