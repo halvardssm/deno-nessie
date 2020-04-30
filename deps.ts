@@ -12,7 +12,7 @@ export {
   DB as SQLiteClient,
   save,
   open,
-} from "https://deno.land/x/sqlite/mod.ts";
+} from "https://deno.land/x/sqlite@v0.1.0/mod.ts";
 export {
   assertEquals,
   assert,
