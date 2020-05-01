@@ -13,7 +13,7 @@ jobs:
         with: 
           deno-version: 0.42.0
       - name: Create migration
-        run: deno run --allow-read --allow-write --allow-net https://deno.land/x/nessie@${GITHUB_REF}/cli.ts make test
+        run: deno run --allow-read --allow-write --allow-net https://deno.land/x/nessie@${GITHUB_HEAD_REF}/cli.ts make test
         
   tests:
     needs: cli
