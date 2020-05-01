@@ -8,6 +8,8 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
+      - name: See ref
+        run: echo ${GITHUB_REF};echo ${GITHUB_REF##*/}
       - name: Install deno
         uses: denolib/setup-deno@master
         with: 
