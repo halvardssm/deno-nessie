@@ -8,14 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - name: See ref
-        run: echo ${GITHUB_REF};echo ${GITHUB_REF##*/}
       - name: Install deno
         uses: denolib/setup-deno@master
         with: 
           deno-version: 0.42.0
       - name: Create migration
-        run: deno run --allow-read --allow-write --allow-net https://deno.land/x/nessie@$(echo ${GITHUB_REF#refs/heads/})/cli.ts make test
+        run: deno run --allow-read --allow-write --allow-net https://deno.land/x/nessie@${GITHUB_REF}/cli.ts make test
         
   tests:
     needs: cli
