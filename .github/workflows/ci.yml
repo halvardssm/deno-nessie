@@ -1,10 +1,22 @@
-name: ci
+name: Nessie CI
 
 on: [ pull_request, release ]
 
 jobs:
-  test:
-    name: Nessie Migrations CI
+  cli:
+    name: Run CLI
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Install deno
+        uses: denolib/setup-deno@master
+        with: 
+          deno-version: 0.42.0
+      - name: Create migration
+        uses: deno run --allow-read --allow-write --allow-net https://deno.land/x/nessie@${GITHUB_REF##*/}/cli.ts make test
+        
+  tests:
+    name: Run tests
     runs-on: ubuntu-latest
 
     services:
