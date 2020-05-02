@@ -1,6 +1,6 @@
 name: Nessie CI
 
-on: [ pull_request, release, push ]
+on: [ pull_request, release ]
 
 jobs:
   cli:
