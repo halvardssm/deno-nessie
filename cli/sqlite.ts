@@ -8,22 +8,22 @@ import {
   queryHandler,
 } from "./utils.ts";
 import Schema from "../src/Schema.ts";
-import { DB, save } from "https://deno.land/x/sqlite/mod.ts";
+import { SQLiteClient, save } from "../deps.ts";
 import { State } from "./state.ts";
 
 export class SQLite implements ClientI {
   private state: State;
-  private client: DB;
+  private client: SQLiteClient;
   private query: (query: string) => (any[] | undefined)[];
 
-  constructor(state: State, client: DB) {
+  constructor(state: State, client: SQLiteClient) {
     this.state = state;
     this.client = client;
     this.query = (query: string) => [...client.query(query, [])];
   }
 
   async migrate() {
-    let files = Array.from(Deno.readdirSync(this.state.migrationFolder));
+    let files = Array.from(Deno.readDirSync(this.state.migrationFolder));
 
     this.state.debug(files, "Files in migration folder");
 

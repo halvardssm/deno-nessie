@@ -1,13 +1,14 @@
 import { _nessieConfig, nessieConfig } from "../nessie.config.ts";
-import Denomander from "https://deno.land/x/denomander/mod.ts";
 import {
-  Client as MySQLClient,
+  MySQLClient,
   ClientConfig,
-} from "https://deno.land/x/mysql/mod.ts";
-import { Client as PGClient } from "https://deno.land/x/postgres/mod.ts";
-import { open } from "https://deno.land/x/sqlite/mod.ts";
+  PGClient,
+  open,
+  IConnectionParams,
+  stdConfig,
+  Denomander,
+} from "../deps.ts";
 import { dbDialects } from "../mod.ts";
-import { IConnectionParams } from "https://deno.land/x/postgres/connection_params.ts";
 import { PGSQL } from "./pgsql.ts";
 import { ClientTypes, ClientI } from "./utils.ts";
 import { MySQL } from "./mysql.ts";
@@ -31,17 +32,17 @@ export class State {
   }
 
   async init() {
-    let configFile;
+    let config: nessieConfig = stdConfig;
 
     try {
-      configFile = await import(
+      const rawConfig = await import(
         this._parsePath(this.configFile, "nessie.config.ts")
       );
-    } catch (e) {
-      configFile = await import("../nessie.config.ts");
-    } finally {
-      const config: nessieConfig = configFile.default;
 
+      config = rawConfig.default;
+    } catch (e) {
+      this.debug("Using standard config");
+    } finally {
       this.debug(config, "Config");
 
       this.migrationFolder = this._parsePath(
@@ -64,9 +65,13 @@ export class State {
 
     await Deno.mkdir(this.migrationFolder, { recursive: true });
 
-    await Deno.copyFile(
-      "./src/templates/migration.ts",
+    const responseFile = await fetch(
+      "https://deno.land/x/nessie/cli/templates/migration.ts",
+    );
+
+    await Deno.writeTextFile(
       `${this.migrationFolder}/${fileName}`,
+      await responseFile.text(),
     );
 
     console.info(`Created migration ${fileName} at ${this.migrationFolder}`);
@@ -110,9 +115,9 @@ export class State {
     return !path
       ? `${Deno.cwd()}${defaultFolder ? `/${defaultFolder}` : ""}`
       : path?.startsWith("/")
-        ? path
-        : path.startsWith("./")
-          ? `${Deno.cwd()}${path.substring(1)}`
-          : `${Deno.cwd()}/${path}`;
+      ? path
+      : path.startsWith("./")
+      ? `${Deno.cwd()}${path.substring(1)}`
+      : `${Deno.cwd()}/${path}`;
   }
 }

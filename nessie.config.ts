@@ -1,6 +1,5 @@
 import { dbDialects } from "./mod.ts";
-import { IConnectionParams } from "https://deno.land/x/postgres/connection_params.ts";
-import { ClientConfig } from "https://deno.land/x/mysql/src/client.ts";
+import { IConnectionParams, ClientConfig } from "./deps.ts";
 
 export interface nessieConnection {
   host: string | "localhost" | "127.0.0.1";
@@ -27,7 +26,7 @@ export interface _nessieConfig {
 }
 
 const configPg: nessieConfig = {
-  migrationFolder: `${Deno.cwd()}/tests/migrations`,
+  migrationFolder: `${Deno.cwd()}/migrations`,
   connection: {
     host: "localhost",
     port: "5000",
@@ -39,7 +38,7 @@ const configPg: nessieConfig = {
 };
 
 const configMySql: nessieConfig = {
-  migrationFolder: `${Deno.cwd()}/tests/migrations`,
+  migrationFolder: `${Deno.cwd()}/migrations`,
   connection: {
     hostname: "localhost",
     port: 5001,
@@ -51,8 +50,8 @@ const configMySql: nessieConfig = {
 };
 
 const configSqLite: nessieConfig = {
-  migrationFolder: `${Deno.cwd()}/tests/migrations`,
-  connection: `tests/data/sqlite.db`,
+  migrationFolder: `${Deno.cwd()}/migrations`,
+  connection: "sqlite.db",
   dialect: "sqlite",
 };
 

@@ -9,20 +9,20 @@ import {
   COL_FILE_NAME,
 } from "./utils.ts";
 import { State } from "./state.ts";
-import { Client } from "https://deno.land/x/mysql/src/client.ts";
+import { MySQLClient } from "../deps.ts";
 import Schema from "../src/Schema.ts";
 
 export class MySQL implements ClientI {
   private state: State;
-  private client: Client;
+  private client: MySQLClient;
 
-  constructor(state: State, client: Client) {
+  constructor(state: State, client: MySQLClient) {
     this.state = state;
     this.client = client;
   }
 
   async migrate() {
-    let files = Array.from(Deno.readdirSync(this.state.migrationFolder));
+    let files = Array.from(Deno.readDirSync(this.state.migrationFolder));
 
     this.state.debug(files, "Files in migration folder");
 

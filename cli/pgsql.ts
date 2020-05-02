@@ -8,7 +8,7 @@ import {
   queryHandler,
 } from "./utils.ts";
 import Schema from "../src/Schema.ts";
-import { Client } from "https://deno.land/x/postgres/client.ts";
+import { PGClient } from "../deps.ts";
 import { State } from "./state.ts";
 
 const QUERY_TRIGGER_UPDATE_AT =
@@ -16,15 +16,15 @@ const QUERY_TRIGGER_UPDATE_AT =
 
 export class PGSQL implements ClientI {
   private state: State;
-  private client: Client;
+  private client: PGClient;
 
-  constructor(state: State, client: Client) {
+  constructor(state: State, client: PGClient) {
     this.state = state;
     this.client = client;
   }
 
   async migrate() {
-    let files = Array.from(Deno.readdirSync(this.state.migrationFolder));
+    let files = Array.from(Deno.readDirSync(this.state.migrationFolder));
 
     this.state.debug(files, "Files in migration folder");
 
