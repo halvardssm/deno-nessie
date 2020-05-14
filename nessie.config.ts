@@ -2,10 +2,10 @@ const configPg = {
   migrationFolder: `${Deno.cwd()}/migrations`,
   connection: {
     database: "nessie",
-		hostname: "localhost",
-		port: 5000,
-		user: "root",
-		password: "pwd",
+    hostname: "localhost",
+    port: 5000,
+    user: "root",
+    password: "pwd",
   },
   dialect: "pg",
 };
