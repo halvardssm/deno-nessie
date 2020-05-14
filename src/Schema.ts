@@ -1,6 +1,5 @@
 import { Table } from "./Table.ts";
-
-export type dbDialects = "pg" | "mysql" | "sqlite";
+import { dbDialects } from "./TypeUtils.ts";
 
 /** The schema class exposed in the `up()` and `down()` methods in the migration files.
  * 

@@ -1,25 +1,24 @@
-import { _nessieConfig, nessieConfig } from "../nessie.config.ts";
 import {
-  MySQLClient,
   ClientConfig,
-  PGClient,
-  open,
-  IConnectionParams,
-  stdConfig,
   Denomander,
+  ConnectionParams,
+  MySQLClient,
+  open,
+  PGClient,
+  stdConfig,
 } from "../deps.ts";
-import { dbDialects } from "../mod.ts";
-import { PGSQL } from "./pgsql.ts";
-import { ClientTypes, ClientI } from "./utils.ts";
+import { dbDialects, nessieConfig } from "../mod.ts";
 import { MySQL } from "./mysql.ts";
+import { PGSQL } from "./pgsql.ts";
 import { SQLite } from "./sqlite.ts";
+import { ClientI, ClientTypes } from "./utils.ts";
 
 export class State {
   private enableDebug: boolean;
   private configFile: string;
   dialect: dbDialects = "pg";
   migrationFolder: string = "";
-  private connection: IConnectionParams | ClientConfig | string = "";
+  private connection: ConnectionParams | ClientConfig | string = "";
   clients: ClientTypes = {};
   client?: ClientI;
 
@@ -95,7 +94,7 @@ export class State {
 
       case "pg":
       default:
-        client = new PGClient((this.connection as string | IConnectionParams));
+        client = new PGClient((this.connection as string | ConnectionParams));
         this.debug(client, "PGClient");
         await client.connect();
         this.client = new PGSQL(this, client);

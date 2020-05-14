@@ -1,31 +1,4 @@
-import { dbDialects } from "./mod.ts";
-import { IConnectionParams, ClientConfig } from "./deps.ts";
-
-export interface nessieConnection {
-  host: string | "localhost" | "127.0.0.1";
-  port: string | number;
-  name: string;
-  user: string;
-  password?: string;
-}
-
-export interface nessieConfig {
-  connection: IConnectionParams | string | ClientConfig;
-  migrationFolder?: string;
-  dialect?: dbDialects;
-}
-
-export interface _nessieConfig {
-  migrationFolder: string;
-  dialect: dbDialects;
-  connection: {
-    pg?: IConnectionParams | string;
-    mysql?: ClientConfig;
-    sqlite?: string;
-  };
-}
-
-const configPg: nessieConfig = {
+const configPg = {
   migrationFolder: `${Deno.cwd()}/migrations`,
   connection: {
     host: "localhost",
@@ -37,7 +10,7 @@ const configPg: nessieConfig = {
   dialect: "pg",
 };
 
-const configMySql: nessieConfig = {
+const configMySql = {
   migrationFolder: `${Deno.cwd()}/migrations`,
   connection: {
     hostname: "localhost",
@@ -49,7 +22,7 @@ const configMySql: nessieConfig = {
   dialect: "mysql",
 };
 
-const configSqLite: nessieConfig = {
+const configSqLite = {
   migrationFolder: `${Deno.cwd()}/migrations`,
   connection: "sqlite.db",
   dialect: "sqlite",

@@ -1,5 +1,5 @@
-import { Schema } from "../mod.ts";
 import { assertEquals } from "../deps.ts";
+import { Schema } from "../mod.ts";
 
 const strings = [
   {

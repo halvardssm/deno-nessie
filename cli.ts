@@ -1,6 +1,5 @@
-import { Denomander } from "./deps.ts";
-import { _nessieConfig } from "./nessie.config.ts";
 import { State } from "./cli/state.ts";
+import { Denomander } from "./deps.ts";
 
 const initDenomander = () => {
   const program = new Denomander({
@@ -13,7 +12,7 @@ const initDenomander = () => {
     .option("-d --debug", "Enables verbose output")
     .option(
       "-c --config",
-      "Path to config file, will default to ./nessie.config.json",
+      "Path to config file, will default to ./nessie.config.ts",
     )
     .command("make [migrationName]", "Creates a migration file with the name")
     .command("migrate", "Migrates one migration")

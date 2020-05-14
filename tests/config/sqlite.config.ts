@@ -1,4 +1,4 @@
-import { nessieConfig } from "../../nessie.config.ts";
+import { nessieConfig } from "../../mod.ts";
 
 const configSqLite: nessieConfig = {
   migrationFolder: `${Deno.cwd()}/tests/migrations`,
