@@ -12,6 +12,7 @@ jobs:
         uses: denolib/setup-deno@master
         with: 
           deno-version: 1.0.0
+          
       - name: Create migration
         run: deno run --allow-read --allow-write --allow-net https://raw.githubusercontent.com/${{github.event.pull_request.head.repo.full_name:-github.repository}}/${{github.event.pull_request.head.ref:-master}}/cli.ts make test
         
