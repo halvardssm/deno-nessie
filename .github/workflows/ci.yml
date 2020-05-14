@@ -11,12 +11,13 @@ jobs:
       - name: Install deno
         uses: denolib/setup-deno@master
         with: 
-          deno-version: 0.42.0
+          deno-version: 1.0.0
+          
       - name: Create migration
-        run: deno run --allow-read --allow-write --allow-net https://raw.githubusercontent.com/${{github.event.pull_request.head.repo.full_name}}/${{github.event.pull_request.head.ref}}/cli.ts make test
-        
+        run: deno run --allow-read --allow-write --allow-net https://raw.githubusercontent.com/$URL_PATH/cli.ts make test
+        env:
+          URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'master'}}
   tests:
-    needs: cli
     name: Run tests
     runs-on: ubuntu-latest
 
@@ -53,7 +54,7 @@ jobs:
       - name: Install deno
         uses: denolib/setup-deno@master
         with: 
-          deno-version: 0.42.0
+          deno-version: 1.0.0
       - name: Check formatting
         run: deno fmt --check
       - name: Create SQLite db
