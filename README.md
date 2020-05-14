@@ -1,6 +1,6 @@
 ![ci](https://github.com/halvardssm/deno-nessie/workflows/ci/badge.svg)
 [![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https/deno.land/x/nessie/mod.ts)
-[![(Deno)](https://img.shields.io/badge/deno-0.42.0-green.svg)](https://deno.land)
+[![(Deno)](https://img.shields.io/badge/deno-1.0.0-green.svg)](https://deno.land)
 
 # Nessie
 
@@ -94,4 +94,4 @@ export const down = (schema: Schema): void => {
 };
 ```
 
-See example folder for more (in development)
+See example folder for more
