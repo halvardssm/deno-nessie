@@ -16,7 +16,7 @@ jobs:
       - name: Create migration
         run: deno run --allow-read --allow-write --allow-net https://raw.githubusercontent.com/$PATH/cli.ts make test
         env:
-          PATH: ${{github.event.pull_request.head.repo.full_name ?? github.repository}}/${{github.event.pull_request.head.ref ?? master}}
+          PATH: ${{github.event.pull_request.head.repo.full_name}}:-${{github.repository}}/${{github.event.pull_request.head.ref}}:-master
   tests:
     name: Run tests
     runs-on: ubuntu-latest
