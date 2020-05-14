@@ -15,7 +15,7 @@ rollback:
 	deno run --allow-net --allow-read cli.ts rollback -c ${CONFIG_FILE}
 
 test:
-	deno test --allow-write --allow-run 
+	deno test --allow-write --allow-run --allow-read
 test-clean: db-all-restart sleeper test
 sleeper:
 	sleep 30s
