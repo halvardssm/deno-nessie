@@ -1,4 +1,4 @@
-import { ClientConfig, ConnectionParams } from "../deps.ts";
+import { ClientConfig, ConnectionOptions } from "../deps.ts";
 
 export type dbDialects = "pg" | "mysql" | "sqlite";
 
@@ -175,7 +175,7 @@ export interface nessieConnection {
 }
 
 export interface nessieConfig {
-  connection: ConnectionParams | string | ClientConfig;
+  connection: ConnectionOptions | string | ClientConfig;
   migrationFolder?: string;
   dialect?: dbDialects;
 }
@@ -184,7 +184,7 @@ export interface _nessieConfig {
   migrationFolder: string;
   dialect: dbDialects;
   connection: {
-    pg?: ConnectionParams | string;
+    pg?: ConnectionOptions | string;
     mysql?: ClientConfig;
     sqlite?: string;
   };
