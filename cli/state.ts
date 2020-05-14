@@ -25,7 +25,7 @@ export class State {
 
   constructor(prog: Denomander) {
     this.enableDebug = prog.debug;
-    this.configFile = prog.config;
+    this.configFile = this._parsePath(prog.config, "nessie.config.ts");
 
     this.debug(prog, "Program");
     this.debug(this, "State");
@@ -35,9 +35,7 @@ export class State {
     let config: nessieConfig = stdConfig as nessieConfig;
 
     try {
-      const rawConfig = await import(
-        this._parsePath(this.configFile, "nessie.config.ts")
-      );
+      const rawConfig = await import(this.configFile);
 
       config = rawConfig.default;
     } catch (e) {
