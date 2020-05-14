@@ -75,8 +75,8 @@ Minimal example of a migration file
 ```ts
 import { Schema } from "https://deno.land/x/nessie/mod.ts";
 
-export const up = (scema: Schema): void => {
-  scema.create("users", (table) => {
+export const up = (schema: Schema): void => {
+  schema.create("users", (table) => {
     table.id();
     table.string("name", 100).nullable();
     table.boolean("is_true").default("false");
@@ -84,7 +84,7 @@ export const up = (scema: Schema): void => {
     table.timestamps();
   });
 
-  scema.queryString(
+  schema.queryString(
     "INSERT INTO users VALUES (DEFAULT, 'Deno', true, 2, DEFAULT, DEFAULT);",
   );
 };
