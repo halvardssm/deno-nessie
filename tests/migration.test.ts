@@ -1,9 +1,9 @@
 import { assert, assertArrayContains } from "../deps.ts";
 import {
+  DIALECTS,
   runner,
   TYPE_MIGRATE,
   TYPE_ROLLBACK,
-  DIALECTS,
 } from "./config/migration.config.ts";
 
 const strings = [

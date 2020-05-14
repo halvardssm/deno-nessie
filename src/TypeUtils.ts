@@ -1,4 +1,4 @@
-import { IConnectionParams, ClientConfig } from "../deps.ts";
+import { ClientConfig, IConnectionParams } from "../deps.ts";
 
 export type dbDialects = "pg" | "mysql" | "sqlite";
 

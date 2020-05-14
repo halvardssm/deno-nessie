@@ -1,5 +1,5 @@
 import { Column } from "./Column.ts";
-import { columnTypes, typeMap, typeMapEl, dbDialects } from "./TypeUtils.ts";
+import { columnTypes, dbDialects, typeMap, typeMapEl } from "./TypeUtils.ts";
 
 export interface EnumColumn {
   name: string;
