@@ -5,6 +5,7 @@ import {
   MySQLClient,
   open,
   PGClient,
+  resolve,
 } from "../deps.ts";
 import stdConfig from "../nessie.config.ts";
 import { dbDialects, nessieConfig } from "../mod.ts";
@@ -111,12 +112,6 @@ export class State {
   }
 
   private _parsePath(path: string | undefined, defaultFolder?: string): string {
-    return !path
-      ? `${Deno.cwd()}${defaultFolder ? `/${defaultFolder}` : ""}`
-      : path?.startsWith("/")
-      ? path
-      : path.startsWith("./")
-      ? `${Deno.cwd()}${path.substring(1)}`
-      : `${Deno.cwd()}/${path}`;
+    return resolve(Deno.cwd(), path ?? defaultFolder ?? "");
   }
 }
