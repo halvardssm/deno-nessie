@@ -94,4 +94,4 @@ export const down = (schema: Schema): void => {
 };
 ```
 
-See example folder for more (in development)
+See example folder for more
