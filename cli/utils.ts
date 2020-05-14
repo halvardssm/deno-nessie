@@ -1,4 +1,3 @@
-import { _nessieConfig } from "../nessie.config.ts";
 import { MySQLClient, PGClient, SQLiteClient } from "../deps.ts";
 import Schema from "../src/Schema.ts";
 import { State } from "./state.ts";

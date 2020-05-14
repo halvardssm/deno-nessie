@@ -1,3 +1,7 @@
+import { IConnectionParams, ClientConfig } from "../deps.ts";
+
+export type dbDialects = "pg" | "mysql" | "sqlite";
+
 export type columnTypeSql =
   | "BIGINT"
   | "BLOB"
@@ -161,3 +165,27 @@ export const typeMap: typeMapType = {
   time: { pg: "time", mysql: "time", sqlite: "time" },
   timestamp: { pg: "timestamp", mysql: "timestamp", sqlite: "timestamp" },
 };
+
+export interface nessieConnection {
+  host: string | "localhost" | "127.0.0.1";
+  port: string | number;
+  name: string;
+  user: string;
+  password?: string;
+}
+
+export interface nessieConfig {
+  connection: IConnectionParams | string | ClientConfig;
+  migrationFolder?: string;
+  dialect?: dbDialects;
+}
+
+export interface _nessieConfig {
+  migrationFolder: string;
+  dialect: dbDialects;
+  connection: {
+    pg?: IConnectionParams | string;
+    mysql?: ClientConfig;
+    sqlite?: string;
+  };
+}

@@ -1,5 +1,4 @@
-import { dbDialects } from "./Schema.ts";
-import { columnTypes } from "./TypeUtils.ts";
+import { columnTypes, dbDialects } from "./TypeUtils.ts";
 
 /** The column class which stores the column information of a table class. */
 export class Column {

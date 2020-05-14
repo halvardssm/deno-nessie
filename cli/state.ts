@@ -1,18 +1,17 @@
-import { _nessieConfig, nessieConfig } from "../nessie.config.ts";
 import {
-  MySQLClient,
   ClientConfig,
-  PGClient,
-  open,
-  IConnectionParams,
-  stdConfig,
   Denomander,
+  IConnectionParams,
+  MySQLClient,
+  open,
+  PGClient,
+  stdConfig,
 } from "../deps.ts";
-import { dbDialects } from "../mod.ts";
-import { PGSQL } from "./pgsql.ts";
-import { ClientTypes, ClientI } from "./utils.ts";
+import { dbDialects, nessieConfig } from "../mod.ts";
 import { MySQL } from "./mysql.ts";
+import { PGSQL } from "./pgsql.ts";
 import { SQLite } from "./sqlite.ts";
+import { ClientI, ClientTypes } from "./utils.ts";
 
 export class State {
   private enableDebug: boolean;
