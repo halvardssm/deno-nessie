@@ -1,7 +1,7 @@
 import {
   ClientConfig,
   Denomander,
-  IConnectionParams,
+  ConnectionParams,
   MySQLClient,
   open,
   PGClient,
@@ -18,7 +18,7 @@ export class State {
   private configFile: string;
   dialect: dbDialects = "pg";
   migrationFolder: string = "";
-  private connection: IConnectionParams | ClientConfig | string = "";
+  private connection: ConnectionParams | ClientConfig | string = "";
   clients: ClientTypes = {};
   client?: ClientI;
 
@@ -94,7 +94,7 @@ export class State {
 
       case "pg":
       default:
-        client = new PGClient((this.connection as string | IConnectionParams));
+        client = new PGClient((this.connection as string | ConnectionParams));
         this.debug(client, "PGClient");
         await client.connect();
         this.client = new PGSQL(this, client);

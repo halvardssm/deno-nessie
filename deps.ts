@@ -10,8 +10,8 @@ export {
   Client as MySQLClient,
   ClientConfig,
 } from "https://deno.land/x/mysql@2.0.0/mod.ts";
-export { IConnectionParams } from "https://deno.land/x/postgres@v0.3.11/connection_params.ts";
-export { Client as PGClient } from "https://deno.land/x/postgres@v0.3.11/mod.ts";
+export { ConnectionParams } from "https://deno.land/x/postgres@v0.4.0/connection_params.ts";
+export { Client as PGClient } from "https://deno.land/x/postgres@v0.4.0/mod.ts";
 export {
   DB as SQLiteClient,
   open,
