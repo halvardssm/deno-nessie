@@ -27,7 +27,7 @@ export class State {
 
   constructor(prog: Denomander) {
     this.enableDebug = prog.debug;
-    this.configFile = this._parsePath(prog.config, STD_CONFIG_FILE);
+    this.configFile = prog.config; //this._parsePath(prog.config, STD_CONFIG_FILE);
 
     this.debug(prog, "Program");
     this.debug(this, "State");
@@ -122,6 +122,6 @@ export class State {
       return path;
     }
 
-    return "file://" + relative(Deno.cwd(), path ?? defaultFolder ?? "");
+    return relative(Deno.cwd(), path ?? defaultFolder ?? "");
   }
 }
