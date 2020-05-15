@@ -6,6 +6,7 @@ import {
   open,
   PGClient,
   relative,
+  readJson,
 } from "../deps.ts";
 import stdConfig from "../nessie.config.ts";
 import { dbDialects, nessieConfig } from "../mod.ts";
@@ -38,7 +39,7 @@ export class State {
 
     try {
       // Checking specified path
-      const rawConfig = await import(this.configFile);
+      const rawConfig = await readJson(this.configFile);
 
       config = rawConfig.default;
     } catch (e) {
