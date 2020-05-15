@@ -122,6 +122,6 @@ export class State {
       return path;
     }
 
-    return relative(Deno.cwd(), path ?? defaultFolder ?? "");
+    return "./" + relative(Deno.cwd(), path ?? defaultFolder ?? "");
   }
 }
