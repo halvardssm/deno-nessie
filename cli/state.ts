@@ -5,7 +5,7 @@ import {
   MySQLClient,
   open,
   PGClient,
-  resolve,
+  relative,
 } from "../deps.ts";
 import stdConfig from "../nessie.config.ts";
 import { dbDialects, nessieConfig } from "../mod.ts";
@@ -13,6 +13,8 @@ import { MySQL } from "./mysql.ts";
 import { PGSQL } from "./pgsql.ts";
 import { SQLite } from "./sqlite.ts";
 import { ClientI, ClientTypes } from "./utils.ts";
+
+const STD_CONFIG_FILE = "nessie.config.ts";
 
 export class State {
   private enableDebug: boolean;
@@ -25,7 +27,7 @@ export class State {
 
   constructor(prog: Denomander) {
     this.enableDebug = prog.debug;
-    this.configFile = this._parsePath(prog.config, "nessie.config.ts");
+    this.configFile = this._parsePath(prog.config, STD_CONFIG_FILE);
 
     this.debug(prog, "Program");
     this.debug(this, "State");
@@ -35,11 +37,17 @@ export class State {
     let config: nessieConfig = stdConfig as nessieConfig;
 
     try {
+      // Checking specified path
       const rawConfig = await import(this.configFile);
 
       config = rawConfig.default;
     } catch (e) {
-      this.debug(e, "Using standard config");
+      this.debug(e, "Checking project root");
+      try {
+        const rawConfig = await import(`./${STD_CONFIG_FILE}`);
+      } catch (er) {
+        this.debug(e, "Using standard config");
+      }
     } finally {
       this.debug(config, "Config");
 
@@ -114,6 +122,6 @@ export class State {
       return path;
     }
 
-    return "file://" + resolve(Deno.cwd(), path ?? defaultFolder ?? "");
+    return relative(Deno.cwd(), path ?? defaultFolder ?? "");
   }
 }

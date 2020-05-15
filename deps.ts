@@ -1,6 +1,6 @@
 import Denomander from "https://deno.land/x/denomander@0.5.1/mod.ts";
 
-export { resolve } from "https://deno.land/std@v0.51.0/path/mod.ts";
+export { relative } from "https://deno.land/std@v0.51.0/path/mod.ts";
 export {
   assert,
   assertArrayContains,
