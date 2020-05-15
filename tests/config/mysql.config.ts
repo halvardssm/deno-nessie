@@ -1,14 +1,10 @@
-import { nessieConfig } from "../../mod.ts";
-
-const configMySql: nessieConfig = {
-  migrationFolder: `${Deno.cwd()}/tests/migrations`,
-  connection: {
-    hostname: "localhost",
-    port: 5001,
-    username: "root",
-    db: "nessie",
+export default {
+  "migrationFolder": "./tests/migrations",
+  "connection": {
+    "hostname": "localhost",
+    "port": 5001,
+    "username": "root",
+    "db": "nessie",
   },
-  dialect: "mysql",
+  "dialect": "mysql",
 };
-
-export default configMySql;

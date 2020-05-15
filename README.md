@@ -18,6 +18,10 @@ If you have a database system you would like to see in this list, feel free to m
 
 ## Usage
 
+* `init`: Generates a `nessie.config.ts` file
+
+  ```deno run --allow-net --allow-read --allow-write https://deno.land/x/nessie/cli.ts init```
+
 * `make [name]`: Create migration
 
   ```deno run --allow-net --allow-read --allow-write https://deno.land/x/nessie/cli.ts make create_users```

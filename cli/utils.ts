@@ -1,4 +1,4 @@
-import { MySQLClient, PGClient, SQLiteClient } from "../deps.ts";
+import { MySQLClient, PGClient, resolve, SQLiteClient } from "../deps.ts";
 import Schema from "../src/Schema.ts";
 import { State } from "./state.ts";
 
@@ -28,6 +28,16 @@ export type ClientTypes = {
   sqlite?: SQLiteClient;
 };
 
+export const parsePath = (...path: string[]): string => {
+  if (
+    path.length === 1 &&
+    (path[0]?.startsWith("http://") || path[0]?.startsWith("https://"))
+  ) {
+    return path[0];
+  }
+  return "file://" + resolve(...path);
+};
+
 export const filterAndSortFiles = (
   files: Deno.DirEntry[],
   queryResult: string | undefined,
@@ -50,7 +60,7 @@ export const traverseAndMigrateFiles = async (
 ) => {
   if (files.length > 0) {
     for await (const file of files) {
-      let { up } = await import(`${state.migrationFolder}/${file.name}`);
+      let { up } = await import(parsePath(state.migrationFolder, file.name));
 
       const schema = new Schema(state.dialect);
 
@@ -85,7 +95,7 @@ export const traverseAndRollbackFiles = async (
   queryfn: (query: string) => any,
 ) => {
   if (typeof fileName === "string") {
-    let { down } = await import(`${state.migrationFolder}/${fileName}`);
+    let { down } = await import(parsePath(state.migrationFolder, fileName));
 
     const schema = new Schema(state.dialect);
 

@@ -1,17 +1,30 @@
 import {
   ClientConfig,
-  Denomander,
   ConnectionOptions,
+  Denomander,
   MySQLClient,
   open,
   PGClient,
+  resolve,
 } from "../deps.ts";
-import stdConfig from "../nessie.config.ts";
 import { dbDialects, nessieConfig } from "../mod.ts";
 import { MySQL } from "./mysql.ts";
 import { PGSQL } from "./pgsql.ts";
 import { SQLite } from "./sqlite.ts";
-import { ClientI, ClientTypes } from "./utils.ts";
+import { ClientI, ClientTypes, parsePath } from "./utils.ts";
+
+const STD_CONFIG_FILE = "nessie.config.ts";
+const stdConfig: nessieConfig = {
+  migrationFolder: "./migrations",
+  connection: {
+    database: "nessie",
+    hostname: "localhost",
+    port: 5432,
+    user: "root",
+    password: "pwd",
+  },
+  dialect: "pg",
+};
 
 export class State {
   private enableDebug: boolean;
@@ -24,30 +37,33 @@ export class State {
 
   constructor(prog: Denomander) {
     this.enableDebug = prog.debug;
-    this.configFile = prog.config;
+    this.configFile = parsePath(prog.config || STD_CONFIG_FILE);
 
     this.debug(prog, "Program");
     this.debug(this, "State");
   }
 
   async init() {
-    let config: nessieConfig = stdConfig as nessieConfig;
-
+    let config: nessieConfig = stdConfig;
+    let configRaw;
     try {
-      const rawConfig = await import(
-        this._parsePath(this.configFile, "nessie.config.ts")
-      );
-
-      config = rawConfig.default;
+      this.debug("Checking config path");
+      configRaw = await import(this.configFile);
+      config = configRaw.default;
     } catch (e) {
-      this.debug("Using standard config");
+      try {
+        this.debug(e, "Checking project root");
+
+        configRaw = await import(parsePath(STD_CONFIG_FILE));
+        config = configRaw.default;
+      } catch (er) {
+        this.debug(e, "Using standard config");
+      }
     } finally {
       this.debug(config, "Config");
 
-      this.migrationFolder = this._parsePath(
-        config.migrationFolder,
-        "migrations",
-      );
+      this.migrationFolder = resolve(config.migrationFolder || "migrations");
+
       this.connection = config.connection;
       this.dialect = config.dialect || "pg";
 
@@ -108,15 +124,5 @@ export class State {
       title ? console.log(title + ": ") : null;
       console.log(output);
     }
-  }
-
-  private _parsePath(path: string | undefined, defaultFolder?: string): string {
-    return !path
-      ? `${Deno.cwd()}${defaultFolder ? `/${defaultFolder}` : ""}`
-      : path?.startsWith("/")
-      ? path
-      : path.startsWith("./")
-      ? `${Deno.cwd()}${path.substring(1)}`
-      : `${Deno.cwd()}/${path}`;
   }
 }

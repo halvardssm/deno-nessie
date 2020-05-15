@@ -1,5 +1,7 @@
 import Denomander from "https://deno.land/x/denomander@0.5.1/mod.ts";
 
+export { relative, resolve } from "https://deno.land/std@v0.51.0/path/mod.ts";
+export { readJson } from "https://deno.land/std@v0.51.0/fs/read_json.ts";
 export {
   assert,
   assertArrayContains,

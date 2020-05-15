@@ -13,10 +13,16 @@ jobs:
         with: 
           deno-version: 1.0.0
           
+      - name: Nessie Init
+        run: deno run --allow-read --allow-write --allow-net https://raw.githubusercontent.com/$URL_PATH/cli.ts init
+        env:
+          URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'master'}}
+
       - name: Create migration
         run: deno run --allow-read --allow-write --allow-net https://raw.githubusercontent.com/$URL_PATH/cli.ts make test
         env:
           URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'master'}}
+
   tests:
     name: Run tests
     runs-on: ubuntu-latest
