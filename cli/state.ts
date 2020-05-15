@@ -6,9 +6,9 @@ import {
   open,
   PGClient,
   relative,
+  resolve,
   readJson,
 } from "../deps.ts";
-import stdConfig from "../nessie.config.ts";
 import { dbDialects, nessieConfig } from "../mod.ts";
 import { MySQL } from "./mysql.ts";
 import { PGSQL } from "./pgsql.ts";
@@ -16,6 +16,17 @@ import { SQLite } from "./sqlite.ts";
 import { ClientI, ClientTypes } from "./utils.ts";
 
 const STD_CONFIG_FILE = "nessie.config.ts";
+const stdConfig: nessieConfig = {
+  migrationFolder: "./migrations",
+  connection: {
+    database: "nessie",
+    hostname: "localhost",
+    port: 5432,
+    user: "root",
+    password: "pwd",
+  },
+  dialect: "pg",
+};
 
 export class State {
   private enableDebug: boolean;
@@ -28,34 +39,36 @@ export class State {
 
   constructor(prog: Denomander) {
     this.enableDebug = prog.debug;
-    this.configFile = prog.config; //this._parsePath(prog.config, STD_CONFIG_FILE);
+    this.configFile = resolve(Deno.cwd(), prog.config || STD_CONFIG_FILE);
 
     this.debug(prog, "Program");
     this.debug(this, "State");
   }
 
   async init() {
-    let config: nessieConfig = stdConfig as nessieConfig;
+    let config: nessieConfig = stdConfig;
 
     try {
-      // Checking specified path
-      const rawConfig = await readJson(this.configFile);
-
-      config = rawConfig as nessieConfig;
+      this.debug("Checking config path");
+      config = await readJson(this.configFile) as nessieConfig;
     } catch (e) {
-      this.debug(e, "Checking project root");
       try {
-        const rawConfig = await import(`./${STD_CONFIG_FILE}`);
+        this.debug(e, "Checking project root");
+
+        config = await readJson(
+          resolve(Deno.cwd(), STD_CONFIG_FILE),
+        ) as nessieConfig;
       } catch (er) {
         this.debug(e, "Using standard config");
       }
     } finally {
       this.debug(config, "Config");
 
-      this.migrationFolder = this._parsePath(
-        config.migrationFolder,
-        "migrations",
+      this.migrationFolder = resolve(
+        Deno.cwd(),
+        config.migrationFolder || "migrations",
       );
+
       this.connection = config.connection;
       this.dialect = config.dialect || "pg";
 
@@ -116,13 +129,5 @@ export class State {
       title ? console.log(title + ": ") : null;
       console.log(output);
     }
-  }
-
-  private _parsePath(path: string | undefined, defaultFolder?: string): string {
-    if (path?.startsWith("http://") || path?.startsWith("https://")) {
-      return path;
-    }
-
-    return relative(Deno.cwd(), path ?? defaultFolder ?? "");
   }
 }
