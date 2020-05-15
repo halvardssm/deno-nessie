@@ -60,10 +60,7 @@ export class State {
     } finally {
       this.debug(config, "Config");
 
-      this.migrationFolder = resolve(
-        Deno.cwd(),
-        config.migrationFolder || "migrations",
-      );
+      this.migrationFolder = resolve(config.migrationFolder || "migrations");
 
       this.connection = config.connection;
       this.dialect = config.dialect || "pg";
