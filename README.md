@@ -18,7 +18,7 @@ If you have a database system you would like to see in this list, feel free to m
 
 ## Usage
 
-* `init`: Generates a `nessie.config.json` file
+* `init`: Generates a `nessie.config.ts` file
 
   ```deno run --allow-net --allow-read --allow-write https://deno.land/x/nessie/cli.ts init```
 
@@ -54,20 +54,24 @@ Feel free to make pr's or create an issue!
 
 ## Examples
 
-`nessie.config.json`
+`nessie.config.ts`
 
-```json
-{
-  "migrationFolder": "./migrations",
-  "connection": {
-    "database": "nessie",
-    "hostname": "localhost",
-    "port": 5432,
-    "user": "root",
-    "password": "pwd"
+```ts
+import { nessieConfigType } from "https://deno.land/x/nessie/mod.ts";
+
+const config: nessieConfigType = {
+  migrationFolder: "./migrations",
+  connection: { // These are the connection option from their respective db clients, will differ
+    host: "localhost",
+    port: 5432,
+    user: "root",
+    password: "pwd",
+    name: "nessie",
   },
-  "dialect": "pg"
-}
+  dialect: "pg",
+};
+
+export default config;
 ```
 
 Minimal example of a migration file
