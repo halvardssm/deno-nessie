@@ -37,7 +37,7 @@ export class State {
 
   constructor(prog: Denomander) {
     this.enableDebug = prog.debug;
-    this.configFile = parsePath(prog.config) || STD_CONFIG_FILE;
+    this.configFile = parsePath(prog.config || STD_CONFIG_FILE);
 
     this.debug(prog, "Program");
     this.debug(this, "State");
