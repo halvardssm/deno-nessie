@@ -1,5 +1,5 @@
 import { State } from "./cli/state.ts";
-import { Denomander } from "./deps.ts";
+import { Denomander, resolve } from "./deps.ts";
 
 const initDenomander = () => {
   const program = new Denomander({
@@ -14,6 +14,7 @@ const initDenomander = () => {
       "-c --config",
       "Path to config file, will default to ./nessie.config.ts",
     )
+    .command("init", "Generates the config file")
     .command("make [migrationName]", "Creates a migration file with the name")
     .command("migrate", "Migrates one migration")
     .command("rollback", "Rolls back one migration");
@@ -23,13 +24,26 @@ const initDenomander = () => {
   return program;
 };
 
+const initNessie = async () => {
+  const responseFile = await fetch(
+    "https://deno.land/x/nessie/cli/templates/config.json",
+  );
+
+  await Deno.writeTextFile(
+    resolve(Deno.cwd(), "nessie.json"),
+    await responseFile.text(),
+  );
+};
+
 const run = async () => {
   const prog = initDenomander();
 
   const state = await new State(prog).init();
 
   try {
-    if (prog.make) {
+    if (prog.init) {
+      await initNessie();
+    } else if (prog.make) {
       await state.makeMigration(prog.make);
     } else {
       await state.initClient();
