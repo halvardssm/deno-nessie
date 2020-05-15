@@ -31,7 +31,7 @@ export type ClientTypes = {
 export const parsePath = (...path: string[]): string => {
   if (
     path.length === 1 &&
-    (path[0].startsWith("http://") || path[0].startsWith("https://"))
+    (path[0]?.startsWith("http://") || path[0]?.startsWith("https://"))
   ) {
     return path[0];
   }
