@@ -114,6 +114,6 @@ export class State {
       return path;
     }
 
-    return "file:///" + resolve(Deno.cwd(), path ?? defaultFolder ?? "");
+    return "file://" + resolve(Deno.cwd(), path ?? defaultFolder ?? "");
   }
 }
