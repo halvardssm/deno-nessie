@@ -1,0 +1,12 @@
+{
+	"migrationFolder": "./migrations",
+	"connection": {
+		"database": "nessie",
+		"hostname": "localhost",
+		"port": 5432,
+		"user": "postgres",
+		"password": "password"
+	},
+	// "connection": "./tests/data/sqlite.db",
+	"dialect": "pg" // "mysql" | "sqlite"
+}
