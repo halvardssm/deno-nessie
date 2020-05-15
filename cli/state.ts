@@ -39,7 +39,7 @@ export class State {
 
   constructor(prog: Denomander) {
     this.enableDebug = prog.debug;
-    this.configFile = resolve(Deno.cwd(), prog.config || STD_CONFIG_FILE);
+    this.configFile = this._parsePath(prog.config) || STD_CONFIG_FILE;
 
     this.debug(prog, "Program");
     this.debug(this, "State");
@@ -50,14 +50,12 @@ export class State {
 
     try {
       this.debug("Checking config path");
-      config = await readJson(this.configFile) as nessieConfig;
+      config = await import(this.configFile);
     } catch (e) {
       try {
         this.debug(e, "Checking project root");
 
-        config = await readJson(
-          resolve(Deno.cwd(), STD_CONFIG_FILE),
-        ) as nessieConfig;
+        config = await import(this._parsePath(STD_CONFIG_FILE));
       } catch (er) {
         this.debug(e, "Using standard config");
       }
@@ -122,6 +120,13 @@ export class State {
     }
 
     this.debug(this.client, "Client");
+  }
+
+  _parsePath(path: string): string {
+    if (path.startsWith("http://") || path.startsWith("https://")) {
+      return path;
+    }
+    return "file://" + resolve(path);
   }
 
   debug(output?: any, title?: string) {

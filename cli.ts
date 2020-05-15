@@ -26,11 +26,11 @@ const initDenomander = () => {
 
 const initNessie = async () => {
   const responseFile = await fetch(
-    "https://deno.land/x/nessie/cli/templates/config.json",
+    "https://deno.land/x/nessie/cli/templates/config.ts",
   );
 
   await Deno.writeTextFile(
-    resolve(Deno.cwd(), "nessie.json"),
+    resolve(Deno.cwd(), "nessie.config.ts"),
     await responseFile.text(),
   );
 };
