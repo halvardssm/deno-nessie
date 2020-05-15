@@ -41,7 +41,7 @@ export class State {
       // Checking specified path
       const rawConfig = await readJson(this.configFile);
 
-      config = rawConfig.default;
+      config = rawConfig as nessieConfig;
     } catch (e) {
       this.debug(e, "Checking project root");
       try {
