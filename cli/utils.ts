@@ -50,7 +50,7 @@ export const filterAndSortFiles = (
     return parseInt(file.name.split("-")[0]) >
       new Date(queryResult).getTime();
   })
-    .sort((a, b) => parseInt(b?.name ?? "0") - parseInt(a?.name ?? "0"));
+    .sort((a, b) => parseInt(a?.name ?? "0") - parseInt(b?.name ?? "0"));
 };
 
 export const traverseAndMigrateFiles = async (
