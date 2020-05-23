@@ -43,7 +43,7 @@ If you have a database system you would like to see in this list, feel free to m
 
 ## Contributing
 
-Feel free to make pr's or create an issue!
+All contributions are welcome, make sure to read the [contributing guideline](./.github/CONTRIBUTING.md).
 
 ## Uses
 
