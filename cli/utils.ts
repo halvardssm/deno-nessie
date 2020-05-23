@@ -42,13 +42,13 @@ export const filterAndSortFiles = (
   files: Deno.DirEntry[],
   queryResult: string | undefined,
 ): Deno.DirEntry[] => {
-  return files.filter((file: Deno.DirEntry): boolean => {
-    if (!regexFileName.test(file.name)) return false;
+  return files
+    .filter((file: Deno.DirEntry): boolean => {
+      if (!regexFileName.test(file.name)) return false;
 
-    if (queryResult === undefined) return true;
+      if (queryResult === undefined) return true;
 
       return file.name > queryResult[0];
-    
     })
     .sort((a, b) => parseInt(a?.name ?? "0") - parseInt(b?.name ?? "0"));
 };
