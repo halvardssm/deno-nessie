@@ -9,8 +9,7 @@ export const COL_CREATED_AT = "created_at";
 export const REGEX_MIGRATION_FILE_NAME = /^\d{10,14}-.+.ts$/;
 let regexFileName = new RegExp(REGEX_MIGRATION_FILE_NAME);
 
-export const QUERY_GET_LATEST =
-  `select ${COL_FILE_NAME} from ${TABLE_MIGRATIONS} order by ${COL_CREATED_AT} desc limit 1`;
+export const QUERY_GET_LATEST = `select ${COL_FILE_NAME} from ${TABLE_MIGRATIONS} order by ${COL_CREATED_AT} desc limit 1`;
 export const QUERY_INSERT = (fileName: string) =>
   `INSERT INTO ${TABLE_MIGRATIONS} (${COL_FILE_NAME}) VALUES ('${fileName}');`;
 export const QUERY_DELETE = (fileName: string) =>
@@ -40,7 +39,7 @@ export const parsePath = (...path: string[]): string => {
 
 export const filterAndSortFiles = (
   files: Deno.DirEntry[],
-  queryResult: string | undefined,
+  queryResult: string | undefined
 ): Deno.DirEntry[] => {
   return files
     .filter((file: Deno.DirEntry): boolean => {
@@ -56,7 +55,7 @@ export const filterAndSortFiles = (
 export const traverseAndMigrateFiles = async (
   state: State,
   files: Deno.DirEntry[],
-  queryfn: (query: string) => any,
+  queryfn: (query: string) => any
 ) => {
   if (files.length > 0) {
     for await (const file of files) {
@@ -75,7 +74,7 @@ export const traverseAndMigrateFiles = async (
       const result = await queryHandler(
         query,
         state,
-        async (query) => await queryfn(query),
+        async (query) => await queryfn(query)
       );
 
       console.info(`Migrated ${file.name}`);
@@ -92,7 +91,7 @@ export const traverseAndMigrateFiles = async (
 export const traverseAndRollbackFiles = async (
   state: State,
   fileName: string | undefined,
-  queryfn: (query: string) => any,
+  queryfn: (query: string) => any
 ) => {
   if (typeof fileName === "string") {
     let { down } = await import(parsePath(state.migrationFolder, fileName));
@@ -118,7 +117,7 @@ export const traverseAndRollbackFiles = async (
 export const queryHandler = async (
   queryString: string,
   state: State,
-  queryfn: (query: string) => any,
+  queryfn: (query: string) => any
 ) => {
   const queries = queryString.trim().split(/(?<!\\);/);
 
