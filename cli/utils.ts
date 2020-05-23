@@ -10,7 +10,7 @@ export const REGEX_MIGRATION_FILE_NAME = /^\d{10,14}-.+.ts$/;
 let regexFileName = new RegExp(REGEX_MIGRATION_FILE_NAME);
 
 export const QUERY_GET_LATEST =
-  `select ${COL_FILE_NAME} from ${TABLE_MIGRATIONS} order by ${COL_CREATED_AT} desc limit 1`;
+  `select ${COL_FILE_NAME} from ${TABLE_MIGRATIONS} order by ${COL_FILE_NAME} desc limit 1`;
 export const QUERY_INSERT = (fileName: string) =>
   `INSERT INTO ${TABLE_MIGRATIONS} (${COL_FILE_NAME}) VALUES ('${fileName}');`;
 export const QUERY_DELETE = (fileName: string) =>
