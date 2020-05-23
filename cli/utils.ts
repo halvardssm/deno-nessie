@@ -10,7 +10,7 @@ export const REGEX_MIGRATION_FILE_NAME = /^\d{10,14}-.+.ts$/;
 let regexFileName = new RegExp(REGEX_MIGRATION_FILE_NAME);
 
 export const QUERY_GET_LATEST =
-  `select ${COL_FILE_NAME} from ${TABLE_MIGRATIONS} order by ${COL_CREATED_AT} desc limit 1`;
+  `select ${COL_FILE_NAME} from ${TABLE_MIGRATIONS} order by ${COL_FILE_NAME} desc limit 1`;
 export const QUERY_INSERT = (fileName: string) =>
   `INSERT INTO ${TABLE_MIGRATIONS} (${COL_FILE_NAME}) VALUES ('${fileName}');`;
 export const QUERY_DELETE = (fileName: string) =>
@@ -42,14 +42,14 @@ export const filterAndSortFiles = (
   files: Deno.DirEntry[],
   queryResult: string | undefined,
 ): Deno.DirEntry[] => {
-  return files.filter((file: Deno.DirEntry): boolean => {
-    if (!regexFileName.test(file.name)) return false;
+  return files
+    .filter((file: Deno.DirEntry): boolean => {
+      if (!regexFileName.test(file.name)) return false;
 
-    if (queryResult === undefined) return true;
+      if (queryResult === undefined) return true;
 
-    return parseInt(file.name.split("-")[0]) >
-      new Date(queryResult).getTime();
-  })
+      return file.name > queryResult[0];
+    })
     .sort((a, b) => parseInt(a?.name ?? "0") - parseInt(b?.name ?? "0"));
 };
 
