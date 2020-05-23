@@ -24,17 +24,17 @@ const strings = [
     solution: ["Nothing to migrate"],
   },
   {
-    name: "Rollback",
+    name: "Rollback Mango",
     string: TYPE_ROLLBACK,
     solution: ["Rolled back 1587937822650-mango.ts"],
   },
   {
-    name: "Rollback",
+    name: "Rollback Apple",
     string: TYPE_ROLLBACK,
     solution: ["Rolled back 1587937822649-apple.ts"],
   },
   {
-    name: "Migrate",
+    name: "Migrate Apple and Mango",
     string: TYPE_MIGRATE,
     solution: [
       "Migrated 1587937822649-apple.ts",
@@ -43,17 +43,17 @@ const strings = [
     ],
   },
   {
-    name: "Rollback",
+    name: "Rollback Mango",
     string: TYPE_ROLLBACK,
     solution: ["Rolled back 1587937822650-mango.ts"],
   },
   {
-    name: "Rollback",
+    name: "Rollback Apple",
     string: TYPE_ROLLBACK,
     solution: ["Rolled back 1587937822649-apple.ts"],
   },
   {
-    name: "Rollback",
+    name: "Rollback Test",
     string: TYPE_ROLLBACK,
     solution: ["Rolled back 1587937822648-test.ts"],
   },
