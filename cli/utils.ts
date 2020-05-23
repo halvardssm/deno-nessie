@@ -47,9 +47,9 @@ export const filterAndSortFiles = (
 
     if (queryResult === undefined) return true;
 
-    return parseInt(file.name.split("-")[0]) >
-      new Date(queryResult).getTime();
-  })
+      return file.name > queryResult[0];
+    
+    })
     .sort((a, b) => parseInt(a?.name ?? "0") - parseInt(b?.name ?? "0"));
 };
 
