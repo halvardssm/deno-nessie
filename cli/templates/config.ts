@@ -1,31 +1,29 @@
+import { ClientPostgreSQL } from "../../clients/ClientPostgreSQL.ts";
+import { ClientMySQL } from "../../clients/ClientMySQL.ts";
+import { ClientSQLite } from "../../clients/ClientSQLite.ts";
+
+const migrationFolder = "./migrations"
+
 const configPg = {
-  migrationFolder: `./migrations`,
-  connection: {
+  client: new ClientPostgreSQL(migrationFolder, {
     database: "nessie",
     hostname: "localhost",
     port: 5432,
     user: "root",
     password: "pwd",
-  },
-  dialect: "pg",
+  })
 };
-
 const configMySql = {
-  migrationFolder: `./migrations`,
-  connection: {
+  client: new ClientMySQL(migrationFolder, {
     hostname: "localhost",
     port: 3306,
     username: "root",
     // password: "pwd", // uncomment this line for <8
     db: "nessie",
-  },
-  dialect: "mysql",
+  })
 };
-
 const configSqLite = {
-  migrationFolder: `./migrations`,
-  connection: "sqlite.db",
-  dialect: "sqlite",
+  client: new ClientSQLite(migrationFolder, "sqlite.db")
 };
 
 export default configPg;

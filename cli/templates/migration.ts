@@ -1,7 +1,10 @@
 import { Schema } from "https://deno.land/x/nessie/mod.ts";
+import Dex from "https://deno.land/x/dex/mod.ts";
 
-export const up = (schema: Schema): void => {
+export const up = (): string => {
+  // return new Schema()
+  // return Dex
 };
 
-export const down = (schema: Schema): void => {
+export const down = (): string => {
 };

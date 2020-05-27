@@ -1,4 +1,4 @@
-import { ClientPostgreSQL } from "./clients/ClientPostgreSQL.ts";
+import { ClientPostgreSQL } from "../clients/ClientPostgreSQL.ts";
 
 const migrationFolder = "./migrations"
 

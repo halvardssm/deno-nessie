@@ -1,13 +1,13 @@
 import { Schema } from "https://deno.land/x/nessie/mod.ts";
 
-export const up = (scema: Schema): void => {
-  scema.create("column_config", (table) => {
+export const up = () => {
+  return new Schema().create("column_config", (table) => {
     table.string("name", 100).nullable().default("Deno");
     table.integer("number").default("0").autoIncrement();
     table.boolean("true").custom("default true");
   });
 };
 
-export const down = (schema: Schema): void => {
-  schema.drop("column_config");
+export const down = () => {
+  return new Schema().drop("column_config");
 };
