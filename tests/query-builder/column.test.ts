@@ -1,5 +1,5 @@
-import { assertEquals } from "../deps.ts";
-import { Column } from "../mod.ts";
+import { assertEquals } from "../../deps.ts";
+import { Column } from "../../qb.ts";
 
 const strings = [
   {

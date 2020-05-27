@@ -1,5 +1,3 @@
-import { ClientConfig, ConnectionOptions } from "../deps.ts";
-
 export type dbDialects = "pg" | "mysql" | "sqlite";
 
 export type columnTypeSql =
@@ -165,27 +163,3 @@ export const typeMap: typeMapType = {
   time: { pg: "time", mysql: "time", sqlite: "time" },
   timestamp: { pg: "timestamp", mysql: "timestamp", sqlite: "timestamp" },
 };
-
-export interface nessieConnection {
-  host: string | "localhost" | "127.0.0.1";
-  port: string | number;
-  name: string;
-  user: string;
-  password?: string;
-}
-
-export interface nessieConfig {
-  connection: ConnectionOptions | string | ClientConfig;
-  migrationFolder?: string;
-  dialect?: dbDialects;
-}
-
-export interface _nessieConfig {
-  migrationFolder: string;
-  dialect: dbDialects;
-  connection: {
-    pg?: ConnectionOptions | string;
-    mysql?: ClientConfig;
-    sqlite?: string;
-  };
-}

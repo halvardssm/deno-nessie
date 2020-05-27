@@ -19,7 +19,7 @@ export const runner = async (type: string, dialect: string) => {
       "cli.ts",
       type,
       "-c",
-      `${Deno.cwd()}/tests/config/${dialect}.config.ts`,
+      `${Deno.cwd()}/tests/migrations/config/${dialect}.config.ts`,
     ],
     stdout: "piped",
   });
