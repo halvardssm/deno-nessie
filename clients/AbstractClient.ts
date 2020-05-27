@@ -3,6 +3,19 @@ import { resolve } from "../deps.ts";
 
 export type QueryWithString = (string: string) => string
 
+export interface ClientI {
+  migrationFolder: string
+  prepare: () => Promise<void>;
+  close: () => Promise<void>;
+  rollback: (numberOfRollbacks?: null) => Promise<void>;
+  migrate: (numberOfMigrations?: null) => Promise<void>;
+  query: (query: string) => Promise<any>
+}
+
+export interface nessieConfig {
+  client: ClientI
+}
+
 export class AbstractClient {
   static readonly MAX_FILE_NAME_LENGTH = 100;
 

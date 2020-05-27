@@ -1,7 +1,7 @@
-import { AbstractClient } from '../clients/AbstractClient.ts';
+import { AbstractClient, ClientI } from '../clients/AbstractClient.ts';
 import { ClientPostgreSQL } from "../clients/ClientPostgreSQL.ts";
 import { Denomander } from "../deps.ts";
-import { parsePath, ClientI } from "./utils.ts";
+import { parsePath } from "./utils.ts";
 
 const STD_CONFIG_FILE = "nessie.config.ts";
 const stdConfig = {

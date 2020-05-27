@@ -1,6 +1,5 @@
 import { DB, open, save } from "https://deno.land/x/sqlite@v1.0.0/mod.ts";
-import { ClientI } from "../cli/utils.ts";
-import { AbstractClient } from './AbstractClient.ts';
+import { AbstractClient, ClientI } from './AbstractClient.ts';
 
 export class ClientSQLite extends AbstractClient implements ClientI {
   private client?: DB;

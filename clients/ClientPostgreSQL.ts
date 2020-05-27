@@ -1,8 +1,7 @@
 import { ConnectionOptions } from "https://deno.land/x/postgres@v0.4.0/connection_params.ts";
 import { Client } from "https://deno.land/x/postgres@v0.4.0/mod.ts";
 import { QueryResult } from "https://deno.land/x/postgres@v0.4.0/query.ts";
-import { ClientI } from "../cli/utils.ts";
-import { AbstractClient } from './AbstractClient.ts';
+import { AbstractClient, ClientI } from './AbstractClient.ts';
 
 export class ClientPostgreSQL extends AbstractClient implements ClientI {
   private client: Client

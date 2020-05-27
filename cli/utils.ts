@@ -1,15 +1,6 @@
 import { resolve } from "../deps.ts";
 import { State } from "./state.ts";
 
-export interface ClientI {
-  migrationFolder: string
-  prepare: () => Promise<void>;
-  close: () => Promise<void>;
-  rollback: (numberOfRollbacks?: null) => Promise<void>;
-  migrate: (numberOfMigrations?: null) => Promise<void>;
-  query: (query: string) => Promise<any>
-}
-
 export const parsePath = (...path: string[]): string => {
   if (
     path.length === 1 &&
