@@ -12,7 +12,7 @@ const strings = [
       });
     })(),
     solution:
-      "CREATE TABLE testTable (id bigserial PRIMARY KEY, created_at timestamp (0) default current_timestamp, updated_at timestamp (0) default current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on public.testTable; CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.testTable FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
+      "CREATE TABLE testTable (id bigserial PRIMARY KEY, created_at timestamp (0) default current_timestamp, updated_at timestamp (0) default current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on testTable; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
   },
   {
     name: "Schema drop",

@@ -4,70 +4,70 @@ import { Column } from "../../qb.ts";
 const strings = [
   {
     name: "Standard Column",
-    string: new Column("testName", "testType")
+    string: new Column("testCol", "testType")
       .toSql(),
-    solution: "testName testType",
+    solution: "testCol testType",
   },
   {
     name: "Column with default",
-    string: new Column("testName", "testType")
+    string: new Column("testCol", "testType")
       .default("testDefault")
       .toSql(),
-    solution: "testName testType default testDefault",
+    solution: "testCol testType default testDefault",
   },
   {
     name: "Column with not nullable",
-    string: new Column("testName", "testType")
+    string: new Column("testCol", "testType")
       .notNullable()
       .toSql(),
-    solution: "testName testType not null",
+    solution: "testCol testType not null",
   },
   {
     name: "Column with default and not nullable",
-    string: new Column("testName", "testType")
+    string: new Column("testCol", "testType")
       .default("testDefault")
       .notNullable()
       .toSql(),
-    solution: "testName testType default testDefault not null",
+    solution: "testCol testType default testDefault not null",
   },
   {
     name: "Column with nullable",
-    string: new Column("testName", "testType")
+    string: new Column("testCol", "testType")
       .nullable()
       .toSql(),
-    solution: "testName testType",
+    solution: "testCol testType",
   },
   {
     name: "Column with default and nullable",
-    string: new Column("testName", "testType")
+    string: new Column("testCol", "testType")
       .default("testDefault")
       .nullable()
       .toSql(),
-    solution: "testName testType default testDefault",
+    solution: "testCol testType default testDefault",
   },
   {
     name: "Column 1 input",
-    string: new Column("testName", "testType", 1)
+    string: new Column("testCol", "testType", 1)
       .default("testDefault")
       .notNullable()
       .toSql(),
-    solution: "testName testType (1) default testDefault not null",
+    solution: "testCol testType (1) default testDefault not null",
   },
   {
     name: "Column 2 input",
-    string: new Column("testName", "testType", 1, 2)
+    string: new Column("testCol", "testType", 1, 2)
       .default("testDefault")
       .notNullable()
       .toSql(),
-    solution: "testName testType (1, 2) default testDefault not null",
+    solution: "testCol testType (1, 2) default testDefault not null",
   },
   {
     name: "Column with default and nullable",
-    string: new Column("testName", "testType", ["one", "two", "three"])
+    string: new Column("testCol", "testType", ["one", "two", "three"])
       .default("testDefault")
       .notNullable()
       .toSql(),
-    solution: "testName testType (one,two,three) default testDefault not null",
+    solution: "testCol testType (one,two,three) default testDefault not null",
   },
 ];
 

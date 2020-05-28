@@ -22,6 +22,7 @@ export class Schema {
     createfn: (table: Table) => void,
   ): string {
     const table = new Table(name, this.dialect);
+
     createfn(table);
 
     const sql = table.toSql();
@@ -48,7 +49,7 @@ export class Schema {
       name.join(
         ", ",
       )
-      }${cascade ? " CASCADE" : ""};`;
+    }${cascade ? " CASCADE" : ""};`;
 
     this.query += sql;
 

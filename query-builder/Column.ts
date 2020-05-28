@@ -42,7 +42,7 @@ export class Column {
     if (this.columnInput1 !== undefined) {
       string += ` (${this.columnInput1}${
         this.columnInput2 ? `, ${this.columnInput2}` : ""
-      })`;
+        })`;
     }
 
     if (this.defaultValue) {
@@ -54,14 +54,14 @@ export class Column {
     }
 
     if (this.isAutoIncrement) {
-      string += " AUTO_INCREMENT";
+      string += this.dialect === "sqlite" ? "" : " AUTO_INCREMENT";
     }
 
     if (this.isPrimary) {
       string += " PRIMARY KEY";
     }
 
-    if (this.isUnique) {
+    if (this.isUnique && !this.isPrimary) {
       string += " UNIQUE";
     }
 
@@ -109,6 +109,9 @@ export class Column {
   autoIncrement() {
     if (this.dialect === "mysql") {
       this.isAutoIncrement = true;
+      if (!this.isPrimary) {
+        this.isUnique = true
+      }
     }
 
     return this;

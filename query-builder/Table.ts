@@ -95,9 +95,9 @@ export class Table {
       default:
         return `CREATE${
           this.constraints.isTemporary ? " TEMPORARY" : ""
-        } TABLE${
+          } TABLE${
           this.constraints.ifNotExists ? " IF NOT EXISTS" : ""
-        } ${this.tableName}`;
+          } ${this.tableName}`;
     }
   }
 
@@ -115,18 +115,15 @@ export class Table {
     }
   }
 
-  /** Generates enum query dependent on dialect. */
+  /** Generates enum query dependent on dialect. In postgres, this will be stored as the column name */
   private _enumHandler(enumCol: EnumColumn): string {
     switch (this.dialect) {
+      case "sqlite":
       case "mysql":
         return "";
       case "pg":
       default:
-        return `CREATE TYPE ${enumCol.name} AS ENUM (${
-          enumCol.columns.join(
-            ", ",
-          )
-        });`;
+        return `CREATE TYPE ${enumCol.name} AS ENUM (${enumCol.columns.join(", ")});`;
     }
   }
 
@@ -141,7 +138,7 @@ export class Table {
 
     switch (this.dialect) {
       case "sqlite":
-        return "";
+        return uniqueArray ? ` CREATE UNIQUE INDEX ${this.tableName} ON ${this.tableName} (${uniqueString});` : '';
       case "mysql":
       case "pg":
       default:
@@ -152,7 +149,10 @@ export class Table {
   /** Generates index query dependent on dialect. */
   private _indexHandler(index: string) {
     switch (this.dialect) {
+      case "sqlite":
+        return ` CREATE INDEX ${this.tableName}_${index} ON ${this.tableName} (${index});`;
       case "mysql":
+        return ` ALTER TABLE ${this.tableName} ADD INDEX ${index} (${index});`
       case "pg":
       default:
         return ` CREATE INDEX ON ${this.tableName} (${index});`;
@@ -170,7 +170,7 @@ export class Table {
         return ` DROP TRIGGER IF EXISTS set_timestamp; CREATE TRIGGER set_timestamp BEFORE UPDATE ON ${this.tableName} FOR EACH ROW BEGIN UPDATE ${this.tableName} SET updated_at = CURRENT_TIMESTAMP WHERE id=OLD.id\\; END;`;
       case "pg":
       default:
-        return ` DROP TRIGGER IF EXISTS set_timestamp on public.${this.tableName}; CREATE TRIGGER set_timestamp BEFORE UPDATE ON public.${this.tableName} FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();`;
+        return ` DROP TRIGGER IF EXISTS set_timestamp on ${this.tableName}; CREATE TRIGGER set_timestamp BEFORE UPDATE ON ${this.tableName} FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();`;
     }
   }
 
@@ -183,6 +183,16 @@ export class Table {
       default:
         return "";
     }
+  }
+
+  /** Adds `IF NOT EXISTS` to the table creation query */
+  ifNotExists() {
+    this.constraints.ifNotExists = true
+  }
+
+  /** Adds `TEMPORARY` to the table creation query */
+  isTemporary() {
+    this.constraints.isTemporary = true
   }
 
   /** Adds a custom column to the table. */
@@ -286,45 +296,53 @@ export class Table {
   // ******* Doubles *******
 
   /** Adds a decimal column to the table. */
-  decimal(
+  numeric(
     name: string,
     before: number = 8,
     after: number = 2,
   ): Column {
     return this._pushColumn(
       name,
-      typeMap.decimal,
+      typeMap.numeric,
       before,
       after,
     );
   }
 
-  /** Adds a double or 8-bit float column to the table. */
+  /** Adds a double or 8-bit single precision float column to the table. */
   double(
     name: string,
     before: number = 8,
     after: number = 2,
   ): Column {
-    return this._pushColumn(
-      name,
-      typeMap.double,
-      before,
-      after,
-    );
+    if (this.dialect === "pg") {
+      return this._pushColumn(name, typeMap.double)
+    } else {
+      return this._pushColumn(
+        name,
+        typeMap.double,
+        before,
+        after,
+      );
+    }
   }
 
-  /** Adds a real or 4-bit float column to the table. */
+  /** Adds a real or 4-bit single precision float column to the table. */
   real(
     name: string,
     before: number = 8,
     after: number = 2,
   ): Column {
-    return this._pushColumn(
-      name,
-      typeMap.real,
-      before,
-      after,
-    );
+    if (this.dialect === "pg") {
+      return this._pushColumn(name, typeMap.real)
+    } else {
+      return this._pushColumn(
+        name,
+        typeMap.real,
+        before,
+        after,
+      );
+    }
   }
 
   /** Adds a money or decimal column to the table. */
@@ -389,7 +407,7 @@ export class Table {
 
   /** Adds a time column with timezone to the table. */
   timeTz(name: string, length: number = 0): Column {
-    return this._pushColumn(name, "timetz", length);
+    return this._pushColumn(name, typeMap.timeTz, length);
   }
 
   /** Adds a timestamp column to the table. */
@@ -399,7 +417,7 @@ export class Table {
 
   /** Adds a timestamp column with timezone to the table. */
   timestampTz(name: string, length: number = 0): Column {
-    return this._pushColumn(name, "timestamptz", length);
+    return this._pushColumn(name, typeMap.timestampTz, length);
   }
 
   /** Adds timestamps columns to the table. 
@@ -467,27 +485,39 @@ export class Table {
     array: string[],
     typeName: string = name,
   ): Column {
+    array = array.map(el => `'${el}'`)
+
     const newEnum: EnumColumn = { name: typeName, columns: array };
+
     if (!this.constraints.enums) {
       this.constraints.enums = [newEnum];
     }
+
     this.constraints.enums.push(newEnum);
 
     return this._pushColumn(
       name,
-      typeName,
+      this.dialect === "pg"
+        ? typeName
+        : this.dialect === 'mysql'
+          ? "ENUM" : 'TEXT',
       undefined,
       undefined,
       (col) =>
         this.dialect === "mysql"
-          ? col.custom(`ENUM(${array.join(", ")})`)
-          : col,
+          ? col.custom(`(${array.join(", ")})`)
+          : this.dialect === "sqlite"
+            ? col.custom(`CHECK(${name} IN (${array.join(", ")}) )`)
+            : col,
     );
   }
 
   /** Adds an ip address column to the table. */
   ipAddress(name: string): Column {
-    return this._pushColumn(name, "inet");
+    if (this.dialect === 'pg')
+      return this._pushColumn(name, "inet");
+    else
+      return this.string(name, 50)
   }
 
   /** Adds a json column to the table. */
@@ -497,12 +527,15 @@ export class Table {
 
   /** Adds a jsonb column to the table. */
   jsonb(name: string): Column {
-    return this._pushColumn(name, "jsonb");
+    return this._pushColumn(name, typeMap.jsonb);
   }
 
   /** Adds a mac address(8) column to the table. */
   macAddress(name: string, isMacAddress8: boolean = false): Column {
-    return this._pushColumn(name, `macaddr${isMacAddress8 ? "8" : ""}`);
+    if (this.dialect === 'pg')
+      return this._pushColumn(name, `macaddr${isMacAddress8 ? "8" : ""}`);
+    else
+      return this.string(name, isMacAddress8 ? 23 : 17)
   }
 
   /** Adds a mac address 8 column to the table. */
@@ -512,7 +545,10 @@ export class Table {
 
   /** Adds an uuid column to the table. */
   uuid(name: string): Column {
-    return this._pushColumn(name, "uuid");
+    if (this.dialect === 'pg')
+      return this._pushColumn(name, "uuid");
+    else
+      return this.string(name, 36)
   }
 }
 

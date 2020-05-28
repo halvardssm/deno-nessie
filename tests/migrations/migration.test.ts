@@ -4,7 +4,7 @@ import {
   runner,
   TYPE_MIGRATE,
   TYPE_ROLLBACK,
-} from "../config/migration.config.ts";
+} from "./config/migration.config.ts";
 
 const strings = [
   {
