@@ -74,7 +74,6 @@ export class State {
     console.info(`Created migration ${fileName} at ${this.client!.migrationFolder}`);
   }
 
-
   debug(output?: any, title?: string) {
     if (this.enableDebug) {
       title ? console.log(title + ": ") : null;

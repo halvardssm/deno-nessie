@@ -33,28 +33,34 @@ const initNessie = async () => {
     resolve(Deno.cwd(), "nessie.config.ts"),
     await responseFile.text(),
   );
+
+  await Deno.mkdir(resolve(Deno.cwd(), "migrations"), { recursive: true })
+  await Deno.create(resolve(Deno.cwd(), "migrations/.gitkeep"))
 };
 
 const run = async () => {
   const prog = initDenomander();
 
-  const state = await new State(prog).init();
 
   try {
     if (prog.init) {
       await initNessie();
-    } else if (prog.make) {
-      await state.makeMigration(prog.make);
     } else {
-      await state.client!.prepare();
+      const state = await new State(prog).init();
 
-      if (prog.migrate) {
-        await state.client!.migrate();
-      } else if (prog.rollback) {
-        await state.client!.rollback();
+      if (prog.make) {
+        await state.makeMigration(prog.make);
+      } else {
+        await state.client!.prepare();
+
+        if (prog.migrate) {
+          await state.client!.migrate();
+        } else if (prog.rollback) {
+          await state.client!.rollback();
+        }
+
+        await state.client!.close();
       }
-
-      await state.client!.close();
     }
     Deno.exit();
   } catch (e) {
