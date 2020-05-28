@@ -6,7 +6,7 @@ import { AbstractClient, ClientI } from './AbstractClient.ts';
 export class ClientPostgreSQL extends AbstractClient implements ClientI {
   private client: Client
 
-  private QUERY_MIGRATION_TABLE_EXISTS = `SELECT to_regclass(${this.TABLE_MIGRATIONS});`
+  private QUERY_MIGRATION_TABLE_EXISTS = `SELECT to_regclass('${this.TABLE_MIGRATIONS}');`
 
   private QUERY_CREATE_MIGRATION_TABLE = `CREATE TABLE ${this.TABLE_MIGRATIONS} (id bigserial PRIMARY KEY, ${this.COL_FILE_NAME} varchar(${AbstractClient.MAX_FILE_NAME_LENGTH}) UNIQUE, ${this.COL_CREATED_AT} timestamp (0) default current_timestamp);`
 
@@ -17,7 +17,10 @@ export class ClientPostgreSQL extends AbstractClient implements ClientI {
 
   async prepare(): Promise<void> {
     await this.client.connect()
-    const migrationTableExists = (await this.query(this.QUERY_MIGRATION_TABLE_EXISTS)).rows[0][0] === this.TABLE_MIGRATIONS;
+
+    const queryResult = await this.query(this.QUERY_MIGRATION_TABLE_EXISTS)
+
+    const migrationTableExists = queryResult.rows?.[0]?.[0] === this.TABLE_MIGRATIONS;
 
     if (!migrationTableExists) {
       await this.query(this.QUERY_CREATE_MIGRATION_TABLE)
@@ -33,13 +36,13 @@ export class ClientPostgreSQL extends AbstractClient implements ClientI {
     await this.client.end();
   }
 
-  async migrate() {
+  async migrate(amount: number | undefined) {
     const latestMigration = await this.query(this.QUERY_GET_LATEST)
-    await super.migrate(latestMigration.rows?.[0]?.[0], this.query)
+    await super.migrate(amount, latestMigration.rows?.[0]?.[0], this.query.bind(this))
   }
 
-  async rollback() {
+  async rollback(amount: number | undefined) {
     const allMigrations = await this.query(this.QUERY_GET_ALL)
-    super.rollback(allMigrations.rows?.[0], this.query)
+    super.rollback(amount, allMigrations.rows?.[0], this.query.bind(this))
   }
 }

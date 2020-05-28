@@ -42,6 +42,8 @@ export class Table {
   toSql(): string {
     let sql = "";
 
+    sql += this._addUpdatedAtFunction()
+
     this.constraints.enums.forEach((enumCol) => {
       sql += this._enumHandler(enumCol);
     });
@@ -156,6 +158,20 @@ export class Table {
       case "pg":
       default:
         return ` CREATE INDEX ON ${this.tableName} (${index});`;
+    }
+  }
+
+  /** Generates updated at query dependent on dialect. */
+  private _addUpdatedAtFunction() {
+    if (!this.constraints.updatedAt) return "";
+
+    switch (this.dialect) {
+      case "mysql":
+      case "sqlite":
+        return ""
+      case "pg":
+      default:
+        return `CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now()\\; RETURN NEW\\; END\\; $$ language 'plpgsql';`;
     }
   }
 

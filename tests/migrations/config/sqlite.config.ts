@@ -1,5 +1,5 @@
+import { ClientSQLite } from "../../../mod.ts";
+
 export default {
-  "migrationFolder": "./tests/migrations",
-  "connection": "./tests/data/sqlite.db",
-  "dialect": "sqlite",
+  client: new ClientSQLite("./tests/migrations", "./tests/data/sqlite.db")
 };

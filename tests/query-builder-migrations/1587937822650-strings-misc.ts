@@ -17,7 +17,7 @@ export const up = (): string => {
     table.timeTz("col_8")
     table.timestamp("col_9")
     table.timestampTz("col_10")
-    table.timestampsTz()
+    // table.timestampsTz()
 
     table.ipAddress("col_12")
     table.json("col_13")

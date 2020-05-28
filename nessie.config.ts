@@ -6,7 +6,7 @@ export default {
   client: new ClientPostgreSQL(migrationFolder, {
     database: "nessie",
     hostname: "localhost",
-    port: 5432,
+    port: 5000,
     user: "root",
     password: "pwd",
   })

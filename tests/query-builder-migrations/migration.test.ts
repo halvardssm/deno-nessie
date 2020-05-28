@@ -4,6 +4,7 @@ import {
   runner,
   TYPE_MIGRATE,
   TYPE_ROLLBACK,
+  DIALECT_PG,
 } from "./config/migration.config.ts";
 
 const strings = [
@@ -64,21 +65,22 @@ const strings = [
   },
 ];
 
-for await (const dialect of DIALECTS) {
-  let hasFailed = false
+const dialect = DIALECT_PG
+// for await (const dialect of DIALECTS) {
+let hasFailed = false
 
-  for await (const { name, string, solution } of strings) {
-    Deno.test(`Migration ${dialect}: ` + (name || "Empty"), async () => {
-      if (hasFailed) {
-        assert(false, "Skipped")
-      } else {
-        const response = await runner(string, dialect);
-        hasFailed = response[response.length - 1].includes("Code was");
+for await (const { name, string, solution } of strings) {
+  Deno.test(`Migration ${dialect}: ` + (name || "Empty"), async () => {
+    // if (hasFailed) {
+    //   assert(false, "Skipped")
+    // } else {
+    const response = await runner(string, dialect);
+    hasFailed = response[response.length - 1].includes("Code was");
 
-        assert(!hasFailed, response.join("\n"));
-        assertArrayContains(response, solution);
-      }
-    });
-    if (hasFailed) break
-  }
+    assert(!hasFailed, response.join("\n"));
+    assertArrayContains(response, solution);
+    // }
+  });
+  // if (hasFailed) break
 }
+// }

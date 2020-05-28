@@ -7,8 +7,8 @@ export interface ClientI {
   migrationFolder: string
   prepare: () => Promise<void>;
   close: () => Promise<void>;
-  rollback: (numberOfRollbacks?: null) => Promise<void>;
-  migrate: (numberOfMigrations?: null) => Promise<void>;
+  rollback: (amount: number | undefined) => Promise<void>;
+  migrate: (amount: number | undefined) => Promise<void>;
   query: (query: string) => Promise<any>
 }
 
@@ -42,11 +42,14 @@ export class AbstractClient {
     this.migrationFiles = Array.from(Deno.readDirSync(this.migrationFolder));
   }
 
-  protected async migrate(latestMigration: string | undefined, queryHandler: (query: string) => Promise<any>) {
+  protected async migrate(amount: number = this.migrationFiles.length, latestMigration: string | undefined, queryHandler: (query: string) => Promise<any>) {
     this.filterAndSortFiles(latestMigration)
 
     if (this.migrationFiles.length > 0) {
-      for await (const file of this.migrationFiles) {
+      amount = Math.min(this.migrationFiles.length, amount)
+
+      for (let i = 0;i < amount;i++) {
+        const file = this.migrationFiles[i]
         let { up } = await import(parsePath(this.migrationFolder, file.name));
 
         let query: string = await up();
@@ -75,9 +78,12 @@ export class AbstractClient {
       .sort((a, b) => parseInt(a?.name ?? "0") - parseInt(b?.name ?? "0"));
   }
 
-  async rollback(allMigrations: string[] | undefined, queryHandler: (query: string) => Promise<any>) {
+  async rollback(amount: number = 1, allMigrations: string[] | undefined, queryHandler: (query: string) => Promise<any>) {
     if (allMigrations) {
-      for await (const fileName of allMigrations) {
+      amount = Math.min(allMigrations.length, amount)
+
+      for (let i = 0;i < amount;i++) {
+        const fileName = allMigrations[i]
         let { down } = await import(parsePath(this.migrationFolder, fileName));
 
         let query: string = await down();

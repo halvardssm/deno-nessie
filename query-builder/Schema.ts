@@ -1,9 +1,6 @@
 import { Table } from "./Table.ts";
 import { dbDialects } from "./TypeUtils.ts";
 
-const QUERY_TRIGGER_UPDATE_AT =
-  "CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now(); RETURN NEW; END; $$ language 'plpgsql';";
-
 /** The schema class exposed in the `up()` and `down()` methods in the migration files.
  * 
  * By using this exposed class, you can generate sql strings via the helper methods`.
@@ -49,7 +46,7 @@ export class Schema {
       name.join(
         ", ",
       )
-    }${cascade ? " CASCADE" : ""};`;
+      }${cascade ? " CASCADE" : ""};`;
 
     this.query += sql;
 

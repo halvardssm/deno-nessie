@@ -1,11 +1,12 @@
+import { ClientPostgreSQL } from "../../../mod.ts";
+
 export default {
-  "migrationFolder": "./tests/migrations",
-  "connection": {
+  client: new ClientPostgreSQL("./tests/migrations", {
     "database": "nessie",
     "hostname": "localhost",
     "port": 5000,
     "user": "root",
     "password": "pwd",
-  },
-  "dialect": "pg",
+  })
 };
+

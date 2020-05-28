@@ -14,6 +14,7 @@ const initDenomander = () => {
       "-c --config",
       "Path to config file, will default to ./nessie.config.ts",
     )
+    .option("-a --amount", "Number of to migrate/rollback. If not provided, it will do them all.")
     .command("init", "Generates the config file")
     .command("make [migrationName]", "Creates a migration file with the name")
     .command("migrate", "Migrates one migration")
@@ -41,7 +42,6 @@ const initNessie = async () => {
 const run = async () => {
   const prog = initDenomander();
 
-
   try {
     if (prog.init) {
       await initNessie();
@@ -54,9 +54,9 @@ const run = async () => {
         await state.client!.prepare();
 
         if (prog.migrate) {
-          await state.client!.migrate();
+          await state.client!.migrate(prog.amount);
         } else if (prog.rollback) {
-          await state.client!.rollback();
+          await state.client!.rollback(prog.amount);
         }
 
         await state.client!.close();

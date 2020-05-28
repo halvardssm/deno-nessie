@@ -4,6 +4,7 @@ import {
   runner,
   TYPE_MIGRATE,
   TYPE_ROLLBACK,
+  DIALECT_PG,
 } from "./config/migration.config.ts";
 
 const strings = [
@@ -12,9 +13,9 @@ const strings = [
     string: TYPE_MIGRATE,
     solution: [
       "Database setup complete",
-      "Migrated 1587937822648-test.ts",
-      "Migrated 1587937822649-apple.ts",
-      "Migrated 1587937822650-mango.ts",
+      "Migrated 1587937822648-test1.ts",
+      "Migrated 1587937822649-test2.ts",
+      "Migrated 1587937822650-test3.ts",
       "Migration complete",
     ],
   },
@@ -24,36 +25,36 @@ const strings = [
     solution: ["Nothing to migrate"],
   },
   {
-    name: "Rollback Mango",
+    name: "Rollback test3",
     string: TYPE_ROLLBACK,
-    solution: ["Rolled back 1587937822650-mango.ts"],
+    solution: ["Rolled back 1587937822650-test3.ts"],
   },
   {
-    name: "Rollback Apple",
+    name: "Rollback test2",
     string: TYPE_ROLLBACK,
-    solution: ["Rolled back 1587937822649-apple.ts"],
+    solution: ["Rolled back 1587937822649-test2.ts"],
   },
   {
-    name: "Migrate Apple and Mango",
+    name: "Migrate test2 and test3",
     string: TYPE_MIGRATE,
     solution: [
-      "Migrated 1587937822649-apple.ts",
-      "Migrated 1587937822650-mango.ts",
+      "Migrated 1587937822649-test2.ts",
+      "Migrated 1587937822650-test3.ts",
       "Migration complete",
     ],
   },
   {
-    name: "Rollback Mango",
+    name: "Rollback test3",
     string: TYPE_ROLLBACK,
-    solution: ["Rolled back 1587937822650-mango.ts"],
+    solution: ["Rolled back 1587937822650-test3.ts"],
   },
   {
-    name: "Rollback Apple",
+    name: "Rollback test2",
     string: TYPE_ROLLBACK,
-    solution: ["Rolled back 1587937822649-apple.ts"],
+    solution: ["Rolled back 1587937822649-test2.ts"],
   },
   {
-    name: "Rollback Test",
+    name: "Rollback test1",
     string: TYPE_ROLLBACK,
     solution: ["Rolled back 1587937822648-test.ts"],
   },
@@ -64,18 +65,23 @@ const strings = [
   },
 ];
 
-const allStrings: any[] = [];
-strings.forEach((el) =>
-  DIALECTS.forEach((dialect: string) => allStrings.push({ ...el, dialect }))
-);
+const dialect = DIALECT_PG
+// for await (const dialect of DIALECTS) {
+let hasFailed = false
 
-for await (const { name, string, solution, dialect } of allStrings) {
+for await (const { name, string, solution } of strings) {
   Deno.test(`Migration ${dialect}: ` + (name || "Empty"), async () => {
+    // if (hasFailed) {
+    //   assert(false, "Skipped")
+    // } else {
     const response = await runner(string, dialect);
-    const hasFailed = response[response.length - 1].includes("Code was");
+    hasFailed = response[response.length - 1].includes("Code was");
 
     assert(!hasFailed, response.join("\n"));
-
     assertArrayContains(response, solution);
+    // }
   });
+  // if (hasFailed) break
 }
+// }
+

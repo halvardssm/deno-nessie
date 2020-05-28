@@ -16,10 +16,12 @@ export const runner = async (type: string, dialect: string) => {
       "--allow-net",
       "--allow-read",
       "--allow-write",
+      "--allow-env",
       "cli.ts",
       type,
+      // "-d",
       "-c",
-      `${Deno.cwd()}/tests/migrations/config/${dialect}.config.ts`,
+      `./tests/migrations/config/${dialect}.config.ts`,
     ],
     stdout: "piped",
   });
