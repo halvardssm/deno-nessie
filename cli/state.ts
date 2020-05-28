@@ -1,23 +1,14 @@
-import { AbstractClient, ClientI } from '../clients/AbstractClient.ts';
+import { AbstractClient, ClientI, nessieConfig } from '../clients/AbstractClient.ts';
 import { ClientPostgreSQL } from "../clients/ClientPostgreSQL.ts";
 import { Denomander } from "../deps.ts";
 import { parsePath } from "./utils.ts";
 
 const STD_CONFIG_FILE = "nessie.config.ts";
-const stdConfig = {
-  client: new ClientPostgreSQL("./migrations", {
-    database: "nessie",
-    hostname: "localhost",
-    port: 5432,
-    user: "root",
-    password: "pwd",
-  })
-};
 
 export class State {
   private enableDebug: boolean;
   private configFile: string;
-  private config = stdConfig;
+  private config?: nessieConfig
   client?: ClientI
 
   constructor(prog: Denomander) {
@@ -40,11 +31,21 @@ export class State {
         this.config = configRaw.default;
       } catch (er) {
         this.debug(er, "Using standard config");
+
+        this.config = {
+          client: new ClientPostgreSQL("./migrations", {
+            database: "nessie",
+            hostname: "localhost",
+            port: 5432,
+            user: "root",
+            password: "pwd",
+          })
+        };
       }
     } finally {
       this.debug(this.config, "Config");
 
-      this.client = this.config.client
+      this.client = this.config!.client
 
       this.debug(this, "State init");
     }
@@ -59,18 +60,18 @@ export class State {
 
     this.debug(fileName, "Migration file name");
 
-    await Deno.mkdir(this.config.client.migrationFolder, { recursive: true });
+    await Deno.mkdir(this.client!.migrationFolder, { recursive: true });
 
     const responseFile = await fetch(
       "https://deno.land/x/nessie/cli/templates/migration.ts",
     );
 
     await Deno.writeTextFile(
-      `${this.config.client.migrationFolder}/${fileName}`,
+      `${this.client!.migrationFolder}/${fileName}`,
       await responseFile.text(),
     );
 
-    console.info(`Created migration ${fileName} at ${this.config.client.migrationFolder}`);
+    console.info(`Created migration ${fileName} at ${this.client!.migrationFolder}`);
   }
 
 
