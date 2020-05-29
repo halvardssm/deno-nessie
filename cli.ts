@@ -14,11 +14,10 @@ const initDenomander = () => {
       "-c --config",
       "Path to config file, will default to ./nessie.config.ts",
     )
-    .option("-a --amount", "Number of to migrate/rollback. If not provided, it will do them all.")
     .command("init", "Generates the config file")
     .command("make [migrationName]", "Creates a migration file with the name")
-    .command("migrate", "Migrates one migration")
-    .command("rollback", "Rolls back one migration");
+    .command("migrate [amount?]", "Migrates one migration. Optional number of migrations. If not provided, it will do them all.")
+    .command("rollback [amount?]", "Rolls back one migration. Optional number of rollbacks. If not provided, it will do one.");
 
   program.parse(Deno.args);
 
@@ -54,9 +53,9 @@ const run = async () => {
         await state.client!.prepare();
 
         if (prog.migrate) {
-          await state.client!.migrate(prog.amount);
+          await state.client!.migrate(prog.migrate);
         } else if (prog.rollback) {
-          await state.client!.rollback(prog.amount);
+          await state.client!.rollback(prog.rollback);
         }
 
         await state.client!.close();

@@ -11,8 +11,37 @@ on:
     types: [ published ]
 
 jobs:
+  get-diff:
+    name: Get Diff
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check Query Builder
+        id: qb
+        uses: technote-space/get-diff-action@v1.2.8
+        with:
+          PREFIX_FILTER: |
+            query-builder/
+            tests/query-builder/
+            tests/query-builder-migrations/
+          SUFFIX_FILTER: .ts
+
+      - name: Check CLI
+        id: cli
+        uses: technote-space/get-diff-action@v1.2.8
+        with:
+          PREFIX_FILTER: |
+            cli.ts
+            deps.ts
+            mod.ts
+            cli/**
+            clients/**
+            tests/cli/**
+
   cli:
     name: Run CLI
+    needs: get-diff
+    if: jobs.get-diff.steps.cli.outputs.diff
     runs-on: ubuntu-latest
     
     steps:
@@ -20,9 +49,6 @@ jobs:
         uses: denolib/setup-deno@master
         with: 
           deno-version: 1.0.2
-
-      - name: Check formatting
-        run: deno fmt --check
           
       - name: Nessie Init
         run: deno run --allow-read --allow-write --allow-net https://raw.githubusercontent.com/$URL_PATH/cli.ts init
@@ -34,31 +60,9 @@ jobs:
         env:
           URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'master'}}
 
-  query-builder:
-    name: Run CLI
-    runs-on: ubuntu-latest
-    
-    steps:
-      - name: Get Diff Action
-        uses: technote-space/get-diff-action@v1.2.8
-        with:
-          PREFIX_FILTER: |
-            query-builder
-            tests/query-builder
-          SUFFIX_FILTER: .ts
-
-      - name: Install deno
-        uses: denolib/setup-deno@master
-        if: env.GIT_DIFF
-        with: 
-          deno-version: 1.0.2
-          
-      - name: Test query builder
-        if: env.GIT_DIFF
-        run: make test-qb
-
-  migrations:
+  cli-migrations:
     name: Run tests
+    needs: get-diff
     runs-on: ubuntu-latest
 
     services:
@@ -102,4 +106,70 @@ jobs:
         run: make db-sqlite-start
 
       - name: Run tests
-        run: make test-migrations
+        run: make test-cli-migrations
+
+  query-builder:
+    name: Test Query Builder
+    needs: get-diff
+    if: jobs.get-diff.steps.qb.outputs.diff
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@master
+
+      - name: Install deno
+        uses: denolib/setup-deno@master
+        with:
+          deno-version: 1.0.2
+
+      - name: Test query builder
+        run: make test-qb
+
+  query-builder-migrations:
+    name: Test Query Builder
+    needs: query-builder
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: root
+          POSTGRES_PASSWORD: pwd
+          POSTGRES_DB: nessie
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5000:5432
+
+        mysql:
+          image: mysql
+          env:
+            MYSQL_ALLOW_EMPTY_PASSWORD: true
+            MYSQL_DATABASE: nessie
+          options: >-
+            --health-cmd="mysqladmin ping"
+            --health-interval=10s
+            --health-timeout=5s
+            --health-retries=3
+          ports:
+            - 5001:3306
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@master
+
+      - name: Install deno
+        uses: denolib/setup-deno@master
+        with:
+          deno-version: 1.0.2
+
+      - name: Create SQLite db
+        run: make db-sqlite-start
+
+      - name: Test query builder
+        run: make test-qb-migrations
