@@ -21,10 +21,10 @@ test-qb:
 	deno test tests/query-builder
 test-qb-migrations:
 	deno test --allow-write --allow-run --allow-read tests/query-builder-migrations
-test-cli-migrations: #db-pg-stop db-pg-start sleeper
+test-cli-migrations: #test-clean
 	deno test --allow-write --allow-run --allow-read tests/cli
 sleeper:
-	sleep 30s
+	sleep 45s
 
 db-all-restart: db-all-stop db-all-start
 db-all-start: db-pg-start db-mysql-start db-sqlite-start

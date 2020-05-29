@@ -89,7 +89,7 @@ export class AbstractClient {
     allMigrations: string[] | undefined,
     queryHandler: (query: string) => Promise<any>,
   ) {
-    if (allMigrations) {
+    if (allMigrations && allMigrations.length>0) {
       amount = Math.min(allMigrations.length, amount);
 
       for (let i = 0; i < amount; i++) {
