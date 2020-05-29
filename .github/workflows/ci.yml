@@ -20,6 +20,9 @@ jobs:
       cli: ${{ steps.cli.outputs.diff }}
 
     steps:
+      - name: Clone repo
+        uses: actions/checkout@master
+
       - name: Check Query Builder
         id: qb
         uses: technote-space/get-diff-action@v1.2.8
