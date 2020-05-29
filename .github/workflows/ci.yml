@@ -146,18 +146,18 @@ jobs:
         ports:
           - 5000:5432
 
-        mysql:
-          image: mysql
-          env:
-            MYSQL_ALLOW_EMPTY_PASSWORD: true
-            MYSQL_DATABASE: nessie
-          options: >-
-            --health-cmd="mysqladmin ping"
-            --health-interval=10s
-            --health-timeout=5s
-            --health-retries=3
-          ports:
-            - 5001:3306
+      mysql:
+        image: mysql
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: true
+          MYSQL_DATABASE: nessie
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+        ports:
+          - 5001:3306
 
     steps:
       - name: Clone repo
