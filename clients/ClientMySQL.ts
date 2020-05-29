@@ -18,8 +18,10 @@ export class ClientMySQL extends AbstractClient implements ClientI {
 
   async prepare(): Promise<void> {
     await this.client.connect(this.clientOptions);
-    const migrationTableExists =
-      (await this.query(this.QUERY_MIGRATION_TABLE_EXISTS)).length > 0;
+    const queryResult = await this.query(this.QUERY_MIGRATION_TABLE_EXISTS);
+
+    const migrationTableExists = queryResult.length > 0;
+
     if (!migrationTableExists) {
       await this.query(this.QUERY_CREATE_MIGRATION_TABLE);
       console.info("Database setup complete");
@@ -34,13 +36,21 @@ export class ClientMySQL extends AbstractClient implements ClientI {
     await this.client.close();
   }
 
-  async migrate() {
+  async migrate(amount: number | undefined) {
     const latestMigration = await this.query(this.QUERY_GET_LATEST);
-    await super.migrate(latestMigration[0]?.[this.COL_FILE_NAME], this.query);
+    await super.migrate(
+      amount,
+      latestMigration[0]?.[this.COL_FILE_NAME],
+      this.query.bind(this),
+    );
   }
 
-  async rollback() {
+  async rollback(amount: number | undefined) {
     const allMigrations = await this.query(this.QUERY_GET_ALL);
-    super.rollback(allMigrations.rows?.[0], this.query);
+    await super.rollback(
+      amount,
+      allMigrations.rows?.[0],
+      this.query.bind(this),
+    );
   }
 }

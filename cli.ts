@@ -5,24 +5,29 @@ const initDenomander = () => {
   const program = new Denomander({
     app_name: "Nessie Migrations",
     app_description: "A database migration tool for Deno.",
-    app_version: "0.4.1",
+    app_version: "0.4.3",
   });
 
   program
-    .option("-d --debug", "Enables verbose output")
-    .option(
+    .globalOption("-d --debug", "Enables verbose output")
+    .globalOption(
       "-c --config",
       "Path to config file, will default to ./nessie.config.ts",
     )
     .command("init", "Generates the config file")
     .command("make [migrationName]", "Creates a migration file with the name")
-    .command(
-      "migrate [amount?]",
-      "Migrates one migration. Optional number of migrations. If not provided, it will do them all.",
+    .command("migrate", "Migrates one migration.")
+    .option(
+      "-a --amount",
+      "Optional number of migrations. If not provided, it will do them all.",
     )
     .command(
-      "rollback [amount?]",
-      "Rolls back one migration. Optional number of rollbacks. If not provided, it will do one.",
+      "rollback",
+      "Rolls back one migration.",
+    )
+    .option(
+      "-a --amount",
+      "Optional number of rollbacks. If not provided, it will do one.",
     );
 
   program.parse(Deno.args);
@@ -59,9 +64,9 @@ const run = async () => {
         await state.client!.prepare();
 
         if (prog.migrate) {
-          await state.client!.migrate(prog.migrate);
+          await state.client!.migrate(prog.amount);
         } else if (prog.rollback) {
-          await state.client!.rollback(prog.rollback);
+          await state.client!.rollback(prog.amount);
         }
 
         await state.client!.close();

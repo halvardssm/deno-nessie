@@ -28,9 +28,9 @@ export class AbstractClient {
   migrationFolder: string;
 
   protected QUERY_GET_LATEST =
-    `SELECT ${this.COL_FILE_NAME} FROM ${this.TABLE_MIGRATIONS} ORDER BY ${this.COL_FILE_NAME} DESC LIMIT 1`;
+    `SELECT ${this.COL_FILE_NAME} FROM ${this.TABLE_MIGRATIONS} ORDER BY ${this.COL_FILE_NAME} DESC LIMIT 1;`;
   protected QUERY_GET_ALL =
-    `SELECT ${this.COL_FILE_NAME} FROM ${this.TABLE_MIGRATIONS} ORDER BY ${this.COL_FILE_NAME} DESC`;
+    `SELECT ${this.COL_FILE_NAME} FROM ${this.TABLE_MIGRATIONS} ORDER BY ${this.COL_FILE_NAME} DESC;`;
 
   protected QUERY_MIGRATION_INSERT: QueryWithString = (fileName) =>
     `INSERT INTO ${this.TABLE_MIGRATIONS} (${this.COL_FILE_NAME}) VALUES ('${fileName}');`;
@@ -43,11 +43,12 @@ export class AbstractClient {
   }
 
   protected async migrate(
-    amount: number = this.migrationFiles.length,
+    amount: number | undefined,
     latestMigration: string | undefined,
     queryHandler: (query: string) => Promise<any>,
   ) {
     this.filterAndSortFiles(latestMigration);
+    amount = amount ?? this.migrationFiles.length;
 
     if (this.migrationFiles.length > 0) {
       amount = Math.min(this.migrationFiles.length, amount);
@@ -58,6 +59,7 @@ export class AbstractClient {
 
         let query: string = await up();
 
+        if (!query || typeof query !== "string") query = "";
         if (!query.endsWith(";")) query += ";";
 
         query += this.QUERY_MIGRATION_INSERT(file.name);
@@ -95,6 +97,9 @@ export class AbstractClient {
         let { down } = await import(parsePath(this.migrationFolder, fileName));
 
         let query: string = await down();
+
+        if (!query || typeof query !== "string") query = "";
+        if (!query.endsWith(";")) query += ";";
 
         query += this.QUERY_MIGRATION_DELETE(fileName);
 

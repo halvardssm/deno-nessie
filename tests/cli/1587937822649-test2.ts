@@ -1,5 +1,5 @@
 export const up = (): string => {
-  return "CREATE TABLE testTable2 (id int, created_at datetime);";
+  return "CREATE TABLE testTable2 (id int);";
 };
 
 export const down = (): string => {

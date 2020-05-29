@@ -21,8 +21,8 @@ test-qb:
 	deno test tests/query-builder
 test-qb-migrations:
 	deno test --allow-write --allow-run --allow-read tests/query-builder-migrations
-test-cli-migrations:
-	deno test --allow-write --allow-run --allow-read tests/migrations
+test-cli-migrations: #db-pg-stop db-pg-start sleeper
+	deno test --allow-write --allow-run --allow-read tests/cli
 sleeper:
 	sleep 30s
 

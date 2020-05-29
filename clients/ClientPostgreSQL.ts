@@ -32,7 +32,11 @@ export class ClientPostgreSQL extends AbstractClient implements ClientI {
   }
 
   async query(query: string): Promise<QueryResult> {
-    return await this.client.query(query);
+    try {
+      return await this.client.query(query);
+    } catch (e) {
+      throw new Error(query + "\n" +e);
+    }
   }
 
   async close(): Promise<void> {
@@ -50,6 +54,10 @@ export class ClientPostgreSQL extends AbstractClient implements ClientI {
 
   async rollback(amount: number | undefined) {
     const allMigrations = await this.query(this.QUERY_GET_ALL);
-    super.rollback(amount, allMigrations.rows?.[0], this.query.bind(this));
+    await super.rollback(
+      amount,
+      allMigrations.rows?.[0],
+      this.query.bind(this),
+    );
   }
 }

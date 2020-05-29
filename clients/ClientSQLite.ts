@@ -17,9 +17,11 @@ export class ClientSQLite extends AbstractClient implements ClientI {
 
   async prepare(): Promise<void> {
     this.client = await open(this.clientOptions);
+
+    const queryResult = await this.query(this.QUERY_MIGRATION_TABLE_EXISTS);
+
     const migrationTableExists =
-      (await this.query(this.QUERY_MIGRATION_TABLE_EXISTS)).rows[0][0] ===
-        this.TABLE_MIGRATIONS;
+      queryResult.rows[0][0] === this.TABLE_MIGRATIONS;
 
     if (!migrationTableExists) {
       await this.query(this.QUERY_CREATE_MIGRATION_TABLE);
@@ -35,13 +37,13 @@ export class ClientSQLite extends AbstractClient implements ClientI {
     await save(this.client!);
   }
 
-  async migrate() {
+  async migrate(amount: number | undefined) {
     const latestMigration = await this.query(this.QUERY_GET_LATEST);
-    await super.migrate(latestMigration[0]?.[0], this.query);
+    await super.migrate(amount, latestMigration[0]?.[0], this.query.bind(this));
   }
 
-  async rollback() {
+  async rollback(amount: number | undefined) {
     const allMigrations = await this.query(this.QUERY_GET_ALL);
-    super.rollback(allMigrations[0], this.query);
+    await super.rollback(amount, allMigrations[0], this.query.bind(this));
   }
 }

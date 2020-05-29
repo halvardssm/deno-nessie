@@ -5,7 +5,7 @@ import {
 } from "../clients/AbstractClient.ts";
 import { ClientPostgreSQL } from "../clients/ClientPostgreSQL.ts";
 import { Denomander } from "../deps.ts";
-import { parsePath, safeConfigImport } from "./utils.ts";
+import { parsePath } from "./utils.ts";
 
 const STD_CONFIG_FILE = "nessie.config.ts";
 
@@ -24,11 +24,11 @@ export class State {
 
   async init() {
     this.debug("Checking config path");
-    this.config = await safeConfigImport(this.configFile);
+    this.config = await this._safeConfigImport(this.configFile);
 
     if (!this.config) {
       this.debug("Checking project root");
-      this.config = await safeConfigImport(parsePath(STD_CONFIG_FILE));
+      this.config = await this._safeConfigImport(parsePath(STD_CONFIG_FILE));
     }
 
     this.debug(this.config, "Config");
@@ -82,10 +82,20 @@ export class State {
     );
   }
 
-  debug(output?: any, title?: string) {
+  debug(output?: any, title?: string): void {
     if (this.enableDebug) {
       title ? console.log(title + ": ") : null;
       console.log(output);
+    }
+  }
+
+  private async _safeConfigImport(file: string): Promise<any | undefined> {
+    try {
+      const configRaw = await import(file);
+      return configRaw.default;
+    } catch (e) {
+      this.debug(e);
+      return;
     }
   }
 }
