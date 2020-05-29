@@ -1,5 +1,6 @@
 import { Table } from "./Table.ts";
 import { dbDialects } from "./TypeUtils.ts";
+import { State } from "../cli/state.ts";
 
 /** The schema class exposed in the `up()` and `down()` methods in the migration files.
  * 
@@ -67,5 +68,32 @@ export class Schema {
     }
   }
 }
+
+export const queryHandler = async (
+  queryString: string,
+  state: State,
+  queryfn: (query: string) => any,
+) => {
+  const queries = queryString.trim().split(/(?<!\\);/);
+
+  if (queries[queries.length - 1]?.trim() === "") queries.pop();
+
+  state.debug(queries, "Queries");
+
+  const results = [];
+
+  for (let query of queries) {
+    query = query.trim().replace("\\;", ";");
+    state.debug(query, "Query");
+
+    const result = await queryfn(query + ";");
+
+    results.push(result);
+  }
+
+  state.debug(results, "Query result");
+
+  return results;
+};
 
 export default Schema;

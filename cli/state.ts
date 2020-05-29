@@ -5,7 +5,7 @@ import {
 } from "../clients/AbstractClient.ts";
 import { ClientPostgreSQL } from "../clients/ClientPostgreSQL.ts";
 import { Denomander } from "../deps.ts";
-import { parsePath } from "./utils.ts";
+import { parsePath, safeConfigImport } from "./utils.ts";
 
 const STD_CONFIG_FILE = "nessie.config.ts";
 
@@ -23,34 +23,29 @@ export class State {
   }
 
   async init() {
-    try {
-      this.debug("Checking config path");
-      const configRaw = await import(this.configFile);
-      this.config = configRaw.default;
-    } catch (e) {
-      try {
-        this.debug(e, "Checking project root");
+    this.debug("Checking config path");
+    this.config = await safeConfigImport(this.configFile);
 
-        const configRaw = await import(parsePath(STD_CONFIG_FILE));
-        this.config = configRaw.default;
-      } catch (er) {
-        this.debug(er, "Using standard config");
-
-        this.config = {
-          client: new ClientPostgreSQL("./migrations", {
-            database: "nessie",
-            hostname: "localhost",
-            port: 5432,
-            user: "root",
-            password: "pwd",
-          }),
-        };
-      }
+    if (!this.config) {
+      this.debug("Checking project root");
+      this.config = await safeConfigImport(parsePath(STD_CONFIG_FILE));
     }
 
     this.debug(this.config, "Config");
 
-    this.client = this.config!.client;
+    if (!this.config?.client) {
+      this.debug("Using standard config");
+
+      this.client = new ClientPostgreSQL("./migrations", {
+        database: "nessie",
+        hostname: "localhost",
+        port: 5432,
+        user: "root",
+        password: "pwd",
+      });
+    } else {
+      this.client = this.config.client;
+    }
 
     this.debug(this, "State init");
 
