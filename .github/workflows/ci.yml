@@ -133,7 +133,7 @@ jobs:
 
   query-builder-migrations:
     name: Test Query Builder
-    needs: get-diff query-builder
+    needs: [get-diff, query-builder]
     if: needs.get-diff.outputs.qb
     runs-on: ubuntu-latest
 
