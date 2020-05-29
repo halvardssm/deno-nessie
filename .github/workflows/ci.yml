@@ -46,7 +46,7 @@ jobs:
             tests/cli/**
 
   cli:
-    name: Run CLI
+    name: Test CLI
     needs: get-diff
     if: needs.get-diff.outputs.cli
     runs-on: ubuntu-latest
@@ -68,7 +68,7 @@ jobs:
           URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'master'}}
 
   cli-migrations:
-    name: Run tests
+    name: Test CLI Migrations
     needs: get-diff
     if: needs.get-diff.outputs.cli
     runs-on: ubuntu-latest
@@ -135,7 +135,7 @@ jobs:
         run: make test-qb
 
   query-builder-migrations:
-    name: Test Query Builder
+    name: Test Query Builder Migration
     needs: [get-diff, query-builder]
     if: needs.get-diff.outputs.qb
     runs-on: ubuntu-latest
