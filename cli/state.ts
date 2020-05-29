@@ -19,7 +19,7 @@ export class State {
     this.enableDebug = prog.debug;
     this.configFile = parsePath(prog.config || STD_CONFIG_FILE);
 
-    this.debug(this, "State");
+    this.debug([this.enableDebug, this.configFile], "State");
   }
 
   async init() {
@@ -46,13 +46,13 @@ export class State {
           }),
         };
       }
-    } finally {
-      this.debug(this.config, "Config");
-
-      this.client = this.config!.client;
-
-      this.debug(this, "State init");
     }
+
+    this.debug(this.config, "Config");
+
+    this.client = this.config!.client;
+
+    this.debug(this, "State init");
 
     return this;
   }
