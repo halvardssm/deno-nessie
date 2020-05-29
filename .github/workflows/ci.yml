@@ -15,6 +15,10 @@ jobs:
     name: Get Diff
     runs-on: ubuntu-latest
 
+    outputs:
+      qb: ${{ steps.qb.outputs.diff }}
+      cli: ${{ steps.cli.outputs.diff }}
+
     steps:
       - name: Check Query Builder
         id: qb
@@ -41,7 +45,7 @@ jobs:
   cli:
     name: Run CLI
     needs: get-diff
-    if: jobs.get-diff.steps.cli.outputs.diff
+    if: needs.get-diff.outputs.cli
     runs-on: ubuntu-latest
     
     steps:
@@ -63,6 +67,7 @@ jobs:
   cli-migrations:
     name: Run tests
     needs: get-diff
+    if: needs.get-diff.outputs.cli
     runs-on: ubuntu-latest
 
     services:
@@ -111,7 +116,7 @@ jobs:
   query-builder:
     name: Test Query Builder
     needs: get-diff
-    if: jobs.get-diff.steps.qb.outputs.diff
+    if: needs.get-diff.outputs.qb
     runs-on: ubuntu-latest
 
     steps:
@@ -128,7 +133,8 @@ jobs:
 
   query-builder-migrations:
     name: Test Query Builder
-    needs: query-builder
+    needs: get-diff query-builder
+    if: needs.get-diff.outputs.qb
     runs-on: ubuntu-latest
 
     services:
