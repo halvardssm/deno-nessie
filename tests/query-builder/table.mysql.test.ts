@@ -1,7 +1,7 @@
 import { assertEquals } from "../../deps.ts";
 import { Table } from "../../qb.ts";
 
-const dialect = "mysql"
+const dialect = "mysql";
 
 const strings = [
   {
@@ -318,7 +318,8 @@ const strings = [
       table.smallIncrements("testCol");
       return table.toSql();
     })(),
-    solution: "CREATE TABLE testTable (testCol smallint AUTO_INCREMENT UNIQUE);",
+    solution:
+      "CREATE TABLE testTable (testCol smallint AUTO_INCREMENT UNIQUE);",
   },
   {
     name: "Table with smallInteger",

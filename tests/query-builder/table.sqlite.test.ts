@@ -1,7 +1,7 @@
 import { assertEquals } from "../../deps.ts";
 import { Table } from "../../qb.ts";
 
-const dialect = "sqlite"
+const dialect = "sqlite";
 
 const strings = [
   {
@@ -60,8 +60,7 @@ const strings = [
       table.primary("testCol");
       return table.toSql();
     })(),
-    solution:
-      "CREATE TABLE testTable (testCol int);",
+    solution: "CREATE TABLE testTable (testCol int);",
   },
   {
     name: "Table with 2 primary",
@@ -72,8 +71,7 @@ const strings = [
       table.primary("testCol", "testCol2");
       return table.toSql();
     })(),
-    solution:
-      "CREATE TABLE testTable (testCol int, testCol2 int);",
+    solution: "CREATE TABLE testTable (testCol int, testCol2 int);",
   },
   {
     name: "Table with 1 index",
@@ -219,7 +217,8 @@ const strings = [
       table.enum("testCol", ["one", "two", "three"]);
       return table.toSql();
     })(),
-    solution: "CREATE TABLE testTable (testCol TEXT CHECK(testCol IN ('one', 'two', 'three') ));",
+    solution:
+      "CREATE TABLE testTable (testCol TEXT CHECK(testCol IN ('one', 'two', 'three') ));",
   },
   {
     name: "Table with float",

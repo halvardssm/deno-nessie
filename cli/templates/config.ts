@@ -2,7 +2,7 @@ import { ClientPostgreSQL } from "../../clients/ClientPostgreSQL.ts";
 import { ClientMySQL } from "../../clients/ClientMySQL.ts";
 import { ClientSQLite } from "../../clients/ClientSQLite.ts";
 
-const migrationFolder = "./migrations"
+const migrationFolder = "./migrations";
 
 const configPg = {
   client: new ClientPostgreSQL(migrationFolder, {
@@ -11,7 +11,7 @@ const configPg = {
     port: 5432,
     user: "root",
     password: "pwd",
-  })
+  }),
 };
 const configMySql = {
   client: new ClientMySQL(migrationFolder, {
@@ -20,10 +20,10 @@ const configMySql = {
     username: "root",
     // password: "pwd", // uncomment this line for <8
     db: "nessie",
-  })
+  }),
 };
 const configSqLite = {
-  client: new ClientSQLite(migrationFolder, "sqlite.db")
+  client: new ClientSQLite(migrationFolder, "sqlite.db"),
 };
 
 export default configPg;

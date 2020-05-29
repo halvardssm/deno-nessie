@@ -1,7 +1,7 @@
 import { Schema } from "https://deno.land/x/nessie/mod.ts";
 
 export const up = (): string => {
-  const sql1 = new Schema('pg').create("basic", (table) => {
+  const sql1 = new Schema("pg").create("basic", (table) => {
     table.id();
     table.string("name", 100).nullable();
     table.boolean("is_true").default("false");
@@ -9,13 +9,13 @@ export const up = (): string => {
     table.timestamps();
   });
 
-  const sql2 = new Schema('pg').queryString(
+  const sql2 = new Schema("pg").queryString(
     "INSERT INTO users VALUES (DEFAULT, 'Deno', true, 2, DEFAULT, DEFAULT);",
   );
 
-  return sql1 + sql2
+  return sql1 + sql2;
 };
 
 export const down = (): string => {
-  return new Schema('pg').drop("basic");
+  return new Schema("pg").drop("basic");
 };

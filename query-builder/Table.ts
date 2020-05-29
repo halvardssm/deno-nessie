@@ -42,7 +42,7 @@ export class Table {
   toSql(): string {
     let sql = "";
 
-    sql += this._addUpdatedAtFunction()
+    sql += this._addUpdatedAtFunction();
 
     this.constraints.enums.forEach((enumCol) => {
       sql += this._enumHandler(enumCol);
@@ -97,9 +97,9 @@ export class Table {
       default:
         return `CREATE${
           this.constraints.isTemporary ? " TEMPORARY" : ""
-          } TABLE${
+        } TABLE${
           this.constraints.ifNotExists ? " IF NOT EXISTS" : ""
-          } ${this.tableName}`;
+        } ${this.tableName}`;
     }
   }
 
@@ -125,7 +125,9 @@ export class Table {
         return "";
       case "pg":
       default:
-        return `CREATE TYPE ${enumCol.name} AS ENUM (${enumCol.columns.join(", ")});`;
+        return `CREATE TYPE ${enumCol.name} AS ENUM (${
+          enumCol.columns.join(", ")
+        });`;
     }
   }
 
@@ -140,7 +142,9 @@ export class Table {
 
     switch (this.dialect) {
       case "sqlite":
-        return uniqueArray ? ` CREATE UNIQUE INDEX ${this.tableName} ON ${this.tableName} (${uniqueString});` : '';
+        return uniqueArray
+          ? ` CREATE UNIQUE INDEX ${this.tableName} ON ${this.tableName} (${uniqueString});`
+          : "";
       case "mysql":
       case "pg":
       default:
@@ -154,7 +158,7 @@ export class Table {
       case "sqlite":
         return ` CREATE INDEX ${this.tableName}_${index} ON ${this.tableName} (${index});`;
       case "mysql":
-        return ` ALTER TABLE ${this.tableName} ADD INDEX ${index} (${index});`
+        return ` ALTER TABLE ${this.tableName} ADD INDEX ${index} (${index});`;
       case "pg":
       default:
         return ` CREATE INDEX ON ${this.tableName} (${index});`;
@@ -168,7 +172,7 @@ export class Table {
     switch (this.dialect) {
       case "mysql":
       case "sqlite":
-        return ""
+        return "";
       case "pg":
       default:
         return `CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now()\\; RETURN NEW\\; END\\; $$ language 'plpgsql';`;
@@ -203,12 +207,12 @@ export class Table {
 
   /** Adds `IF NOT EXISTS` to the table creation query */
   ifNotExists() {
-    this.constraints.ifNotExists = true
+    this.constraints.ifNotExists = true;
   }
 
   /** Adds `TEMPORARY` to the table creation query */
   isTemporary() {
-    this.constraints.isTemporary = true
+    this.constraints.isTemporary = true;
   }
 
   /** Adds a custom column to the table. */
@@ -332,7 +336,7 @@ export class Table {
     after: number = 2,
   ): Column {
     if (this.dialect === "pg") {
-      return this._pushColumn(name, typeMap.double)
+      return this._pushColumn(name, typeMap.double);
     } else {
       return this._pushColumn(
         name,
@@ -350,7 +354,7 @@ export class Table {
     after: number = 2,
   ): Column {
     if (this.dialect === "pg") {
-      return this._pushColumn(name, typeMap.real)
+      return this._pushColumn(name, typeMap.real);
     } else {
       return this._pushColumn(
         name,
@@ -501,7 +505,7 @@ export class Table {
     array: string[],
     typeName: string = name,
   ): Column {
-    array = array.map(el => `'${el}'`)
+    array = array.map((el) => `'${el}'`);
 
     const newEnum: EnumColumn = { name: typeName, columns: array };
 
@@ -515,25 +519,26 @@ export class Table {
       name,
       this.dialect === "pg"
         ? typeName
-        : this.dialect === 'mysql'
-          ? "ENUM" : 'TEXT',
+        : this.dialect === "mysql"
+        ? "ENUM"
+        : "TEXT",
       undefined,
       undefined,
       (col) =>
-        this.dialect === "mysql"
-          ? col.custom(`(${array.join(", ")})`)
-          : this.dialect === "sqlite"
-            ? col.custom(`CHECK(${name} IN (${array.join(", ")}) )`)
-            : col,
+        this.dialect === "mysql" ? col.custom(`(${array.join(", ")})`)
+        : this.dialect === "sqlite"
+        ? col.custom(`CHECK(${name} IN (${array.join(", ")}) )`)
+        : col,
     );
   }
 
   /** Adds an ip address column to the table. */
   ipAddress(name: string): Column {
-    if (this.dialect === 'pg')
+    if (this.dialect === "pg") {
       return this._pushColumn(name, "inet");
-    else
-      return this.string(name, 50)
+    } else {
+      return this.string(name, 50);
+    }
   }
 
   /** Adds a json column to the table. */
@@ -548,10 +553,11 @@ export class Table {
 
   /** Adds a mac address(8) column to the table. */
   macAddress(name: string, isMacAddress8: boolean = false): Column {
-    if (this.dialect === 'pg')
+    if (this.dialect === "pg") {
       return this._pushColumn(name, `macaddr${isMacAddress8 ? "8" : ""}`);
-    else
-      return this.string(name, isMacAddress8 ? 23 : 17)
+    } else {
+      return this.string(name, isMacAddress8 ? 23 : 17);
+    }
   }
 
   /** Adds a mac address 8 column to the table. */
@@ -561,10 +567,11 @@ export class Table {
 
   /** Adds an uuid column to the table. */
   uuid(name: string): Column {
-    if (this.dialect === 'pg')
+    if (this.dialect === "pg") {
       return this._pushColumn(name, "uuid");
-    else
-      return this.string(name, 36)
+    } else {
+      return this.string(name, 36);
+    }
   }
 }
 

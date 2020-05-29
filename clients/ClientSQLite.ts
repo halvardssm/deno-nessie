@@ -1,12 +1,14 @@
 import { DB, open, save } from "https://deno.land/x/sqlite@v1.0.0/mod.ts";
-import { AbstractClient, ClientI } from './AbstractClient.ts';
+import { AbstractClient, ClientI } from "./AbstractClient.ts";
 
 export class ClientSQLite extends AbstractClient implements ClientI {
   private client?: DB;
-  private clientOptions: string
+  private clientOptions: string;
 
-  private QUERY_MIGRATION_TABLE_EXISTS = `SELECT name FROM sqlite_master WHERE type='table' AND name='${this.TABLE_MIGRATIONS}';`
-  private QUERY_CREATE_MIGRATION_TABLE = `CREATE TABLE ${this.TABLE_MIGRATIONS} (id integer NOT NULL PRIMARY KEY autoincrement, ${this.COL_FILE_NAME} varchar(${AbstractClient.MAX_FILE_NAME_LENGTH}) UNIQUE, ${this.COL_CREATED_AT} datetime NOT NULL DEFAULT CURRENT_TIMESTAMP);`
+  private QUERY_MIGRATION_TABLE_EXISTS =
+    `SELECT name FROM sqlite_master WHERE type='table' AND name='${this.TABLE_MIGRATIONS}';`;
+  private QUERY_CREATE_MIGRATION_TABLE =
+    `CREATE TABLE ${this.TABLE_MIGRATIONS} (id integer NOT NULL PRIMARY KEY autoincrement, ${this.COL_FILE_NAME} varchar(${AbstractClient.MAX_FILE_NAME_LENGTH}) UNIQUE, ${this.COL_CREATED_AT} datetime NOT NULL DEFAULT CURRENT_TIMESTAMP);`;
 
   constructor(migrationFolder: string, connectionOptions: string) {
     super(migrationFolder);
@@ -14,11 +16,13 @@ export class ClientSQLite extends AbstractClient implements ClientI {
   }
 
   async prepare(): Promise<void> {
-    this.client = await open(this.clientOptions)
-    const migrationTableExists = (await this.query(this.QUERY_MIGRATION_TABLE_EXISTS)).rows[0][0] === this.TABLE_MIGRATIONS;
+    this.client = await open(this.clientOptions);
+    const migrationTableExists =
+      (await this.query(this.QUERY_MIGRATION_TABLE_EXISTS)).rows[0][0] ===
+        this.TABLE_MIGRATIONS;
 
     if (!migrationTableExists) {
-      await this.query(this.QUERY_CREATE_MIGRATION_TABLE)
+      await this.query(this.QUERY_CREATE_MIGRATION_TABLE);
       console.info("Database setup complete");
     }
   }
@@ -32,12 +36,12 @@ export class ClientSQLite extends AbstractClient implements ClientI {
   }
 
   async migrate() {
-    const latestMigration = await this.query(this.QUERY_GET_LATEST)
-    await super.migrate(latestMigration[0]?.[0], this.query)
+    const latestMigration = await this.query(this.QUERY_GET_LATEST);
+    await super.migrate(latestMigration[0]?.[0], this.query);
   }
 
   async rollback() {
-    const allMigrations = await this.query(this.QUERY_GET_ALL)
-    super.rollback(allMigrations[0], this.query)
+    const allMigrations = await this.query(this.QUERY_GET_ALL);
+    super.rollback(allMigrations[0], this.query);
   }
 }

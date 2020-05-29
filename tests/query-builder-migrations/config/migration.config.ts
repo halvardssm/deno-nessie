@@ -25,8 +25,8 @@ export const runner = async (type: string, dialect: string) => {
     ],
     stdout: "piped",
     env: {
-      DB_DIALECT: dialect
-    }
+      DB_DIALECT: dialect,
+    },
   });
 
   const { code } = await r.status();

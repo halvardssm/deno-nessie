@@ -6,6 +6,5 @@ export default {
     "port": 5001,
     "username": "root",
     "db": "nessie",
-  })
+  }),
 };
-

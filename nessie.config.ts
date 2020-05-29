@@ -1,6 +1,6 @@
 import { ClientPostgreSQL } from "./clients/ClientPostgreSQL.ts";
 
-const migrationFolder = "./migrations"
+const migrationFolder = "./migrations";
 
 export default {
   client: new ClientPostgreSQL(migrationFolder, {
@@ -9,5 +9,5 @@ export default {
     port: 5000,
     user: "root",
     password: "pwd",
-  })
+  }),
 };

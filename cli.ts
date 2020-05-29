@@ -16,8 +16,14 @@ const initDenomander = () => {
     )
     .command("init", "Generates the config file")
     .command("make [migrationName]", "Creates a migration file with the name")
-    .command("migrate [amount?]", "Migrates one migration. Optional number of migrations. If not provided, it will do them all.")
-    .command("rollback [amount?]", "Rolls back one migration. Optional number of rollbacks. If not provided, it will do one.");
+    .command(
+      "migrate [amount?]",
+      "Migrates one migration. Optional number of migrations. If not provided, it will do them all.",
+    )
+    .command(
+      "rollback [amount?]",
+      "Rolls back one migration. Optional number of rollbacks. If not provided, it will do one.",
+    );
 
   program.parse(Deno.args);
 
@@ -34,8 +40,8 @@ const initNessie = async () => {
     await responseFile.text(),
   );
 
-  await Deno.mkdir(resolve(Deno.cwd(), "migrations"), { recursive: true })
-  await Deno.create(resolve(Deno.cwd(), "migrations/.gitkeep"))
+  await Deno.mkdir(resolve(Deno.cwd(), "migrations"), { recursive: true });
+  await Deno.create(resolve(Deno.cwd(), "migrations/.gitkeep"));
 };
 
 const run = async () => {

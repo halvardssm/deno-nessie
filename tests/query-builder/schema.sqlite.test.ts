@@ -1,7 +1,7 @@
 import { assertEquals } from "../../deps.ts";
 import { Schema } from "../../qb.ts";
 
-const dialect = "sqlite"
+const dialect = "sqlite";
 
 const strings = [
   {
@@ -51,7 +51,8 @@ const strings = [
   {
     name: "Schema hasTable",
     string: new Schema(dialect).hasTable("testTable"),
-    solution: "SELECT name FROM sqlite_master WHERE type='table' AND name='testTable';",
+    solution:
+      "SELECT name FROM sqlite_master WHERE type='table' AND name='testTable';",
   },
 ];
 

@@ -65,9 +65,9 @@ const strings = [
   },
 ];
 
-const dialect = DIALECT_PG
+const dialect = DIALECT_PG;
 // for await (const dialect of DIALECTS) {
-let hasFailed = false
+let hasFailed = false;
 
 for await (const { name, string, solution } of strings) {
   Deno.test(`Migration ${dialect}: ` + (name || "Empty"), async () => {
