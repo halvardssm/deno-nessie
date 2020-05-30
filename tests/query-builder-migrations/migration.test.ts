@@ -20,7 +20,7 @@ const strings = [
   },
   {
     name: "Rollback all",
-    string: [TYPE_ROLLBACK,"all"],
+    string: [TYPE_ROLLBACK, "all"],
     solution: [
       "Rolled back 1587937822650-strings-misc.ts",
       "Rolled back 1587937822649-numerics.ts",
@@ -29,22 +29,17 @@ const strings = [
   },
 ];
 
-// const dialect = DIALECT_PG;
 for await (const dialect of DIALECTS) {
   let hasFailed = false;
 
   for await (const { name, string, solution } of strings) {
     Deno.test(`Migration ${dialect}: ` + (name || "Empty"), async () => {
-      // if (hasFailed) {
-      //   assert(false, "Skipped")
-      // } else {
-      const response = await runner(string, dialect);
+
+      const response = await runner(dialect, string);
       hasFailed = response[response.length - 1].includes("Code was");
 
       assert(!hasFailed, response.join("\n"));
       assertArrayContains(response, solution);
-      // }
     });
-    // if (hasFailed) break
   }
 }

@@ -8,7 +8,7 @@ export const DIALECTS = [DIALECT_PG, DIALECT_MYSQL, DIALECT_SQLITE];
 
 export const decoder = new TextDecoder();
 
-export const runner = async (type: string[], dialect: string) => {
+export const runner = async (dialect: string, type: string[]) => {
   const r = Deno.run({
     cmd: [
       "deno",

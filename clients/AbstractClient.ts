@@ -54,8 +54,10 @@ export class AbstractClient {
     latestMigration: string | undefined,
     queryHandler: (query: string) => Promise<any>,
   ) {
-    amount = typeof amount === "number" ? amount : this.migrationFiles.length;
+    this.logger(amount, "Amount pre");
+
     this.filterAndSortFiles(latestMigration);
+    amount = typeof amount === "number" ? amount : this.migrationFiles.length;
 
     this.logger(latestMigration, "Latest migrations");
 
@@ -103,6 +105,8 @@ export class AbstractClient {
     allMigrations: string[] | undefined,
     queryHandler: (query: string) => Promise<any>,
   ) {
+    this.logger(amount, "Amount pre");
+
     amount = typeof amount === "number"
       ? amount
       : (amount === "all" ? (allMigrations?.length ? allMigrations.length : 0)

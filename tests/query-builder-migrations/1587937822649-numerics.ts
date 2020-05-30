@@ -25,8 +25,6 @@ export const up = (): string => {
     table.index("col_1");
     table.primary("col_3");
     table.unique("col_8");
-
-    console.log(table.toSql());
   });
 };
 

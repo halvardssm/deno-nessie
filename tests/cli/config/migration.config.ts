@@ -12,7 +12,7 @@ export const DIALECTS = [
 
 export const decoder = new TextDecoder();
 
-export const runner = async (type: string, dialect: string) => {
+export const runner = async (dialect: string, type: any[]) => {
   const r = Deno.run({
     cmd: [
       "deno",
@@ -22,7 +22,7 @@ export const runner = async (type: string, dialect: string) => {
       "--allow-write",
       "--allow-env",
       "cli.ts",
-      type,
+      ...type,
       "-c",
       `./tests/cli/config/${dialect}.config.ts`,
       // "-d",

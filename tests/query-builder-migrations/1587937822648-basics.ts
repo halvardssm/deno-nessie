@@ -8,8 +8,6 @@ export const up = (): string => {
     table.string("col_1", 10);
     // table.timestamps(); TODO FIX TIMESTAMPS
     table.enum("col_11", ["enum_1", "enum_2"]);
-
-    console.log(table.toSql());
   });
 };
 

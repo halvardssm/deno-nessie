@@ -25,8 +25,6 @@ export const up = (): string => {
     table.macAddress("col_15");
     table.macAddress8("col_16");
     table.uuid("col_17");
-
-    console.log(table.toSql());
   });
 };
 

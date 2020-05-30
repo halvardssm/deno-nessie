@@ -48,7 +48,7 @@ export class State {
       this.client = this.config.client;
     }
 
-    this.client?.setLogger(this.logger);
+    this.client?.setLogger(this.logger.bind(this));
 
     return this;
   }
@@ -90,7 +90,7 @@ export class State {
         console.log(output);
       }
     } catch {
-      console.log("Error at: "+title)
+      console.error("Error at: "+title)
     }
   }
 

@@ -67,9 +67,10 @@ export class ClientSQLite extends AbstractClient implements ClientI {
 
   async rollback(amount: amountRollbackT) {
     const allMigrations = await this.query(this.QUERY_GET_ALL);
+
     await super.rollback(
       amount,
-      allMigrations?.[0]?.[0],
+      allMigrations?.[0]?.flatMap(el => el?.[0]),
       this.query.bind(this),
     );
   }

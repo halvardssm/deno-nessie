@@ -47,7 +47,7 @@ export class ClientPostgreSQL extends AbstractClient implements ClientI {
         return await this.client.multiQuery(query.map((el) => ({ text: el })));
       }
     } catch (e) {
-      throw new Error(query + "\n" + e);
+      throw new Error("Error:" + query + "\n" + e);
     }
   }
 
@@ -56,9 +56,7 @@ export class ClientPostgreSQL extends AbstractClient implements ClientI {
   }
 
   async migrate(amount: amountMigrateT) {
-    const latestMigration = await this.query(
-      this.QUERY_GET_LATEST,
-    ) as QueryResult;
+    const latestMigration = await this.query(this.QUERY_GET_LATEST) as QueryResult;
     await super.migrate(
       amount,
       latestMigration.rows?.[0]?.[0],
@@ -68,9 +66,10 @@ export class ClientPostgreSQL extends AbstractClient implements ClientI {
 
   async rollback(amount: amountRollbackT) {
     const allMigrations = await this.query(this.QUERY_GET_ALL) as QueryResult;
+
     await super.rollback(
       amount,
-      allMigrations.rows?.[0],
+      allMigrations.rows?.flatMap(el => el?.[0]),
       this.query.bind(this),
     );
   }

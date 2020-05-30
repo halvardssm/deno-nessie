@@ -59,9 +59,9 @@ const run = async () => {
         await state.client!.prepare();
 
         if (prog.migrate) {
-          await state.client!.migrate(prog.migrate);
+          await state.client!.migrate(prog.amount);
         } else if (prog.rollback) {
-          await state.client!.rollback(prog.rollback);
+          await state.client!.rollback(prog.amount);
         }
 
         await state.client!.close();
