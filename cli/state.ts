@@ -33,7 +33,6 @@ export class State {
       this.config = await this._safeConfigImport(parsePath(STD_CONFIG_FILE));
     }
 
-    this.logger(this.config, "Config");
 
     if (!this.config?.client) {
       this.logger("Using standard config");
