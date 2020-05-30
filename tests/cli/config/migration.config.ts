@@ -4,7 +4,11 @@ export const TYPE_ROLLBACK = "rollback";
 export const DIALECT_PG = "pg";
 export const DIALECT_MYSQL = "mysql";
 export const DIALECT_SQLITE = "sqlite";
-export const DIALECTS = [DIALECT_PG, DIALECT_MYSQL, DIALECT_SQLITE];
+export const DIALECTS = [
+  DIALECT_PG,
+  DIALECT_MYSQL,
+  DIALECT_SQLITE
+];
 
 export const decoder = new TextDecoder();
 

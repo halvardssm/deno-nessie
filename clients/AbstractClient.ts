@@ -111,4 +111,8 @@ export class AbstractClient {
       console.info("Nothing to rollback");
     }
   }
+
+  splitAndTrimQueries(query:string){
+    return query.split(';').filter(el=>el.trim()!=='')
+  }
 }

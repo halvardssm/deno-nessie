@@ -30,7 +30,7 @@ export class ClientMySQL extends AbstractClient implements ClientI {
   }
 
   async query(query: string | string[]): Promise<any> {
-    if (typeof query === 'string') query = query.split(';')
+    if (typeof query === 'string') query = this.splitAndTrimQueries(query)
     const ra = []
 
     for await (const qs of query) {

@@ -21,7 +21,7 @@ test-qb:
 	deno test tests/query-builder
 test-qb-migrations:
 	deno test --allow-write --allow-run --allow-read tests/query-builder-migrations
-test-cli-migrations: #test-clean
+test-cli-migrations:
 	deno test --allow-write --allow-run --allow-read tests/cli
 sleeper:
 	sleep 45s
