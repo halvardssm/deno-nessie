@@ -5,19 +5,25 @@ const initDenomander = () => {
   const program = new Denomander({
     app_name: "Nessie Migrations",
     app_description: "A database migration tool for Deno.",
-    app_version: "0.4.1",
+    app_version: "0.5.0",
   });
 
   program
-    .option("-d --debug", "Enables verbose output")
-    .option(
+    .globalOption("-d --debug", "Enables verbose output")
+    .globalOption(
       "-c --config",
       "Path to config file, will default to ./nessie.config.ts",
     )
     .command("init", "Generates the config file")
     .command("make [migrationName]", "Creates a migration file with the name")
-    .command("migrate", "Migrates one migration")
-    .command("rollback", "Rolls back one migration");
+    .command(
+      "migrate [amount?]",
+      "Migrates migrations. Optional number of migrations. If not provided, it will do all available.",
+    )
+    .command(
+      "rollback [amount?]",
+      "Rolls back migrations. Optional number of rollbacks. If not provided, it will do one.",
+    );
 
   program.parse(Deno.args);
 
@@ -33,28 +39,33 @@ const initNessie = async () => {
     resolve(Deno.cwd(), "nessie.config.ts"),
     await responseFile.text(),
   );
+
+  await Deno.mkdir(resolve(Deno.cwd(), "migrations"), { recursive: true });
+  await Deno.create(resolve(Deno.cwd(), "migrations/.gitkeep"));
 };
 
 const run = async () => {
-  const prog = initDenomander();
-
-  const state = await new State(prog).init();
-
   try {
+    const prog = initDenomander();
+
     if (prog.init) {
       await initNessie();
-    } else if (prog.make) {
-      await state.makeMigration(prog.make);
     } else {
-      await state.initClient();
+      const state = await new State(prog).init();
 
-      if (prog.migrate) {
-        await state.client!.migrate();
-      } else if (prog.rollback) {
-        await state.client!.rollback();
+      if (prog.make) {
+        await state.makeMigration(prog.make);
+      } else {
+        await state.client!.prepare();
+
+        if (prog.migrate) {
+          await state.client!.migrate(prog.amount);
+        } else if (prog.rollback) {
+          await state.client!.rollback(prog.amount);
+        }
+
+        await state.client!.close();
       }
-
-      await state.client!.close();
     }
     Deno.exit();
   } catch (e) {

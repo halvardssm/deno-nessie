@@ -14,11 +14,21 @@ migrate:
 rollback:
 	deno run --allow-net --allow-read cli.ts rollback -c ${CONFIG_FILE}
 
-test:
-	deno test --allow-write --allow-run --allow-read
-test-clean: db-all-restart sleeper test
+test-clean: db-all-restart sleeper
+test-all:
+	make test-qb & make test-clean
+	make test-qb-migrations
+	make test-clean
+	make test-cli-migrations
+
+test-qb:
+	deno test tests/query-builder
+test-qb-migrations:
+	deno test --allow-write --allow-run --allow-read tests/query-builder-migrations
+test-cli-migrations:
+	deno test --allow-write --allow-run --allow-read tests/cli
 sleeper:
-	sleep 30s
+	sleep 45s
 
 db-all-restart: db-all-stop db-all-start
 db-all-start: db-pg-start db-mysql-start db-sqlite-start

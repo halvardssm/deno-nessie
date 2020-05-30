@@ -1,128 +1,105 @@
 import {
-  ClientConfig,
-  ConnectionOptions,
-  Denomander,
-  MySQLClient,
-  open,
-  PGClient,
-  resolve,
-} from "../deps.ts";
-import { dbDialects, nessieConfig } from "../mod.ts";
-import { MySQL } from "./mysql.ts";
-import { PGSQL } from "./pgsql.ts";
-import { SQLite } from "./sqlite.ts";
-import { ClientI, ClientTypes, parsePath } from "./utils.ts";
+  AbstractClient,
+  ClientI,
+  nessieConfig,
+} from "../clients/AbstractClient.ts";
+import { ClientPostgreSQL } from "../clients/ClientPostgreSQL.ts";
+import { Denomander } from "../deps.ts";
+import { parsePath } from "./utils.ts";
+
+export type loggerFn = (output?: any, title?: string) => void;
 
 const STD_CONFIG_FILE = "nessie.config.ts";
-const stdConfig: nessieConfig = {
-  migrationFolder: "./migrations",
-  connection: {
-    database: "nessie",
-    hostname: "localhost",
-    port: 5432,
-    user: "root",
-    password: "pwd",
-  },
-  dialect: "pg",
-};
 
 export class State {
   private enableDebug: boolean;
   private configFile: string;
-  dialect: dbDialects = "pg";
-  migrationFolder: string = "";
-  private connection: ConnectionOptions | ClientConfig | string = "";
-  clients: ClientTypes = {};
+  private config?: nessieConfig;
   client?: ClientI;
 
   constructor(prog: Denomander) {
     this.enableDebug = prog.debug;
     this.configFile = parsePath(prog.config || STD_CONFIG_FILE);
 
-    this.debug(prog, "Program");
-    this.debug(this, "State");
+    this.logger([this.enableDebug, this.configFile], "State");
   }
 
   async init() {
-    let config: nessieConfig = stdConfig;
-    let configRaw;
-    try {
-      this.debug("Checking config path");
-      configRaw = await import(this.configFile);
-      config = configRaw.default;
-    } catch (e) {
-      try {
-        this.debug(e, "Checking project root");
+    this.logger("Checking config path");
+    this.config = await this._safeConfigImport(this.configFile);
 
-        configRaw = await import(parsePath(STD_CONFIG_FILE));
-        config = configRaw.default;
-      } catch (er) {
-        this.debug(e, "Using standard config");
-      }
-    } finally {
-      this.debug(config, "Config");
-
-      this.migrationFolder = resolve(config.migrationFolder || "migrations");
-
-      this.connection = config.connection;
-      this.dialect = config.dialect || "pg";
-
-      this.debug(this, "State init");
+    if (!this.config) {
+      this.logger("Checking project root");
+      this.config = await this._safeConfigImport(parsePath(STD_CONFIG_FILE));
     }
+
+    if (!this.config?.client) {
+      this.logger("Using standard config");
+
+      this.client = new ClientPostgreSQL("./migrations", {
+        database: "nessie",
+        hostname: "localhost",
+        port: 5432,
+        user: "root",
+        password: "pwd",
+      });
+    } else {
+      this.client = this.config.client;
+    }
+
+    this.client?.setLogger(this.logger.bind(this));
 
     return this;
   }
 
   async makeMigration(migrationName: string) {
+    if (
+      migrationName.length > AbstractClient.MAX_FILE_NAME_LENGTH - 13
+    ) {
+      throw new Error(
+        `Migration name can't be longer than ${AbstractClient
+          .MAX_FILE_NAME_LENGTH - 13}`,
+      );
+    }
+
     const fileName = `${Date.now()}-${migrationName}.ts`;
 
-    this.debug(fileName, "Migration file name");
+    this.logger(fileName, "Migration file name");
 
-    await Deno.mkdir(this.migrationFolder, { recursive: true });
+    await Deno.mkdir(this.client!.migrationFolder, { recursive: true });
 
     const responseFile = await fetch(
       "https://deno.land/x/nessie/cli/templates/migration.ts",
     );
 
     await Deno.writeTextFile(
-      `${this.migrationFolder}/${fileName}`,
+      `${this.client!.migrationFolder}/${fileName}`,
       await responseFile.text(),
     );
 
-    console.info(`Created migration ${fileName} at ${this.migrationFolder}`);
+    console.info(
+      `Created migration ${fileName} at ${this.client!.migrationFolder}`,
+    );
   }
 
-  async initClient(): Promise<void> {
-    let client;
-
-    switch (this.dialect) {
-      case "mysql":
-        client = await new MySQLClient().connect(
-          (this.connection as ClientConfig),
-        );
-        this.client = new MySQL(this, client);
-        break;
-
-      case "sqlite":
-        client = await open((this.connection as string));
-        this.client = new SQLite(this, client);
-        break;
-
-      case "pg":
-      default:
-        client = new PGClient((this.connection as string | ConnectionOptions));
-        this.debug(client, "PGClient");
-        await client.connect();
-        this.client = new PGSQL(this, client);
+  logger(output?: any, title?: string): void {
+    try {
+      if (this.enableDebug) {
+        title ? console.log(title + ": ") : null;
+        console.log(output);
+      }
+    } catch {
+      console.error("Error at: " + title);
     }
-
-    this.debug(this.client, "Client");
   }
 
-  debug(output?: any, title?: string) {
-    if (this.enableDebug) {
-      title ? console.log(title + ": ") : null;
-      console.log(output);
+  private async _safeConfigImport(file: string): Promise<any | undefined> {
+    try {
+      const configRaw = await import(file);
+      return configRaw.default;
+    } catch (e) {
+      this.logger(e);
+      return;
     }
   }
 }
