@@ -1,4 +1,4 @@
-name: Nessie CI
+name: CI
 
 on:
   push:

@@ -1,12 +1,15 @@
 ![ci](https://github.com/halvardssm/deno-nessie/workflows/ci/badge.svg)
 [![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https/deno.land/x/nessie/mod.ts)
-[![(Deno)](https://img.shields.io/badge/deno-1.0.0-green.svg)](https://deno.land)
+[![(Deno)](https://img.shields.io/badge/deno-1.0.2-green.svg)](https://deno.land)
 
 # Nessie
 
 <p align="center"><img src="./.github/logo.png" alt="Nessie logo" width="200" height="200"></p>
 
-A database migration tool for [deno](https://deno.land) inspired by [Laravel](https://github.com/laravel/laravel). Supports PostgreSQL and  MySQL, soon: SQLite. See [documentation](https://doc.deno.land/https/deno.land/x/nessie/mod.ts).
+A modular database migration tool for [Deno](https://deno.land) inspired by [Laravel](https://github.com/laravel/laravel). Supports PostgreSQL,  MySQL and SQLite. 
+
+See documentation for the [query builder](https://doc.deno.land/https/deno.land/x/nessie/qb.ts). \
+See documentation for the [clients](https://doc.deno.land/https/deno.land/x/nessie/mod.ts).
 
 ## Supported databases
 
@@ -14,7 +17,9 @@ A database migration tool for [deno](https://deno.land) inspired by [Laravel](ht
 * [x] MySQL - Currently it works with password for 5.*, but for >=8 you have to send a blank password, see [Deno MySQL](https://deno.land/x/mysql/) for version support
 * [x] SQLite
 
-If you have a database system you would like to see in this list, feel free to make an issue or create a pr with your implementation.
+If you have a database system you would like to see in this list, feel free to make an issue or create a pr with your implementation. 
+
+You can see examples of how to make a client plugin in the [clients folder](./clients) or in the section [How to make a client](#how-to-make-a-client).
 
 ## Usage
 
@@ -26,15 +31,19 @@ If you have a database system you would like to see in this list, feel free to m
 
   ```deno run --allow-net --allow-read --allow-write https://deno.land/x/nessie/cli.ts make create_users```
 
-* `migrate`: Run migration - will migrate all migrations in your migration folder (sorted by timestamp) newer than the latest migration in your db
+* `migrate [amount?]`: Run migration - will migrate your migrations in your migration folder (sorted by timestamp) newer than the latest migration in your db. Amount defines how many migrations, defaults to all available if not set.
 
   ```deno run --allow-net --allow-read https://deno.land/x/nessie/cli.ts migrate```
+  
+  ```deno run --allow-net --allow-read https://deno.land/x/nessie/cli.ts migrate 1```
 
   ```deno run --allow-net --allow-read https://deno.land/x/nessie/cli.ts migrate -c ./nessie.config.ts```
 
-* `rollback`: Rollback - will rollback the latest migration
+* `rollback [amount?]`: Rollback - will rollback your migrations. Amount defines how many migrations, defaults to 1 if not set.
 
   ```deno run --allow-net --allow-read https://deno.land/x/nessie/cli.ts rollback```
+  
+  ```deno run --allow-net --allow-read https://deno.land/x/nessie/cli.ts rollback 2```
 
 ### Flags
 
@@ -57,18 +66,18 @@ All contributions are welcome, make sure to read the [contributing guideline](./
 `nessie.config.ts`
 
 ```ts
-import { nessieConfigType } from "https://deno.land/x/nessie/mod.ts";
+import { ClientPostgreSQL, nessieConfig } from "https://deno.land/x/nessie/mod.ts"; 
 
-const config: nessieConfigType = {
-  migrationFolder: "./migrations",
-  connection: { // These are the connection option from their respective db clients, will differ
-    host: "localhost",
+const migrationFolder = "./migrations";
+
+const config: nessieConfig = {
+  client: new ClientPostgreSQL(migrationFolder, {
+    database: "nessie",
+    hostname: "localhost",
     port: 5432,
     user: "root",
     password: "pwd",
-    name: "nessie",
-  },
-  dialect: "pg",
+  }),
 };
 
 export default config;
@@ -77,10 +86,24 @@ export default config;
 Minimal example of a migration file
 
 ```ts
-import { Schema } from "https://deno.land/x/nessie/mod.ts";
+export const up = (): string => {
+  return "CREATE TABLE table1 (id int);";
+};
 
-export const up = (schema: Schema): void => {
-  schema.create("users", (table) => {
+export const down = (): string => {
+  return "DROP TABLE table1";
+};
+```
+
+Using the native query builder
+
+```ts
+import { Schema, dbDialects } from "https://deno.land/x/nessie/qb.ts";
+
+const dialect: dbDialects = "mysql"
+
+export const up = (): string => {
+  let query = new Schema(dialect).create("users", (table) => {
     table.id();
     table.string("name", 100).nullable();
     table.boolean("is_true").default("false");
@@ -88,14 +111,30 @@ export const up = (schema: Schema): void => {
     table.timestamps();
   });
 
-  schema.queryString(
+  query += new Schema(dialect).queryString(
     "INSERT INTO users VALUES (DEFAULT, 'Deno', true, 2, DEFAULT, DEFAULT);",
   );
+
+  return query
 };
 
 export const down = (schema: Schema): void => {
-  schema.drop("users");
+  return new Schema(dialect).drop("users");
 };
 ```
 
 See example folder for more
+
+## How to make a client
+
+A client needs to extend [AbstractClient](./clients/AbstractClient.ts) and implement the [ClientI interface](./clients/AbstractClient.ts).
+
+`query`: Takes a query string or array of query strings and sends them of to the batabase for execution. Should return whatever the database responds.
+
+`prepare`: Will be run when the migration or rollback commands are executed. This should create the connection, set up the `nessie_migrations` table and prepare the database for incoming migrations.
+
+`migrate`: Takes a number as an optional input, will default to all files if not set. Will run `Math.min(amount, numberOfFiles)` migration files. Only handles the `up` method.
+
+`rollback`: Takes a number as an optional input, will default to 1 if not set. Will run `Math.min(amount, numberOfFiles)` migration files. Only handles the `down` method.
+
+`close`: Will be the last method run before the program is finished. This should close the database connection.

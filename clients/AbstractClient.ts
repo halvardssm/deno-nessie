@@ -4,12 +4,11 @@ import { resolve } from "../deps.ts";
 export type QueryWithString = (string: string) => string;
 
 export interface ClientI {
-  migrationFolder: string;
   prepare: () => Promise<void>;
   close: () => Promise<void>;
   rollback: (amount: number | undefined) => Promise<void>;
   migrate: (amount: number | undefined) => Promise<void>;
-  query: (query: string) => Promise<any>;
+  query: (query: string | string[]) => Promise<any>;
 }
 
 export interface nessieConfig {
@@ -89,7 +88,7 @@ export class AbstractClient {
     allMigrations: string[] | undefined,
     queryHandler: (query: string) => Promise<any>,
   ) {
-    if (allMigrations && allMigrations.length>0) {
+    if (allMigrations && allMigrations.length > 0) {
       amount = Math.min(allMigrations.length, amount);
 
       for (let i = 0; i < amount; i++) {
@@ -112,7 +111,7 @@ export class AbstractClient {
     }
   }
 
-  splitAndTrimQueries(query:string){
-    return query.split(';').filter(el=>el.trim()!=='')
+  splitAndTrimQueries(query: string) {
+    return query.split(";").filter((el) => el.trim() !== "");
   }
 }

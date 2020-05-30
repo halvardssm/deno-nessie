@@ -1,7 +1,7 @@
 import { DB } from "https://deno.land/x/sqlite@v2.0.0/mod.ts";
 import { AbstractClient, ClientI } from "./AbstractClient.ts";
-import { parsePath } from '../cli/utils.ts';
-import {resolve} from '../deps.ts'
+import { parsePath } from "../cli/utils.ts";
+import { resolve } from "../deps.ts";
 
 export class ClientSQLite extends AbstractClient implements ClientI {
   private client?: DB;
@@ -13,7 +13,7 @@ export class ClientSQLite extends AbstractClient implements ClientI {
 
   constructor(migrationFolder: string, connectionOptions: string) {
     super(migrationFolder);
-    this.client = new DB(resolve(connectionOptions))
+    this.client = new DB(resolve(connectionOptions));
   }
 
   async prepare(): Promise<void> {
@@ -28,38 +28,46 @@ export class ClientSQLite extends AbstractClient implements ClientI {
     }
   }
 
-  async query(query: string|string[]): Promise<any> {
-    console.log(query)
-    if (typeof query === 'string') query = this.splitAndTrimQueries(query)
-    const ra = []
+  async query(query: string | string[]): Promise<any> {
+    console.log(query);
+    if (typeof query === "string") query = this.splitAndTrimQueries(query);
+    const ra = [];
 
     for await (const qs of query) {
       try {
-          ra.push([...this.client!.query(qs)])
+        ra.push([...this.client!.query(qs)]);
       } catch (e) {
         if (e?.message === "Query was empty") {
-          ra.push(undefined)
+          ra.push(undefined);
         } else {
-          throw new Error(query + '\n' + e + '\n' + ra.join('\n'))
+          throw new Error(query + "\n" + e + "\n" + ra.join("\n"));
         }
       }
     }
-    console.log(ra)
+    console.log(ra);
 
     return ra;
   }
 
   async close(): Promise<void> {
-    this.client?.close()
+    this.client?.close();
   }
 
   async migrate(amount: number | undefined) {
     const latestMigration = await this.query(this.QUERY_GET_LATEST);
-    await super.migrate(amount, latestMigration?.[0]?.[0]?.[0], this.query.bind(this));
+    await super.migrate(
+      amount,
+      latestMigration?.[0]?.[0]?.[0],
+      this.query.bind(this),
+    );
   }
 
   async rollback(amount: number | undefined) {
     const allMigrations = await this.query(this.QUERY_GET_ALL);
-    await super.rollback(amount, allMigrations?.[0]?.[0], this.query.bind(this));
+    await super.rollback(
+      amount,
+      allMigrations?.[0]?.[0],
+      this.query.bind(this),
+    );
   }
 }

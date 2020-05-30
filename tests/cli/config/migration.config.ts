@@ -7,7 +7,7 @@ export const DIALECT_SQLITE = "sqlite";
 export const DIALECTS = [
   DIALECT_PG,
   DIALECT_MYSQL,
-  DIALECT_SQLITE
+  DIALECT_SQLITE,
 ];
 
 export const decoder = new TextDecoder();

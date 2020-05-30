@@ -143,7 +143,9 @@ export class Table {
     switch (this.dialect) {
       case "sqlite":
         return uniqueArray
-          ? ` CREATE UNIQUE INDEX ${this.tableName} ON ${this.tableName} (${uniqueString});`
+          ? ` CREATE UNIQUE INDEX ${this.tableName}_${
+            uniqueArray.join("_")
+          } ON ${this.tableName} (${uniqueString});`
           : "";
       case "mysql":
       case "pg":

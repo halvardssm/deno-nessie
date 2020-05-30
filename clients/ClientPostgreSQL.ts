@@ -1,6 +1,6 @@
-import { ConnectionOptions } from "https://deno.land/x/postgres@v0.4.0/connection_params.ts";
-import { Client } from "https://deno.land/x/postgres@v0.4.0/mod.ts";
-import { QueryResult } from "https://deno.land/x/postgres@v0.4.0/query.ts";
+import { ConnectionOptions } from "https://deno.land/x/postgres@v0.4.1/connection_params.ts";
+import { Client } from "https://deno.land/x/postgres@v0.4.1/mod.ts";
+import { QueryResult } from "https://deno.land/x/postgres@v0.4.1/query.ts";
 import { AbstractClient, ClientI } from "./AbstractClient.ts";
 
 export class ClientPostgreSQL extends AbstractClient implements ClientI {
@@ -20,7 +20,9 @@ export class ClientPostgreSQL extends AbstractClient implements ClientI {
   async prepare(): Promise<void> {
     await this.client.connect();
 
-    const queryResult = await this.query(this.QUERY_MIGRATION_TABLE_EXISTS);
+    const queryResult = await this.query(
+      this.QUERY_MIGRATION_TABLE_EXISTS,
+    ) as QueryResult;
 
     const migrationTableExists =
       queryResult.rows?.[0]?.[0] === this.TABLE_MIGRATIONS;
@@ -31,11 +33,15 @@ export class ClientPostgreSQL extends AbstractClient implements ClientI {
     }
   }
 
-  async query(query: string): Promise<QueryResult> {
+  async query(query: string | string[]): Promise<QueryResult | QueryResult[]> {
     try {
-      return await this.client.query(query);
+      if (typeof query === "string") {
+        return await this.client.query(query);
+      } else {
+        return await this.client.multiQuery(query.map((el) => ({ text: el })));
+      }
     } catch (e) {
-      throw new Error(query + "\n" +e);
+      throw new Error(query + "\n" + e);
     }
   }
 
@@ -44,7 +50,9 @@ export class ClientPostgreSQL extends AbstractClient implements ClientI {
   }
 
   async migrate(amount: number | undefined) {
-    const latestMigration = await this.query(this.QUERY_GET_LATEST);
+    const latestMigration = await this.query(
+      this.QUERY_GET_LATEST,
+    ) as QueryResult;
     await super.migrate(
       amount,
       latestMigration.rows?.[0]?.[0],
@@ -53,7 +61,7 @@ export class ClientPostgreSQL extends AbstractClient implements ClientI {
   }
 
   async rollback(amount: number | undefined) {
-    const allMigrations = await this.query(this.QUERY_GET_ALL);
+    const allMigrations = await this.query(this.QUERY_GET_ALL) as QueryResult;
     await super.rollback(
       amount,
       allMigrations.rows?.[0],

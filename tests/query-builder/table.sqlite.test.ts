@@ -38,7 +38,7 @@ const strings = [
       return table.toSql();
     })(),
     solution:
-      "CREATE TABLE testTable (testCol int); CREATE UNIQUE INDEX testTable ON testTable (testCol);",
+      "CREATE TABLE testTable (testCol int); CREATE UNIQUE INDEX testTable_testCol ON testTable (testCol);",
   },
   {
     name: "Table with 2 unique",
@@ -50,7 +50,7 @@ const strings = [
       return table.toSql();
     })(),
     solution:
-      "CREATE TABLE testTable (testCol int, testCol2 int); CREATE UNIQUE INDEX testTable ON testTable (testCol, testCol2);",
+      "CREATE TABLE testTable (testCol int, testCol2 int); CREATE UNIQUE INDEX testTable_testCol_testCol2 ON testTable (testCol, testCol2);",
   },
   {
     name: "Table with 1 primary",

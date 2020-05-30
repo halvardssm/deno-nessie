@@ -23,7 +23,7 @@ const configMySql = {
   }),
 };
 const configSqLite = {
-  client: new ClientSQLite(migrationFolder, "sqlite.db"),
+  client: new ClientSQLite(migrationFolder, "./sqlite.db"),
 };
 
 export default configPg;

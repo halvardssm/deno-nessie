@@ -15,7 +15,11 @@ rollback:
 	deno run --allow-net --allow-read cli.ts rollback -c ${CONFIG_FILE}
 
 test-clean: db-all-restart sleeper
-test-all: test-qb test-qb-migrations test-clean test-cli-migrations
+test-all:
+	make test-qb & make test-clean
+	make test-qb-migrations
+	make test-clean
+	make test-cli-migrations
 
 test-qb:
 	deno test tests/query-builder
