@@ -55,7 +55,7 @@ jobs:
       - name: Install deno
         uses: denolib/setup-deno@master
         with: 
-          deno-version: 1.0.2
+          deno-version: 1.0.3
           
       - name: Nessie Init
         run: deno run --allow-read --allow-write --allow-net https://raw.githubusercontent.com/$URL_PATH/cli.ts init
@@ -108,7 +108,7 @@ jobs:
       - name: Install deno
         uses: denolib/setup-deno@master
         with: 
-          deno-version: 1.0.2
+          deno-version: 1.0.3
 
       - name: Create SQLite db
         run: make db-sqlite-start
@@ -129,7 +129,7 @@ jobs:
       - name: Install deno
         uses: denolib/setup-deno@master
         with:
-          deno-version: 1.0.2
+          deno-version: 1.0.3
 
       - name: Test query builder
         run: make test-qb
@@ -175,7 +175,7 @@ jobs:
       - name: Install deno
         uses: denolib/setup-deno@master
         with:
-          deno-version: 1.0.2
+          deno-version: 1.0.3
 
       - name: Create SQLite db
         run: make db-sqlite-start
