@@ -20,18 +20,10 @@ const initDenomander = () => {
       "migrate [amount?]",
       "Migrates migrations. Optional number of migrations. If not provided, it will do all available.",
     )
-    // .option(
-    //   "-a --amount",
-    //   "Optional number of migrations. If not provided, it will do them all.",
-    // )
     .command(
       "rollback [amount?]",
       "Rolls back migrations. Optional number of rollbacks. If not provided, it will do one.",
     );
-  // .option(
-  //   "-a --amount",
-  //   "Optional number of rollbacks. If not provided, it will do one.",
-  // );
 
   program.parse(Deno.args);
 
@@ -53,9 +45,9 @@ const initNessie = async () => {
 };
 
 const run = async () => {
+  try {
   const prog = initDenomander();
 
-  try {
     if (prog.init) {
       await initNessie();
     } else {
