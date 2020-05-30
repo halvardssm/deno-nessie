@@ -4,7 +4,6 @@ import {
   runner,
   TYPE_MIGRATE,
   TYPE_ROLLBACK,
-  DIALECT_PG,
 } from "./config/migration.config.ts";
 
 const strings = [

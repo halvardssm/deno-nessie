@@ -1,4 +1,4 @@
-import { Schema, dbDialects } from "../../qb.ts";
+import { dbDialects, Schema } from "../../qb.ts";
 
 const dialect = Deno.env.get("DB_DIALECT") as dbDialects;
 
