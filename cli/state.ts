@@ -91,7 +91,7 @@ export class State {
         console.log(output);
       }
     } catch {
-      console.log("Error at: " + title);
+      console.log("Error at: "+title)
     }
   }
 

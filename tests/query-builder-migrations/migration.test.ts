@@ -9,7 +9,7 @@ import {
 const strings = [
   {
     name: "Migrate and create table",
-    string: TYPE_MIGRATE,
+    string: [TYPE_MIGRATE],
     solution: [
       "Database setup complete",
       "Migrated 1587937822648-basics.ts",
@@ -20,7 +20,7 @@ const strings = [
   },
   {
     name: "Rollback all",
-    string: TYPE_ROLLBACK,
+    string: [TYPE_ROLLBACK,"all"],
     solution: [
       "Rolled back 1587937822650-strings-misc.ts",
       "Rolled back 1587937822649-numerics.ts",

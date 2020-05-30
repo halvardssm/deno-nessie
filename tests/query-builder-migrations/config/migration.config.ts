@@ -8,7 +8,7 @@ export const DIALECTS = [DIALECT_PG, DIALECT_MYSQL, DIALECT_SQLITE];
 
 export const decoder = new TextDecoder();
 
-export const runner = async (type: string, dialect: string) => {
+export const runner = async (type: string[], dialect: string) => {
   const r = Deno.run({
     cmd: [
       "deno",
@@ -18,10 +18,10 @@ export const runner = async (type: string, dialect: string) => {
       "--allow-write",
       "--allow-env",
       "cli.ts",
+      ...type,
       "-c",
       `./tests/query-builder-migrations/config/${dialect}.config.ts`,
       // "-d",
-      type,
     ],
     stdout: "piped",
     env: {
