@@ -18,10 +18,10 @@ export const runner = async (type: string, dialect: string) => {
       "--allow-write",
       "--allow-env",
       "cli.ts",
-      type,
       "-c",
       `./tests/query-builder-migrations/config/${dialect}.config.ts`,
       // "-d",
+      type,
     ],
     stdout: "piped",
     env: {

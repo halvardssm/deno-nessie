@@ -1,5 +1,5 @@
 import { Client, ClientConfig } from "https://deno.land/x/mysql@2.2.0/mod.ts";
-import { AbstractClient, ClientI } from "./AbstractClient.ts";
+import { AbstractClient, ClientI, amountMigrateT, amountRollbackT, queryT } from "./AbstractClient.ts";
 
 export class ClientMySQL extends AbstractClient implements ClientI {
   private client: Client;
@@ -17,7 +17,7 @@ export class ClientMySQL extends AbstractClient implements ClientI {
     this.client = new Client();
   }
 
-  async prepare(): Promise<void> {
+  async prepare() {
     await this.client.connect(this.clientOptions);
     const queryResult = await this.query(this.QUERY_MIGRATION_TABLE_EXISTS);
 
@@ -29,7 +29,7 @@ export class ClientMySQL extends AbstractClient implements ClientI {
     }
   }
 
-  async query(query: string | string[]): Promise<any> {
+  async query(query: queryT) {
     if (typeof query === "string") query = this.splitAndTrimQueries(query);
     const ra = [];
 
@@ -55,11 +55,11 @@ export class ClientMySQL extends AbstractClient implements ClientI {
     return ra;
   }
 
-  async close(): Promise<void> {
+  async close() {
     await this.client.close();
   }
 
-  async migrate(amount: number | undefined) {
+  async migrate(amount: amountMigrateT) {
     const latestMigration = await this.query(this.QUERY_GET_LATEST);
     await super.migrate(
       amount,
@@ -68,7 +68,7 @@ export class ClientMySQL extends AbstractClient implements ClientI {
     );
   }
 
-  async rollback(amount: number | undefined) {
+  async rollback(amount: amountRollbackT) {
     const allMigrations = await this.query(this.QUERY_GET_ALL);
 
     const parsedMigrations: string[] = allMigrations?.[0].map((el: any) =>

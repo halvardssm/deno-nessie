@@ -16,19 +16,19 @@ const initDenomander = () => {
     )
     .command("init", "Generates the config file")
     .command("make [migrationName]", "Creates a migration file with the name")
-    .command("migrate", "Migrates one migration.")
-    .option(
-      "-a --amount",
-      "Optional number of migrations. If not provided, it will do them all.",
-    )
+    .command("migrate [amount?]", "Migrates migrations. Optional number of migrations. If not provided, it will do all available.")
+    // .option(
+    //   "-a --amount",
+    //   "Optional number of migrations. If not provided, it will do them all.",
+    // )
     .command(
-      "rollback",
-      "Rolls back one migration.",
+      "rollback [amount?]",
+      "Rolls back migrations. Optional number of rollbacks. If not provided, it will do one.",
     )
-    .option(
-      "-a --amount",
-      "Optional number of rollbacks. If not provided, it will do one.",
-    );
+    // .option(
+    //   "-a --amount",
+    //   "Optional number of rollbacks. If not provided, it will do one.",
+    // );
 
   program.parse(Deno.args);
 
@@ -64,9 +64,9 @@ const run = async () => {
         await state.client!.prepare();
 
         if (prog.migrate) {
-          await state.client!.migrate(prog.amount);
+          await state.client!.migrate(prog.migrate);
         } else if (prog.rollback) {
-          await state.client!.rollback(prog.amount);
+          await state.client!.rollback(prog.rollback);
         }
 
         await state.client!.close();

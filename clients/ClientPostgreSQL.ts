@@ -1,7 +1,7 @@
 import { ConnectionOptions } from "https://deno.land/x/postgres@v0.4.1/connection_params.ts";
 import { Client } from "https://deno.land/x/postgres@v0.4.1/mod.ts";
 import { QueryResult } from "https://deno.land/x/postgres@v0.4.1/query.ts";
-import { AbstractClient, ClientI } from "./AbstractClient.ts";
+import { AbstractClient, ClientI, queryT, amountMigrateT, amountRollbackT } from "./AbstractClient.ts";
 
 export class ClientPostgreSQL extends AbstractClient implements ClientI {
   private client: Client;
@@ -17,7 +17,7 @@ export class ClientPostgreSQL extends AbstractClient implements ClientI {
     this.client = new Client(connectionOptions);
   }
 
-  async prepare(): Promise<void> {
+  async prepare() {
     await this.client.connect();
 
     const queryResult = await this.query(
@@ -33,7 +33,7 @@ export class ClientPostgreSQL extends AbstractClient implements ClientI {
     }
   }
 
-  async query(query: string | string[]): Promise<QueryResult | QueryResult[]> {
+  async query(query: queryT) {
     try {
       if (typeof query === "string") {
         return await this.client.query(query);
@@ -45,11 +45,11 @@ export class ClientPostgreSQL extends AbstractClient implements ClientI {
     }
   }
 
-  async close(): Promise<void> {
+  async close() {
     await this.client.end();
   }
 
-  async migrate(amount: number | undefined) {
+  async migrate(amount: amountMigrateT) {
     const latestMigration = await this.query(
       this.QUERY_GET_LATEST,
     ) as QueryResult;
@@ -60,7 +60,7 @@ export class ClientPostgreSQL extends AbstractClient implements ClientI {
     );
   }
 
-  async rollback(amount: number | undefined) {
+  async rollback(amount: amountRollbackT) {
     const allMigrations = await this.query(this.QUERY_GET_ALL) as QueryResult;
     await super.rollback(
       amount,
