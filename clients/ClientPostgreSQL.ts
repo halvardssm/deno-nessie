@@ -3,10 +3,10 @@ import { Client } from "https://deno.land/x/postgres@v0.4.1/mod.ts";
 import { QueryResult } from "https://deno.land/x/postgres@v0.4.1/query.ts";
 import {
   AbstractClient,
-  ClientI,
-  queryT,
   amountMigrateT,
   amountRollbackT,
+  ClientI,
+  queryT,
 } from "./AbstractClient.ts";
 
 export class ClientPostgreSQL extends AbstractClient implements ClientI {
@@ -56,7 +56,9 @@ export class ClientPostgreSQL extends AbstractClient implements ClientI {
   }
 
   async migrate(amount: amountMigrateT) {
-    const latestMigration = await this.query(this.QUERY_GET_LATEST) as QueryResult;
+    const latestMigration = await this.query(
+      this.QUERY_GET_LATEST,
+    ) as QueryResult;
     await super.migrate(
       amount,
       latestMigration.rows?.[0]?.[0],
@@ -69,7 +71,7 @@ export class ClientPostgreSQL extends AbstractClient implements ClientI {
 
     await super.rollback(
       amount,
-      allMigrations.rows?.flatMap(el => el?.[0]),
+      allMigrations.rows?.flatMap((el) => el?.[0]),
       this.query.bind(this),
     );
   }

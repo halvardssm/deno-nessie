@@ -33,7 +33,6 @@ export class State {
       this.config = await this._safeConfigImport(parsePath(STD_CONFIG_FILE));
     }
 
-
     if (!this.config?.client) {
       this.logger("Using standard config");
 
@@ -90,7 +89,7 @@ export class State {
         console.log(output);
       }
     } catch {
-      console.error("Error at: "+title)
+      console.error("Error at: " + title);
     }
   }
 

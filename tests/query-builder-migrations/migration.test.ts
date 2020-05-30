@@ -34,7 +34,6 @@ for await (const dialect of DIALECTS) {
 
   for await (const { name, string, solution } of strings) {
     Deno.test(`Migration ${dialect}: ` + (name || "Empty"), async () => {
-
       const response = await runner(dialect, string);
       hasFailed = response[response.length - 1].includes("Code was");
 

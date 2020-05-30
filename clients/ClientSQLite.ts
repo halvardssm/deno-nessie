@@ -1,10 +1,10 @@
 import { DB } from "https://deno.land/x/sqlite@v2.0.0/mod.ts";
 import {
   AbstractClient,
-  ClientI,
-  queryT,
   amountMigrateT,
   amountRollbackT,
+  ClientI,
+  queryT,
 } from "./AbstractClient.ts";
 import { resolve } from "../deps.ts";
 
@@ -70,7 +70,7 @@ export class ClientSQLite extends AbstractClient implements ClientI {
 
     await super.rollback(
       amount,
-      allMigrations?.[0]?.flatMap(el => el?.[0]),
+      allMigrations?.[0]?.flatMap((el) => el?.[0]),
       this.query.bind(this),
     );
   }

@@ -46,7 +46,7 @@ const initNessie = async () => {
 
 const run = async () => {
   try {
-  const prog = initDenomander();
+    const prog = initDenomander();
 
     if (prog.init) {
       await initNessie();

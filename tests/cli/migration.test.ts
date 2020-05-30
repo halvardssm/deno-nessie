@@ -9,7 +9,7 @@ import {
 const strings = [
   {
     name: "Rollback none",
-    string: [TYPE_ROLLBACK ,"all"],
+    string: [TYPE_ROLLBACK, "all"],
     solution: ["Nothing to rollback"],
   },
   {
@@ -36,7 +36,7 @@ const strings = [
   },
   {
     name: "Rollback test3 and test2",
-    string: [TYPE_ROLLBACK , "2"],
+    string: [TYPE_ROLLBACK, "2"],
     solution: [
       "Rolled back 1587937822650-test3.ts",
       "Rolled back 1587937822649-test2.ts",
@@ -44,7 +44,7 @@ const strings = [
   },
   {
     name: "Migrate test2 and test3",
-    string: [TYPE_MIGRATE ,"2"],
+    string: [TYPE_MIGRATE, "2"],
     solution: [
       "Migrated 1587937822649-test2.ts",
       "Migrated 1587937822650-test3.ts",
@@ -53,7 +53,7 @@ const strings = [
   },
   {
     name: "Rollback all",
-    string: [TYPE_ROLLBACK ,"all"],
+    string: [TYPE_ROLLBACK, "all"],
     solution: [
       "Rolled back 1587937822650-test3.ts",
       "Rolled back 1587937822649-test2.ts",
@@ -72,7 +72,6 @@ for await (const dialect of DIALECTS) {
 
   for await (const { name, string, solution } of strings) {
     Deno.test(`Migration ${dialect}: ` + (name || "Empty"), async () => {
-
       const response = await runner(dialect, string);
       hasFailed = response[response.length - 1].includes("Code was");
 

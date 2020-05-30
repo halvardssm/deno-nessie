@@ -1,6 +1,5 @@
 import { Table } from "./Table.ts";
 import { dbDialects } from "./TypeUtils.ts";
-import { State } from "../cli/state.ts";
 
 /** The schema class exposed in the `up()` and `down()` methods in the migration files.
  * 
