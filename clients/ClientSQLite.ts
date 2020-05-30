@@ -1,5 +1,11 @@
 import { DB } from "https://deno.land/x/sqlite@v2.0.0/mod.ts";
-import { AbstractClient, ClientI, queryT, amountMigrateT, amountRollbackT } from "./AbstractClient.ts";
+import {
+  AbstractClient,
+  ClientI,
+  queryT,
+  amountMigrateT,
+  amountRollbackT,
+} from "./AbstractClient.ts";
 import { resolve } from "../deps.ts";
 
 export class ClientSQLite extends AbstractClient implements ClientI {

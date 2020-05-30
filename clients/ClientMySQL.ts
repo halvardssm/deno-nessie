@@ -1,5 +1,11 @@
 import { Client, ClientConfig } from "https://deno.land/x/mysql@2.2.0/mod.ts";
-import { AbstractClient, ClientI, amountMigrateT, amountRollbackT, queryT } from "./AbstractClient.ts";
+import {
+  AbstractClient,
+  ClientI,
+  amountMigrateT,
+  amountRollbackT,
+  queryT,
+} from "./AbstractClient.ts";
 
 export class ClientMySQL extends AbstractClient implements ClientI {
   private client: Client;

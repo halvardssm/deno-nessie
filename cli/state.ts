@@ -7,6 +7,8 @@ import { ClientPostgreSQL } from "../clients/ClientPostgreSQL.ts";
 import { Denomander } from "../deps.ts";
 import { parsePath } from "./utils.ts";
 
+export type loggerFn = (output?: any, title?: string) => void;
+
 const STD_CONFIG_FILE = "nessie.config.ts";
 
 export class State {
@@ -19,22 +21,22 @@ export class State {
     this.enableDebug = prog.debug;
     this.configFile = parsePath(prog.config || STD_CONFIG_FILE);
 
-    this.debug([this.enableDebug, this.configFile], "State");
+    this.logger([this.enableDebug, this.configFile], "State");
   }
 
   async init() {
-    this.debug("Checking config path");
+    this.logger("Checking config path");
     this.config = await this._safeConfigImport(this.configFile);
 
     if (!this.config) {
-      this.debug("Checking project root");
+      this.logger("Checking project root");
       this.config = await this._safeConfigImport(parsePath(STD_CONFIG_FILE));
     }
 
-    this.debug(this.config, "Config");
+    this.logger(this.config, "Config");
 
     if (!this.config?.client) {
-      this.debug("Using standard config");
+      this.logger("Using standard config");
 
       this.client = new ClientPostgreSQL("./migrations", {
         database: "nessie",
@@ -47,7 +49,7 @@ export class State {
       this.client = this.config.client;
     }
 
-    this.debug(this, "State init");
+    this.client?.setLogger(this.logger);
 
     return this;
   }
@@ -64,7 +66,7 @@ export class State {
 
     const fileName = `${Date.now()}-${migrationName}.ts`;
 
-    this.debug(fileName, "Migration file name");
+    this.logger(fileName, "Migration file name");
 
     await Deno.mkdir(this.client!.migrationFolder, { recursive: true });
 
@@ -82,10 +84,14 @@ export class State {
     );
   }
 
-  debug(output?: any, title?: string): void {
-    if (this.enableDebug) {
-      title ? console.log(title + ": ") : null;
-      console.log(output);
+  logger(output?: any, title?: string): void {
+    try {
+      if (this.enableDebug) {
+        title ? console.log(title + ": ") : null;
+        console.log(output);
+      }
+    } catch {
+      console.log("Error at: " + title);
     }
   }
 
@@ -94,7 +100,7 @@ export class State {
       const configRaw = await import(file);
       return configRaw.default;
     } catch (e) {
-      this.debug(e);
+      this.logger(e);
       return;
     }
   }

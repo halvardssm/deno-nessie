@@ -24,7 +24,7 @@ const strings = [
     solution: [
       "Rolled back 1587937822650-strings-misc.ts",
       "Rolled back 1587937822649-numerics.ts",
-      "Rolled back 1587937822648-basics.ts"
+      "Rolled back 1587937822648-basics.ts",
     ],
   },
 ];
