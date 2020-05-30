@@ -45,6 +45,8 @@ You can see examples of how to make a client plugin in the [clients folder](./cl
   
   ```deno run --allow-net --allow-read https://deno.land/x/nessie/cli.ts rollback 2```
 
+  ```deno run --allow-net --allow-read https://deno.land/x/nessie/cli.ts rollback all```
+
 ### Flags
 
 * `-c, --config`: Path to config file, will default to ./nessie.config.ts
