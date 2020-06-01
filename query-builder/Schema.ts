@@ -53,7 +53,7 @@ export class Schema {
       name.join(
         ", ",
       )
-    }${cascade ? " CASCADE" : ""};`;
+      }${cascade ? " CASCADE" : ""};`;
 
     this.query.push(sql);
 
@@ -77,11 +77,9 @@ export class Schema {
   /** TODO(halvardssm) This is a temporary fix which will have to be sorted out before v1.0 */
   queryHandler(queryString: string) {
     let queries = queryString.trim().split(/(?<!\\);/);
-
     queries = queries
-      .filter((el) => el.trim() !== "" || el.trim() !== undefined)
-      .map((el) => el.trim().replace("\\;", ";"));
-
+      .filter((el) => el.trim() !== "" && el.trim() !== undefined)
+      .map((el) => `${el.trim().replace(/\\;/, ";")};`);
     return queries;
   }
 }
