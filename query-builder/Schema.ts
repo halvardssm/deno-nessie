@@ -30,8 +30,13 @@ export class Schema {
   }
 
   /** Adds a custom query string to the migration */
-  queryString(queryString: string) {
+  queryString(queryString: string): string {
+    const lastChar = queryString[queryString.length - 1];
+    if (lastChar != ";") {
+      queryString += ";";
+    }
     this.query += queryString;
+    return queryString;
   }
 
   /** Drops a table */
