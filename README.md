@@ -120,12 +120,12 @@ export const up = (): string => {
   return query
 };
 
-export const down = (schema: Schema): void => {
+export const down = (): void => {
   return new Schema(dialect).drop("users");
 };
 ```
 
-See example folder for more
+See the [example folder](./examples) for more
 
 ## How to make a client
 
