@@ -108,7 +108,7 @@ import { Schema, dbDialects } from "https://deno.land/x/nessie/qb.ts";
 const dialect: dbDialects = "mysql"
 
 export const up: Migration = () => {
-  let query = new Schema(dialect).create("users", (table) => {
+  const queryArray: string[] = new Schema(dialect).create("users", (table) => {
     table.id();
     table.string("name", 100).nullable();
     table.boolean("is_true").default("false");
@@ -116,11 +116,13 @@ export const up: Migration = () => {
     table.timestamps();
   });
 
-  query += new Schema(dialect).queryString(
+  const queryString = new Schema(dialect).queryString(
     "INSERT INTO users VALUES (DEFAULT, 'Deno', true, 2, DEFAULT, DEFAULT);",
-  );
+  )
+  
+  queryArray.push(queryString);
 
-  return query
+  return queryArray
 };
 
 export const down: Migration = () => {
