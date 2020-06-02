@@ -14,7 +14,7 @@ const strings = [
       });
     })(),
     solution: [
-      "CREATE TABLE testTable (id bigint PRIMARY KEY, created_at timestamp (0) default current_timestamp, updated_at timestamp (0) default current_timestamp);",
+      "CREATE TABLE testTable (id bigint PRIMARY KEY, created_at timestamp (0) DEFAULT current_timestamp, updated_at timestamp (0) DEFAULT current_timestamp);",
       "DROP TRIGGER IF EXISTS set_timestamp;",
       "CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW BEGIN UPDATE testTable SET updated_at = CURRENT_TIMESTAMP WHERE id=OLD.id; END;",
     ],

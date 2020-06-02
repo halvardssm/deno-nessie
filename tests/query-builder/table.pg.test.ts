@@ -162,7 +162,7 @@ const strings = [
       return table.toSql();
     })(),
     solution:
-      "CREATE TABLE testTable (created_at timestamp (0) default current_timestamp);",
+      "CREATE TABLE testTable (created_at timestamp (0) DEFAULT current_timestamp);",
   },
   {
     name: "Table with createdAtTz",
@@ -172,7 +172,7 @@ const strings = [
       return table.toSql();
     })(),
     solution:
-      "CREATE TABLE testTable (created_at timestamptz (0) default current_timestamp);",
+      "CREATE TABLE testTable (created_at timestamptz (0) DEFAULT current_timestamp);",
   },
   {
     name: "Table with date",
@@ -390,7 +390,7 @@ const strings = [
       return table.toSql();
     })(),
     solution:
-      "CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now()\\; RETURN NEW\\; END\\; $$ language 'plpgsql';CREATE TABLE testTable (created_at timestamp (0) default current_timestamp, updated_at timestamp (0) default current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on testTable; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
+      "CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now()\\; RETURN NEW\\; END\\; $$ language 'plpgsql';CREATE TABLE testTable (created_at timestamp (0) DEFAULT current_timestamp, updated_at timestamp (0) DEFAULT current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on testTable; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
   },
   {
     name: "Table with timestampsTz",
@@ -400,7 +400,7 @@ const strings = [
       return table.toSql();
     })(),
     solution:
-      "CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now()\\; RETURN NEW\\; END\\; $$ language 'plpgsql';CREATE TABLE testTable (created_at timestamptz (0) default current_timestamp, updated_at timestamptz (0) default current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on testTable; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
+      "CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now()\\; RETURN NEW\\; END\\; $$ language 'plpgsql';CREATE TABLE testTable (created_at timestamptz (0) DEFAULT current_timestamp, updated_at timestamptz (0) DEFAULT current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on testTable; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
   },
   {
     name: "Table with updatedAt",
@@ -410,7 +410,7 @@ const strings = [
       return table.toSql();
     })(),
     solution:
-      "CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now()\\; RETURN NEW\\; END\\; $$ language 'plpgsql';CREATE TABLE testTable (updated_at timestamp (0) default current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on testTable; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
+      "CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now()\\; RETURN NEW\\; END\\; $$ language 'plpgsql';CREATE TABLE testTable (updated_at timestamp (0) DEFAULT current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on testTable; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
   },
   {
     name: "Table with updatedAtTz",
@@ -420,7 +420,7 @@ const strings = [
       return table.toSql();
     })(),
     solution:
-      "CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now()\\; RETURN NEW\\; END\\; $$ language 'plpgsql';CREATE TABLE testTable (updated_at timestamptz (0) default current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on testTable; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
+      "CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now()\\; RETURN NEW\\; END\\; $$ language 'plpgsql';CREATE TABLE testTable (updated_at timestamptz (0) DEFAULT current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on testTable; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
   },
   {
     name: "Table with text",

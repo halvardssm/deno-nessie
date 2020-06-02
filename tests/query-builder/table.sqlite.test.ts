@@ -162,7 +162,7 @@ const strings = [
       return table.toSql();
     })(),
     solution:
-      "CREATE TABLE testTable (created_at timestamp (0) default current_timestamp);",
+      "CREATE TABLE testTable (created_at timestamp (0) DEFAULT current_timestamp);",
   },
   {
     name: "Table with createdAtTz",
@@ -172,7 +172,7 @@ const strings = [
       return table.toSql();
     })(),
     solution:
-      "CREATE TABLE testTable (created_at datetime (0) default current_timestamp);",
+      "CREATE TABLE testTable (created_at datetime (0) DEFAULT current_timestamp);",
   },
   {
     name: "Table with date",
@@ -390,7 +390,7 @@ const strings = [
       return table.toSql();
     })(),
     solution:
-      "CREATE TABLE testTable (created_at timestamp (0) default current_timestamp, updated_at timestamp (0) default current_timestamp); DROP TRIGGER IF EXISTS set_timestamp; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW BEGIN UPDATE testTable SET updated_at = CURRENT_TIMESTAMP WHERE id=OLD.id\\; END;",
+      "CREATE TABLE testTable (created_at timestamp (0) DEFAULT current_timestamp, updated_at timestamp (0) DEFAULT current_timestamp); DROP TRIGGER IF EXISTS set_timestamp; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW BEGIN UPDATE testTable SET updated_at = CURRENT_TIMESTAMP WHERE id=OLD.id\\; END;",
   },
   {
     name: "Table with timestampsTz",
@@ -400,7 +400,7 @@ const strings = [
       return table.toSql();
     })(),
     solution:
-      "CREATE TABLE testTable (created_at datetime (0) default current_timestamp, updated_at datetime (0) default current_timestamp); DROP TRIGGER IF EXISTS set_timestamp; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW BEGIN UPDATE testTable SET updated_at = CURRENT_TIMESTAMP WHERE id=OLD.id\\; END;",
+      "CREATE TABLE testTable (created_at datetime (0) DEFAULT current_timestamp, updated_at datetime (0) DEFAULT current_timestamp); DROP TRIGGER IF EXISTS set_timestamp; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW BEGIN UPDATE testTable SET updated_at = CURRENT_TIMESTAMP WHERE id=OLD.id\\; END;",
   },
   {
     name: "Table with updatedAtTz",
@@ -410,7 +410,7 @@ const strings = [
       return table.toSql();
     })(),
     solution:
-      "CREATE TABLE testTable (updated_at datetime (0) default current_timestamp); DROP TRIGGER IF EXISTS set_timestamp; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW BEGIN UPDATE testTable SET updated_at = CURRENT_TIMESTAMP WHERE id=OLD.id\\; END;",
+      "CREATE TABLE testTable (updated_at datetime (0) DEFAULT current_timestamp); DROP TRIGGER IF EXISTS set_timestamp; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW BEGIN UPDATE testTable SET updated_at = CURRENT_TIMESTAMP WHERE id=OLD.id\\; END;",
   },
   {
     name: "Table with text",
