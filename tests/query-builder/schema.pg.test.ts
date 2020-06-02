@@ -79,6 +79,30 @@ const strings = [
     string: new Schema().hasTable("testTable"),
     solution: "SELECT to_regclass('testTable');",
   },
+  {
+    name: "Schema rename table",
+    string: (() => {
+      const testSchema = new Schema();
+      return testSchema.renameTable("testTable", "testTable2");
+    })(),
+    solution: ["ALTER TABLE testTable RENAME TO testTable2;"],
+  },
+  {
+    name: "Schema rename column",
+    string: (() => {
+      const testSchema = new Schema();
+      return testSchema.renameColumn("testTable", "testCol", "testCol2");
+    })(),
+    solution: ["ALTER TABLE testTable RENAME testCol TO testCol2;"],
+  },
+  {
+    name: "Schema drop column",
+    string: (() => {
+      const testSchema = new Schema();
+      return testSchema.dropColumn("testTable", "testCol");
+    })(),
+    solution: ["ALTER TABLE testTable DROP testCol;"],
+  },
 ];
 
 strings.forEach(({ name, string, solution }) =>

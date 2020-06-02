@@ -1,6 +1,6 @@
 ![ci](https://github.com/halvardssm/deno-nessie/workflows/ci/badge.svg)
 [![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https/deno.land/x/nessie/mod.ts)
-[![(Deno)](https://img.shields.io/badge/deno-1.0.3-green.svg)](https://deno.land)
+[![(Deno)](https://img.shields.io/badge/deno-1.0.4-green.svg)](https://deno.land)
 
 # Nessie
 

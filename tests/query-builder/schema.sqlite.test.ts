@@ -1,4 +1,4 @@
-import { assertEquals } from "../../deps.ts";
+import { assertEquals, assertArrayContains } from "../../deps.ts";
 import { Schema } from "../../qb.ts";
 
 const dialect = "sqlite";
@@ -81,12 +81,39 @@ const strings = [
     solution:
       "SELECT name FROM sqlite_master WHERE type='table' AND name='testTable';",
   },
+  {
+    name: "Schema rename table",
+    string: (() => {
+      const testSchema = new Schema(dialect);
+      return testSchema.renameTable("testTable", "testTable2");
+    })(),
+    solution: ["ALTER TABLE testTable RENAME TO testTable2;"],
+  },
+  {
+    name: "Schema rename column",
+    string: (() => {
+      const testSchema = new Schema(dialect);
+      return testSchema.renameColumn("testTable", "testCol", "testCol2");
+    })(),
+    solution: ["ALTER TABLE testTable RENAME COLUMN testCol TO testCol2;"],
+  },
+  {
+    name: "Schema drop column",
+    string: (() => {
+      const testSchema = new Schema(dialect);
+      return testSchema.dropColumn("testTable", "testCol");
+    })(),
+    solution: [],
+  },
 ];
 
 strings.forEach(({ name, string, solution }) =>
   Deno.test({
     name: "SQLite: " + (name || "Empty"),
     fn(): void {
+      if (Array.isArray(string)) {
+        assertArrayContains(string, solution as string[]);
+      }
       assertEquals(string, solution);
     },
   })
