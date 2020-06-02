@@ -1,12 +1,18 @@
 import { parsePath } from "../cli/utils.ts";
 import { resolve } from "../deps.ts";
 import { loggerFn } from "../cli/state.ts";
+import { Migration } from "../types.ts";
 
 export type QueryWithString = (string: string) => string;
 
-export type amountRollbackT = number | undefined | "all";
 export type amountMigrateT = number | undefined;
+export type amountRollbackT = amountMigrateT | "all";
 export type queryT = string | string[];
+export type QueryHandler = (query: queryT) => Promise<any>;
+export type MigrationFile = {
+  up: Migration;
+  down: Migration;
+};
 
 export interface ClientI {
   migrationFolder: string;
@@ -14,7 +20,7 @@ export interface ClientI {
   close: () => Promise<void>;
   migrate: (amount: amountMigrateT) => Promise<void>;
   rollback: (amount: amountRollbackT) => Promise<void>;
-  query: (query: queryT) => Promise<any>;
+  query: QueryHandler;
   setLogger: loggerFn;
 }
 
@@ -52,7 +58,7 @@ export class AbstractClient {
   protected async migrate(
     amount: amountMigrateT,
     latestMigration: string | undefined,
-    queryHandler: (query: string) => Promise<any>,
+    queryHandler: QueryHandler,
   ) {
     this.logger(amount, "Amount pre");
 
@@ -71,14 +77,16 @@ export class AbstractClient {
 
       for (let i = 0; i < amount; i++) {
         const file = this.migrationFiles[i];
-        let { up } = await import(parsePath(this.migrationFolder, file.name));
+        let { up }: MigrationFile = await import(
+          parsePath(this.migrationFolder, file.name)
+        );
 
-        let query: string = await up();
+        let query = await up();
 
-        if (!query || typeof query !== "string") query = "";
-        if (!query.endsWith(";")) query += ";";
+        if (!query) query = [];
+        else if (typeof query === "string") query = [query];
 
-        query += this.QUERY_MIGRATION_INSERT(file.name);
+        query.push(this.QUERY_MIGRATION_INSERT(file.name));
 
         await queryHandler(query);
 
@@ -103,7 +111,7 @@ export class AbstractClient {
   async rollback(
     amount: amountRollbackT,
     allMigrations: string[] | undefined,
-    queryHandler: (query: string) => Promise<any>,
+    queryHandler: QueryHandler,
   ) {
     this.logger(amount, "Amount pre");
 
@@ -120,14 +128,16 @@ export class AbstractClient {
 
       for (let i = 0; i < amount; i++) {
         const fileName = allMigrations[i];
-        let { down } = await import(parsePath(this.migrationFolder, fileName));
+        let { down }: MigrationFile = await import(
+          parsePath(this.migrationFolder, fileName)
+        );
 
-        let query: string = await down();
+        let query = await down();
 
-        if (!query || typeof query !== "string") query = "";
-        if (!query.endsWith(";")) query += ";";
+        if (!query) query = [];
+        else if (typeof query === "string") query = [query];
 
-        query += this.QUERY_MIGRATION_DELETE(fileName);
+        query.push(this.QUERY_MIGRATION_DELETE(fileName));
 
         await queryHandler(query);
 

@@ -88,11 +88,13 @@ export default config;
 Minimal example of a migration file
 
 ```ts
-export const up = (): string => {
+import { Migration } from "https://deno.land/x/nessie/mod.ts";
+
+export const up: Migration = () => {
   return "CREATE TABLE table1 (id int);";
 };
 
-export const down = (): string => {
+export const down: Migration = () => {
   return "DROP TABLE table1";
 };
 ```
@@ -100,11 +102,12 @@ export const down = (): string => {
 Using the native query builder
 
 ```ts
+import { Migration } from "https://deno.land/x/nessie/mod.ts";
 import { Schema, dbDialects } from "https://deno.land/x/nessie/qb.ts";
 
 const dialect: dbDialects = "mysql"
 
-export const up = (): string => {
+export const up: Migration = () => {
   let query = new Schema(dialect).create("users", (table) => {
     table.id();
     table.string("name", 100).nullable();
@@ -120,7 +123,7 @@ export const up = (): string => {
   return query
 };
 
-export const down = (): void => {
+export const down: Migration = () => {
   return new Schema(dialect).drop("users");
 };
 ```

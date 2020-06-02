@@ -6,7 +6,7 @@ import { dbDialects } from "./TypeUtils.ts";
  * By using this exposed class, you can generate sql strings via the helper methods`.
  */
 export class Schema {
-  query: string = "";
+  query: string[] = [];
   dialect: dbDialects;
 
   constructor(dialenct: dbDialects = "pg") {
@@ -17,26 +17,28 @@ export class Schema {
   create(
     name: string,
     createfn: (table: Table) => void,
-  ): string {
+  ): string[] {
     const table = new Table(name, this.dialect);
 
     createfn(table);
 
     const sql = table.toSql();
 
-    this.query += sql;
+    const sqlArray = this._queryHandler(sql);
 
-    return sql;
+    this.query.push(...sqlArray);
+
+    return this.query;
   }
 
   /** Adds a custom query string to the migration */
-  queryString(queryString: string): string {
+  queryString(queryString: string): string[] {
     const lastChar = queryString[queryString.length - 1];
     if (lastChar != ";") {
       queryString += ";";
     }
-    this.query += queryString;
-    return queryString;
+    this.query.push(queryString);
+    return this.query;
   }
 
   /** Drops a table */
@@ -44,7 +46,7 @@ export class Schema {
     name: string | string[],
     ifExists: boolean = false,
     cascade: boolean = false,
-  ) {
+  ): string[] {
     if (typeof name === "string") name = [name];
 
     const sql = `DROP TABLE${ifExists ? " IF EXISTS" : ""} ${
@@ -53,13 +55,13 @@ export class Schema {
       )
     }${cascade ? " CASCADE" : ""};`;
 
-    this.query += sql;
+    this.query.push(sql);
 
-    return sql;
+    return this.query;
   }
 
   /** Generates a string for checking if a table exists */
-  hasTable(name: string) {
+  hasTable(name: string): string {
     switch (this.dialect) {
       case "mysql":
         //SELECT 1 FROM testtable LIMIT 1;
@@ -71,33 +73,15 @@ export class Schema {
         return `SELECT to_regclass('${name}');`;
     }
   }
-}
 
-// export const queryHandler = async (
-//   queryString: string,
-//   state: State,
-//   queryfn: (query: string) => any,
-// ) => {
-//   const queries = queryString.trim().split(/(?<!\\);/);
-//
-//   if (queries[queries.length - 1]?.trim() === "") queries.pop();
-//
-//   state.debug(queries, "Queries");
-//
-//   const results = [];
-//
-//   for (let query of queries) {
-//     query = query.trim().replace("\\;", ";");
-//     state.debug(query, "Query");
-//
-//     const result = await queryfn(query + ";");
-//
-//     results.push(result);
-//   }
-//
-//   state.debug(results, "Query result");
-//
-//   return results;
-// };
+  /** TODO(halvardssm) This is a temporary fix which will have to be sorted out before v1.0 */
+  private _queryHandler(queryString: string): string[] {
+    let queries = queryString.trim().split(/(?<!\\);/);
+    queries = queries
+      .filter((el) => el.trim() !== "" && el.trim() !== undefined)
+      .map((el) => `${el.trim().replace(/\\;/g, ";")};`);
+    return queries;
+  }
+}
 
 export default Schema;
