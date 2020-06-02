@@ -13,7 +13,7 @@ const strings = [
     })(),
     solution: [
       "CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now(); RETURN NEW; END; $$ language 'plpgsql';",
-      "CREATE TABLE testTable (id bigserial PRIMARY KEY, created_at timestamp (0) default current_timestamp, updated_at timestamp (0) default current_timestamp);",
+      "CREATE TABLE testTable (id bigserial PRIMARY KEY, created_at timestamp (0) DEFAULT current_timestamp, updated_at timestamp (0) DEFAULT current_timestamp);",
       "DROP TRIGGER IF EXISTS set_timestamp on testTable;",
       "CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
     ],
@@ -78,6 +78,30 @@ const strings = [
     name: "Schema hasTable",
     string: new Schema().hasTable("testTable"),
     solution: "SELECT to_regclass('testTable');",
+  },
+  {
+    name: "Schema rename table",
+    string: (() => {
+      const testSchema = new Schema();
+      return testSchema.renameTable("testTable", "testTable2");
+    })(),
+    solution: ["ALTER TABLE testTable RENAME TO testTable2;"],
+  },
+  {
+    name: "Schema rename column",
+    string: (() => {
+      const testSchema = new Schema();
+      return testSchema.renameColumn("testTable", "testCol", "testCol2");
+    })(),
+    solution: ["ALTER TABLE testTable RENAME testCol TO testCol2;"],
+  },
+  {
+    name: "Schema drop column",
+    string: (() => {
+      const testSchema = new Schema();
+      return testSchema.dropColumn("testTable", "testCol");
+    })(),
+    solution: ["ALTER TABLE testTable DROP testCol;"],
   },
 ];
 

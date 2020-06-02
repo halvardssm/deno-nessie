@@ -13,14 +13,14 @@ const strings = [
     string: new Column("testCol", "testType")
       .default("testDefault")
       .toSql(),
-    solution: "testCol testType default testDefault",
+    solution: "testCol testType DEFAULT testDefault",
   },
   {
     name: "Column with not nullable",
     string: new Column("testCol", "testType")
       .notNullable()
       .toSql(),
-    solution: "testCol testType not null",
+    solution: "testCol testType NOT NULL",
   },
   {
     name: "Column with default and not nullable",
@@ -28,7 +28,7 @@ const strings = [
       .default("testDefault")
       .notNullable()
       .toSql(),
-    solution: "testCol testType default testDefault not null",
+    solution: "testCol testType DEFAULT testDefault NOT NULL",
   },
   {
     name: "Column with nullable",
@@ -43,7 +43,7 @@ const strings = [
       .default("testDefault")
       .nullable()
       .toSql(),
-    solution: "testCol testType default testDefault",
+    solution: "testCol testType DEFAULT testDefault",
   },
   {
     name: "Column 1 input",
@@ -51,7 +51,7 @@ const strings = [
       .default("testDefault")
       .notNullable()
       .toSql(),
-    solution: "testCol testType (1) default testDefault not null",
+    solution: "testCol testType (1) DEFAULT testDefault NOT NULL",
   },
   {
     name: "Column 2 input",
@@ -59,7 +59,7 @@ const strings = [
       .default("testDefault")
       .notNullable()
       .toSql(),
-    solution: "testCol testType (1, 2) default testDefault not null",
+    solution: "testCol testType (1, 2) DEFAULT testDefault NOT NULL",
   },
   {
     name: "Column with default and nullable",
@@ -67,7 +67,25 @@ const strings = [
       .default("testDefault")
       .notNullable()
       .toSql(),
-    solution: "testCol testType (one,two,three) default testDefault not null",
+    solution: "testCol testType (one,two,three) DEFAULT testDefault NOT NULL",
+  },
+  {
+    name: "Column with unsigned",
+    string: new Column("testCol", "testType")
+      .unsigned()
+      .default("testDefault")
+      .notNullable()
+      .toSql(),
+    solution: "testCol testType DEFAULT testDefault NOT NULL",
+  },
+  {
+    name: "Column with unsigned mysql",
+    string: new Column("testCol", "testType", undefined, undefined, "mysql")
+      .unsigned()
+      .default("testDefault")
+      .notNullable()
+      .toSql(),
+    solution: "testCol testType UNSIGNED DEFAULT testDefault NOT NULL",
   },
 ];
 

@@ -13,6 +13,7 @@ export class Column {
   private isAutoIncrement: boolean = false;
   private isPrimary: boolean = false;
   private isUnique: boolean = false;
+  private isUnsigned: boolean = false;
 
   constructor(
     name: string,
@@ -45,12 +46,16 @@ export class Column {
       })`;
     }
 
+    if (this.isUnsigned && this.dialect === "mysql") {
+      string += " UNSIGNED";
+    }
+
     if (this.defaultValue) {
-      string += ` default ${this.defaultValue}`;
+      string += ` DEFAULT ${this.defaultValue}`;
     }
 
     if (!this.isNullable) {
-      string += " not null";
+      string += " NOT NULL";
     }
 
     if (this.isAutoIncrement) {
@@ -75,16 +80,19 @@ export class Column {
   /** Adds primary key to the column string */
   primary() {
     this.isPrimary = true;
+    return this;
   }
 
   /** Adds unique constraint to the column string */
   unique() {
     this.isUnique = true;
+    return this;
   }
 
   /** Adds custom attributes to the column string */
   custom(str: string) {
     this.customCol = str;
+    return this;
   }
 
   /** Adds a default value to the column */
@@ -114,6 +122,12 @@ export class Column {
       }
     }
 
+    return this;
+  }
+
+  /** Makes an integer unsigned, only works for MySQL */
+  unsigned() {
+    this.isUnsigned = true;
     return this;
   }
 }

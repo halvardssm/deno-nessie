@@ -164,7 +164,7 @@ const strings = [
       return table.toSql();
     })(),
     solution:
-      "CREATE TABLE testTable (created_at timestamp (0) default current_timestamp);",
+      "CREATE TABLE testTable (created_at timestamp (0) DEFAULT current_timestamp);",
   },
   {
     name: "Table with createdAtTz",
@@ -174,7 +174,7 @@ const strings = [
       return table.toSql();
     })(),
     solution:
-      "CREATE TABLE testTable (created_at datetime (0) default current_timestamp);",
+      "CREATE TABLE testTable (created_at datetime (0) DEFAULT current_timestamp);",
   },
   {
     name: "Table with date",
@@ -392,7 +392,7 @@ const strings = [
       return table.toSql();
     })(),
     solution:
-      "CREATE TABLE testTable (created_at timestamp (0) default current_timestamp, updated_at timestamp (0) default current_timestamp on update current_timestamp);",
+      "CREATE TABLE testTable (created_at timestamp (0) DEFAULT current_timestamp, updated_at timestamp (0) DEFAULT current_timestamp on update current_timestamp);",
   },
   {
     name: "Table with timestampsTz",
@@ -402,7 +402,7 @@ const strings = [
       return table.toSql();
     })(),
     solution:
-      "CREATE TABLE testTable (created_at datetime (0) default current_timestamp, updated_at datetime (0) default current_timestamp on update current_timestamp);",
+      "CREATE TABLE testTable (created_at datetime (0) DEFAULT current_timestamp, updated_at datetime (0) DEFAULT current_timestamp on update current_timestamp);",
   },
   {
     name: "Table with updatedAtTz",
@@ -412,7 +412,7 @@ const strings = [
       return table.toSql();
     })(),
     solution:
-      "CREATE TABLE testTable (updated_at datetime (0) default current_timestamp on update current_timestamp);",
+      "CREATE TABLE testTable (updated_at datetime (0) DEFAULT current_timestamp on update current_timestamp);",
   },
   {
     name: "Table with text",

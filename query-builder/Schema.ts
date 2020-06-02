@@ -1,7 +1,7 @@
 import { Table } from "./Table.ts";
 import { dbDialects } from "./TypeUtils.ts";
 
-/** The schema class exposed in the `up()` and `down()` methods in the migration files.
+/** The schema class used to create the queries.
  * 
  * By using this exposed class, you can generate sql strings via the helper methods`.
  */
@@ -72,6 +72,40 @@ export class Schema {
       default:
         return `SELECT to_regclass('${name}');`;
     }
+  }
+
+  /** Renames table */
+  renameTable(from: string, to: string): string[] {
+    switch (this.dialect) {
+      case "mysql":
+        this.query.push(`RENAME TABLE ${from} TO ${to};`);
+        break;
+      case "sqlite":
+      case "pg":
+      default:
+        this.query.push(`ALTER TABLE ${from} RENAME TO ${to};`);
+    }
+    return this.query;
+  }
+
+  /** Renames column */
+  renameColumn(table: string, from: string, to: string): string[] {
+    this.query.push(
+      `ALTER TABLE ${table} RENAME${
+        this.dialect !== "pg" ? " COLUMN" : ""
+      } ${from} TO ${to};`,
+    );
+
+    return this.query;
+  }
+
+  /** Drops column */
+  dropColumn(table: string, column: string): string[] {
+    if (this.dialect !== "sqlite") {
+      this.query.push(`ALTER TABLE ${table} DROP ${column};`);
+    }
+
+    return this.query;
   }
 
   /** TODO(halvardssm) This is a temporary fix which will have to be sorted out before v1.0 */

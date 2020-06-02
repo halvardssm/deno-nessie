@@ -1,4 +1,4 @@
-import { assertEquals } from "../../deps.ts";
+import { assertEquals, assertArrayContains } from "../../deps.ts";
 import { Schema } from "../../qb.ts";
 
 const dialect = "sqlite";
@@ -14,7 +14,7 @@ const strings = [
       });
     })(),
     solution: [
-      "CREATE TABLE testTable (id bigint PRIMARY KEY, created_at timestamp (0) default current_timestamp, updated_at timestamp (0) default current_timestamp);",
+      "CREATE TABLE testTable (id bigint PRIMARY KEY, created_at timestamp (0) DEFAULT current_timestamp, updated_at timestamp (0) DEFAULT current_timestamp);",
       "DROP TRIGGER IF EXISTS set_timestamp;",
       "CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW BEGIN UPDATE testTable SET updated_at = CURRENT_TIMESTAMP WHERE id=OLD.id; END;",
     ],
@@ -81,12 +81,39 @@ const strings = [
     solution:
       "SELECT name FROM sqlite_master WHERE type='table' AND name='testTable';",
   },
+  {
+    name: "Schema rename table",
+    string: (() => {
+      const testSchema = new Schema(dialect);
+      return testSchema.renameTable("testTable", "testTable2");
+    })(),
+    solution: ["ALTER TABLE testTable RENAME TO testTable2;"],
+  },
+  {
+    name: "Schema rename column",
+    string: (() => {
+      const testSchema = new Schema(dialect);
+      return testSchema.renameColumn("testTable", "testCol", "testCol2");
+    })(),
+    solution: ["ALTER TABLE testTable RENAME COLUMN testCol TO testCol2;"],
+  },
+  {
+    name: "Schema drop column",
+    string: (() => {
+      const testSchema = new Schema(dialect);
+      return testSchema.dropColumn("testTable", "testCol");
+    })(),
+    solution: [],
+  },
 ];
 
 strings.forEach(({ name, string, solution }) =>
   Deno.test({
     name: "SQLite: " + (name || "Empty"),
     fn(): void {
+      if (Array.isArray(string)) {
+        assertArrayContains(string, solution as string[]);
+      }
       assertEquals(string, solution);
     },
   })
