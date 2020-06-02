@@ -48,7 +48,7 @@ const strings = [
       const testSchema = new Schema();
       return testSchema.drop("testTable");
     })(),
-    solution: "DROP TABLE testTable;",
+    solution: ["DROP TABLE testTable;"],
   },
   {
     name: "Schema drop if exists",
@@ -56,7 +56,7 @@ const strings = [
       const testSchema = new Schema();
       return testSchema.drop("testTable", true);
     })(),
-    solution: "DROP TABLE IF EXISTS testTable;",
+    solution: ["DROP TABLE IF EXISTS testTable;"],
   },
   {
     name: "Schema drop cascade",
@@ -64,7 +64,7 @@ const strings = [
       const testSchema = new Schema();
       return testSchema.drop("testTable", false, true);
     })(),
-    solution: "DROP TABLE testTable CASCADE;",
+    solution: ["DROP TABLE testTable CASCADE;"],
   },
   {
     name: "Schema drop if exists cascade",
@@ -72,7 +72,7 @@ const strings = [
       const testSchema = new Schema();
       return testSchema.drop("testTable", true, true);
     })(),
-    solution: "DROP TABLE IF EXISTS testTable CASCADE;",
+    solution: ["DROP TABLE IF EXISTS testTable CASCADE;"],
   },
   {
     name: "Schema hasTable",
