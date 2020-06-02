@@ -53,7 +53,7 @@ export class Schema {
       name.join(
         ", ",
       )
-      }${cascade ? " CASCADE" : ""};`;
+    }${cascade ? " CASCADE" : ""};`;
 
     this.query.push(sql);
 

@@ -85,7 +85,9 @@ strings.forEach(({ name, string, solution }) =>
   Deno.test({
     name: "PG: " + (name || "Empty"),
     fn(): void {
-      if (Array.isArray(string)) assertArrayContains(string, solution as string[])
+      if (Array.isArray(string)) {
+        assertArrayContains(string, solution as string[]);
+      }
       assertEquals(string, solution);
     },
   })

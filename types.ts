@@ -1,1 +1,1 @@
-export type Migration = () => string | string[]
+export type Migration = () => string | string[] | Promise<string | string[]>;
