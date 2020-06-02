@@ -1,6 +1,6 @@
-import { assertEquals } from "../../deps.ts";
+import { assertEquals, assertArrayContains } from "../../deps.ts";
 import { Schema } from "../../qb.ts";
-import { assertArrayContains } from "https://deno.land/std@v0.54.0/testing/asserts.ts";
+
 const strings = [
   {
     name: "Schema create",
