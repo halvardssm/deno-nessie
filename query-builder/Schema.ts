@@ -79,7 +79,7 @@ export class Schema {
     let queries = queryString.trim().split(/(?<!\\);/);
     queries = queries
       .filter((el) => el.trim() !== "" && el.trim() !== undefined)
-      .map((el) => `${el.trim().replace(/\\;/, ";")};`);
+      .map((el) => `${el.trim().replace(/\\;/g, ";")};`);
     return queries;
   }
 }
