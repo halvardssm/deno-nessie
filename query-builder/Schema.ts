@@ -24,7 +24,7 @@ export class Schema {
 
     const sql = table.toSql();
 
-    const sqlArray = this.queryHandler(sql);
+    const sqlArray = this._queryHandler(sql);
 
     this.query.push(...sqlArray);
 
@@ -46,7 +46,7 @@ export class Schema {
     name: string | string[],
     ifExists: boolean = false,
     cascade: boolean = false,
-  ) {
+  ): string[] {
     if (typeof name === "string") name = [name];
 
     const sql = `DROP TABLE${ifExists ? " IF EXISTS" : ""} ${
@@ -57,11 +57,11 @@ export class Schema {
 
     this.query.push(sql);
 
-    return sql;
+    return this.query;
   }
 
   /** Generates a string for checking if a table exists */
-  hasTable(name: string) {
+  hasTable(name: string): string {
     switch (this.dialect) {
       case "mysql":
         //SELECT 1 FROM testtable LIMIT 1;
@@ -75,7 +75,7 @@ export class Schema {
   }
 
   /** TODO(halvardssm) This is a temporary fix which will have to be sorted out before v1.0 */
-  queryHandler(queryString: string) {
+  private _queryHandler(queryString: string): string[] {
     let queries = queryString.trim().split(/(?<!\\);/);
     queries = queries
       .filter((el) => el.trim() !== "" && el.trim() !== undefined)

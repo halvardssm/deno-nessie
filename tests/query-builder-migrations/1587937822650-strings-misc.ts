@@ -1,8 +1,9 @@
+import { Migration } from "../../mod.ts";
 import { dbDialects, Schema } from "../../qb.ts";
 
 const dialect = Deno.env.get("DB_DIALECT") as dbDialects;
 
-export const up = (): string => {
+export const up: Migration = () => {
   return new Schema(dialect).create("strings_misc", (table) => {
     table.increments("col_0");
 
@@ -17,7 +18,7 @@ export const up = (): string => {
     table.timeTz("col_8");
     table.timestamp("col_9");
     table.timestampTz("col_10");
-    // table.timestampsTz()
+    table.timestampsTz()
 
     table.ipAddress("col_12");
     table.json("col_13");
@@ -28,6 +29,6 @@ export const up = (): string => {
   });
 };
 
-export const down = (): string => {
+export const down: Migration = () => {
   return new Schema(dialect).drop("strings_misc");
 };

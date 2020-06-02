@@ -1,6 +1,6 @@
-import { ClientPostgreSQL } from "../../clients/ClientPostgreSQL.ts";
-import { ClientMySQL } from "../../clients/ClientMySQL.ts";
-import { ClientSQLite } from "../../clients/ClientSQLite.ts";
+import { ClientPostgreSQL } from "https://deno.land/x/nessie/mod.ts";
+import { ClientMySQL } from "https://deno.land/x/nessie/mod.ts";
+import { ClientSQLite } from "https://deno.land/x/nessie/mod.ts";
 
 const migrationFolder = "./migrations";
 
