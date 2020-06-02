@@ -84,7 +84,7 @@ export class AbstractClient {
         let query = await up();
 
         if (!query) query = [];
-        else if (typeof query == "string") query = [query];
+        else if (typeof query === "string") query = [query];
 
         query.push(this.QUERY_MIGRATION_INSERT(file.name));
 
@@ -135,7 +135,7 @@ export class AbstractClient {
         let query = await down();
 
         if (!query) query = [];
-        else if (typeof query == "string") query = [query];
+        else if (typeof query === "string") query = [query];
 
         query.push(this.QUERY_MIGRATION_DELETE(fileName));
 
