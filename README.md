@@ -1,6 +1,8 @@
-![ci](https://github.com/halvardssm/deno-nessie/workflows/ci/badge.svg)
-[![deno doc](https://doc.deno.land/badge.svg)](https://doc.deno.land/https/deno.land/x/nessie/mod.ts)
-[![(Deno)](https://img.shields.io/badge/deno-1.0.4-green.svg)](https://deno.land)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/halvardssm/deno-nessie?label=Nessie&style=flat-square)](https://deno.land/x/nessie)
+[![(Deno)](https://img.shields.io/badge/deno-v1.0.3-green.svg?style=flat-square&logo=deno)](https://deno.land)
+[![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/halvardssm/deno-nessie/ci/master?style=flat-square&logo=github)](https://github.com/halvardssm/deno-nessie/actions?query=branch%3Amaster+workflow%3ACI)
+[![(query-builder)](https://img.shields.io/badge/query_builder-doc-informational.svg?style=flat-square&logo=deno)](https://doc.deno.land/https/deno.land/x/nessie/qb.ts)
+[![(clients)](https://img.shields.io/badge/clients-doc-informational.svg?style=flat-square&logo=deno)](https://doc.deno.land/https/deno.land/x/nessie/mod.ts)
 
 # Nessie
 
