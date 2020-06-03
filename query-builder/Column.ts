@@ -9,7 +9,8 @@ export class Column {
   private columnInput2?: number;
   private isNullable: boolean = true;
   private defaultValue?: string | number | boolean | object | null;
-  private defaultValueIsExpression?: string | number | boolean | object | null = false;
+  private defaultValueIsExpression?: string | number | boolean | object | null =
+    false;
   private customCol?: string;
   private isAutoIncrement: boolean = false;
   private isPrimary: boolean = false;
@@ -62,9 +63,13 @@ export class Column {
         val += ` DEFAULT '${this.defaultValue ? 1 : 0}'`;
       } else if (typeof this.defaultValue == "object") {
         val += ` DEFAULT '${JSON.stringify(this.defaultValue)}'`;
-      } else if (typeof this.defaultValue == "string" && !this.defaultValueIsExpression) {
+      } else if (
+        typeof this.defaultValue == "string" && !this.defaultValueIsExpression
+      ) {
         val += ` DEFAULT '${this.defaultValue}'`;
-      }  else if (typeof this.defaultValue == "string" && this.defaultValueIsExpression) {
+      } else if (
+        typeof this.defaultValue == "string" && this.defaultValueIsExpression
+      ) {
         val += ` DEFAULT ${this.defaultValue}`;
       }
       string += val;
@@ -112,8 +117,10 @@ export class Column {
   }
 
   /** Adds a default value to the column */
-  default(value: string | number | boolean | object | null,
-    isExpression: boolean = false) {
+  default(
+    value: string | number | boolean | object | null,
+    isExpression: boolean = false,
+  ) {
     this.defaultValue = value;
     this.defaultValueIsExpression = isExpression;
     return this;
