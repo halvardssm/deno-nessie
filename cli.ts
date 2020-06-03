@@ -54,7 +54,7 @@ const run = async () => {
       const state = await new State(prog).init();
 
       if (prog.make) {
-        await state.makeMigration(prog.make);
+        await state.makeMigration(prog.migrationName);
       } else {
         await state.client!.prepare();
 
