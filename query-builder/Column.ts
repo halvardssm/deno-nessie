@@ -9,8 +9,7 @@ export class Column {
   private columnInput2?: number;
   private isNullable: boolean = true;
   private defaultValue?: string | number | boolean | object | null;
-  private defaultValueIsExpression?: string | number | boolean | object | null =
-    false;
+  private defaultValueIsExpression?: boolean = false;
   private customCol?: string;
   private isAutoIncrement: boolean = false;
   private isPrimary: boolean = false;
