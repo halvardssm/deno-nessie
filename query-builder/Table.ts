@@ -393,12 +393,12 @@ export class Table {
 
   /** Adds a `created_at` column to the table. */
   createdAt() {
-    this.timestamp("created_at").default("current_timestamp");
+    this.timestamp("created_at").default("current_timestamp", true);
   }
 
   /** Adds a `created_at` column with timezone to the table. */
   createdAtTz() {
-    this.timestampTz("created_at").default("current_timestamp");
+    this.timestampTz("created_at").default("current_timestamp", true);
   }
 
   /** Adds a date column to the table. */
@@ -464,7 +464,7 @@ export class Table {
 
   /** Adds an updated_at column with auto update of current timestamp to the table. */
   updatedAt() {
-    this.timestamp("updated_at").default("current_timestamp").custom(
+    this.timestamp("updated_at").default("current_timestamp", true).custom(
       this._getUpdatedAtString(),
     );
     this.constraints.updatedAt = true;
@@ -472,7 +472,7 @@ export class Table {
 
   /** Adds an updated_at column with auto update and timezone of current timestamp to the table. */
   updatedAtTz() {
-    this.timestampTz("updated_at").default("current_timestamp").custom(
+    this.timestampTz("updated_at").default("current_timestamp", true).custom(
       this._getUpdatedAtString(),
     );
     this.constraints.updatedAt = true;
