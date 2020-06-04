@@ -33,6 +33,10 @@ You can see examples of how to make a client plugin in the [clients folder](./cl
 
   ```deno run --allow-net --allow-read --allow-write https://deno.land/x/nessie/cli.ts make create_users```
 
+* `make:seed [name]`: Create seed
+
+  ```deno run --allow-net --allow-read --allow-write https://deno.land/x/nessie/cli.ts make:seed create_users```
+
 * `migrate [amount?]`: Run migration - will migrate your migrations in your migration folder (sorted by timestamp) newer than the latest migration in your db. Amount defines how many migrations, defaults to all available if not set.
 
   ```deno run --allow-net --allow-read https://deno.land/x/nessie/cli.ts migrate```
@@ -48,6 +52,14 @@ You can see examples of how to make a client plugin in the [clients folder](./cl
   ```deno run --allow-net --allow-read https://deno.land/x/nessie/cli.ts rollback 2```
 
   ```deno run --allow-net --allow-read https://deno.land/x/nessie/cli.ts rollback all```
+
+* `seed [matcher?]`: Seed - will seed your database. Optional matcher will match all files in your seed folder by string literal or RegExp.
+
+  ```deno run --allow-net --allow-read https://deno.land/x/nessie/cli.ts seed```
+  
+  ```deno run --allow-net --allow-read https://deno.land/x/nessie/cli.ts seed seed_file.js```
+
+  ```deno run --allow-net --allow-read https://deno.land/x/nessie/cli.ts seed ".+.ts"```
 
 ### Flags
 
@@ -132,6 +144,16 @@ export const down: Migration = () => {
 };
 ```
 
+Seed file
+
+```ts
+import { Seed } from "https://deno.land/x/nessie/mod.ts";
+
+export const run: Seed = () => {
+  return "INSERT INTO testTable VALUES (1)"
+};
+```
+
 See the [example folder](./examples) for more
 
 ## How to make a client
@@ -145,5 +167,7 @@ A client needs to extend [AbstractClient](./clients/AbstractClient.ts) and imple
 `migrate`: Takes a number as an optional input, will default to all files if not set. Will run `Math.min(amount, numberOfFiles)` migration files. Only handles the `up` method.
 
 `rollback`: Takes a number as an optional input, will default to 1 if not set. Will run `Math.min(amount, numberOfFiles)` migration files. Only handles the `down` method.
+
+`seed`: Takes an optional matcher as input. Matcher can be regex or string. Will seed the database. Handles the `run` method in seed files.
 
 `close`: Will be the last method run before the program is finished. This should close the database connection.

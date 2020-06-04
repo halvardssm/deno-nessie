@@ -4,6 +4,7 @@ import {
   runner,
   TYPE_MIGRATE,
   TYPE_ROLLBACK,
+  TYPE_SEED,
 } from "./config/migration.config.ts";
 
 const strings = [
@@ -27,6 +28,13 @@ const strings = [
       "Migrated 1587937822649-test2.ts",
       "Migrated 1587937822650-test3.ts",
       "Migration complete",
+    ],
+  },
+  {
+    name: "Seed",
+    string: [TYPE_SEED, "seed.ts"],
+    solution: [
+      "Seeding complete",
     ],
   },
   {

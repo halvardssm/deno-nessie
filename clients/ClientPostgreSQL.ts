@@ -7,6 +7,7 @@ import {
   amountRollbackT,
   ClientI,
   queryT,
+  ClientOptions,
 } from "./AbstractClient.ts";
 
 export class ClientPostgreSQL extends AbstractClient implements ClientI {
@@ -18,8 +19,11 @@ export class ClientPostgreSQL extends AbstractClient implements ClientI {
   private QUERY_CREATE_MIGRATION_TABLE =
     `CREATE TABLE ${this.TABLE_MIGRATIONS} (id bigserial PRIMARY KEY, ${this.COL_FILE_NAME} varchar(${AbstractClient.MAX_FILE_NAME_LENGTH}) UNIQUE, ${this.COL_CREATED_AT} timestamp (0) default current_timestamp);`;
 
-  constructor(migrationFolder: string, connectionOptions: ConnectionOptions) {
-    super(migrationFolder);
+  constructor(
+    options: string | ClientOptions,
+    connectionOptions: ConnectionOptions,
+  ) {
+    super(options);
     this.client = new Client(connectionOptions);
   }
 
@@ -74,5 +78,9 @@ export class ClientPostgreSQL extends AbstractClient implements ClientI {
       allMigrations.rows?.flatMap((el) => el?.[0]),
       this.query.bind(this),
     );
+  }
+
+  async seed(matcher?: string) {
+    await super.seed(matcher, this.query.bind(this));
   }
 }

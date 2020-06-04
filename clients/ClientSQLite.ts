@@ -5,6 +5,7 @@ import {
   amountRollbackT,
   ClientI,
   queryT,
+  ClientOptions,
 } from "./AbstractClient.ts";
 import { resolve } from "../deps.ts";
 
@@ -16,8 +17,8 @@ export class ClientSQLite extends AbstractClient implements ClientI {
   private QUERY_CREATE_MIGRATION_TABLE =
     `CREATE TABLE ${this.TABLE_MIGRATIONS} (id integer NOT NULL PRIMARY KEY autoincrement, ${this.COL_FILE_NAME} varchar(${AbstractClient.MAX_FILE_NAME_LENGTH}) UNIQUE, ${this.COL_CREATED_AT} datetime NOT NULL DEFAULT CURRENT_TIMESTAMP);`;
 
-  constructor(migrationFolder: string, connectionOptions: string) {
-    super(migrationFolder);
+  constructor(options: string | ClientOptions, connectionOptions: string) {
+    super(options);
     this.client = new DB(resolve(connectionOptions));
   }
 
@@ -73,5 +74,9 @@ export class ClientSQLite extends AbstractClient implements ClientI {
       allMigrations?.[0]?.flatMap((el) => el?.[0]),
       this.query.bind(this),
     );
+  }
+
+  async seed(matcher?: string) {
+    await super.seed(matcher, this.query.bind(this));
   }
 }
