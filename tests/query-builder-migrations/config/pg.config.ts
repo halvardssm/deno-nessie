@@ -1,7 +1,7 @@
 import { ClientPostgreSQL } from "../../../mod.ts";
 
 export default {
-  client: new ClientPostgreSQL("./tests/query-builder-migrations", {
+  client: new ClientPostgreSQL({ migrationFolder: "./tests/query-builder-migrations" }, {
     "database": "nessie",
     "hostname": "localhost",
     "port": 5000,

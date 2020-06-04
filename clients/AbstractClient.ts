@@ -36,9 +36,9 @@ export class AbstractClient {
       this.seedFolder = resolve("./db/seeds");
     } else {
       this.migrationFolder = resolve(
-        options.migrationFolder || "./db/migrations",
+        options?.migrationFolder || "./db/migrations",
       );
-      this.seedFolder = resolve(options.seedFolder || "./db/seeds");
+      this.seedFolder = resolve(options?.seedFolder || "./db/seeds");
     }
 
     try {

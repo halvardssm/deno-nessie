@@ -40,7 +40,7 @@ export interface NessieConfig {
 }
 
 export interface ClientOptions {
-  migrationFolder: string;
-  seedFolder: string;
+  migrationFolder?: string;
+  seedFolder?: string;
   [option: string]: any;
 }
