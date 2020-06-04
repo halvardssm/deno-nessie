@@ -8,7 +8,7 @@ export type Info<T = any> = {
 export type Migration<T = any> = (
   info: Info<T>,
 ) => string | string[] | Promise<string | string[]>;
-export type Seed = Migration;
+export type Seed = () => string | string[] | Promise<string | string[]>;
 export type LoggerFn = (output?: any, title?: string) => void;
 export type QueryWithString = (string: string) => string;
 export type AmountMigrateT = number | undefined;
