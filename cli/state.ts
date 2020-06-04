@@ -11,6 +11,11 @@ export type loggerFn = (output?: any, title?: string) => void;
 
 const STD_CONFIG_FILE = "nessie.config.ts";
 
+const STD_CLIENT_OPTIONS = {
+  seedFolder: "./db/seeds",
+  migrationFolder: "./db/migrations",
+};
+
 export class State {
   private enableDebug: boolean;
   private configFile: string;
@@ -36,7 +41,7 @@ export class State {
     if (!this.config?.client) {
       this.logger("Using standard config");
 
-      this.client = new ClientPostgreSQL("./migrations", {
+      this.client = new ClientPostgreSQL(STD_CLIENT_OPTIONS, {
         database: "nessie",
         hostname: "localhost",
         port: 5432,
@@ -52,7 +57,7 @@ export class State {
     return this;
   }
 
-  async makeMigration(migrationName: string) {
+  async makeMigration(migrationName: string = "migration") {
     if (
       migrationName.length > AbstractClient.MAX_FILE_NAME_LENGTH - 13
     ) {
@@ -79,6 +84,30 @@ export class State {
 
     console.info(
       `Created migration ${fileName} at ${this.client!.migrationFolder}`,
+    );
+  }
+
+  async makeSeed(seedName: string = "seed") {
+    const fileName = `${seedName}.ts`;
+    if (this.client?.seedFiles.find((el) => el.name === seedName)) {
+      console.info(`Seed with name '${seedName}' already exists.`);
+    }
+
+    this.logger(fileName, "Seed file name");
+
+    await Deno.mkdir(this.client!.seedFolder, { recursive: true });
+
+    const responseFile = await fetch(
+      "https://deno.land/x/nessie/cli/templates/seed.ts",
+    );
+
+    await Deno.writeTextFile(
+      `${this.client!.migrationFolder}/${fileName}`,
+      await responseFile.text(),
+    );
+
+    console.info(
+      `Created seed ${fileName} at ${this.client!.seedFolder}`,
     );
   }
 

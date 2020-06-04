@@ -16,16 +16,26 @@ export type MigrationFile = {
 
 export interface ClientI {
   migrationFolder: string;
+  seedFolder: string;
+  migrationFiles: Deno.DirEntry[];
+  seedFiles: Deno.DirEntry[];
   prepare: () => Promise<void>;
   close: () => Promise<void>;
   migrate: (amount: amountMigrateT) => Promise<void>;
   rollback: (amount: amountRollbackT) => Promise<void>;
+  seed: (matcher?: string) => Promise<void>;
   query: QueryHandler;
   setLogger: loggerFn;
 }
 
 export interface nessieConfig {
   client: ClientI;
+}
+
+export interface ClientOptions {
+  migrationFolder: string;
+  seedFolder: string;
+  [option: string]: any;
 }
 
 export class AbstractClient {
@@ -36,9 +46,11 @@ export class AbstractClient {
   protected COL_CREATED_AT = "created_at";
   protected REGEX_MIGRATION_FILE_NAME = /^\d{10,14}-.+.ts$/;
   protected regexFileName = new RegExp(this.REGEX_MIGRATION_FILE_NAME);
-  protected migrationFiles: Deno.DirEntry[];
   protected logger: loggerFn = () => undefined;
+  migrationFiles: Deno.DirEntry[];
+  seedFiles: Deno.DirEntry[];
   migrationFolder: string;
+  seedFolder: string;
 
   protected QUERY_GET_LATEST =
     `SELECT ${this.COL_FILE_NAME} FROM ${this.TABLE_MIGRATIONS} ORDER BY ${this.COL_FILE_NAME} DESC LIMIT 1;`;
@@ -50,9 +62,21 @@ export class AbstractClient {
   protected QUERY_MIGRATION_DELETE: QueryWithString = (fileName) =>
     `DELETE FROM ${this.TABLE_MIGRATIONS} WHERE ${this.COL_FILE_NAME} = '${fileName}';`;
 
-  constructor(migrationFolder: string) {
-    this.migrationFolder = resolve(migrationFolder);
+  constructor(options: string | ClientOptions) {
+    if (typeof options === "string") {
+      console.info(
+        "DEPRECATED: Using string as the client option is deprecated, please use a config object instead.",
+      );
+      this.migrationFolder = resolve(options);
+      this.seedFolder = resolve("./db/seeds");
+    } else {
+      this.migrationFolder = resolve(
+        options.migrationFolder || "./db/migrations",
+      );
+      this.seedFolder = resolve(options.seedFolder || "./db/seeds");
+    }
     this.migrationFiles = Array.from(Deno.readDirSync(this.migrationFolder));
+    this.seedFiles = Array.from(Deno.readDirSync(this.seedFolder));
   }
 
   protected async migrate(
@@ -154,5 +178,30 @@ export class AbstractClient {
 
   setLogger(fn: loggerFn) {
     this.logger = fn;
+  }
+
+  async seed(matcher: string = ".+.ts", queryHandler: QueryHandler) {
+    console.log(matcher);
+    const files = this.seedFiles.filter((el) =>
+      el.isFile && (el.name === matcher || new RegExp(matcher).test(el.name))
+    );
+    console.log(files);
+    if (!files) {
+      console.info(
+        `No seed file found at '${this.seedFolder}' with matcher '${matcher}'`,
+      );
+      return;
+    } else {
+      for await (const file of files) {
+        const filePath = parsePath(this.seedFolder, file.name);
+        console.log(filePath);
+        const { run } = await import(filePath);
+        const sql = await run();
+        console.log(sql);
+        await queryHandler(sql);
+      }
+
+      console.info("Seeding complete");
+    }
   }
 }

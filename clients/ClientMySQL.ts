@@ -5,6 +5,7 @@ import {
   amountRollbackT,
   ClientI,
   queryT,
+  ClientOptions,
 } from "./AbstractClient.ts";
 
 export class ClientMySQL extends AbstractClient implements ClientI {
@@ -17,8 +18,11 @@ export class ClientMySQL extends AbstractClient implements ClientI {
   private QUERY_CREATE_MIGRATION_TABLE =
     `CREATE TABLE ${this.TABLE_MIGRATIONS} (id bigint UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, ${this.COL_FILE_NAME} varchar(${AbstractClient.MAX_FILE_NAME_LENGTH}) NOT NULL UNIQUE, ${this.COL_CREATED_AT} datetime NOT NULL DEFAULT CURRENT_TIMESTAMP);`;
 
-  constructor(migrationFolder: string, connectionOptions: ClientConfig) {
-    super(migrationFolder);
+  constructor(
+    options: string | ClientOptions,
+    connectionOptions: ClientConfig,
+  ) {
+    super(options);
     this.clientOptions = connectionOptions;
     this.client = new Client();
   }
@@ -86,5 +90,9 @@ export class ClientMySQL extends AbstractClient implements ClientI {
       parsedMigrations,
       this.query.bind(this),
     );
+  }
+
+  async seed(matcher?: string) {
+    await super.seed(matcher, this.query.bind(this));
   }
 }
