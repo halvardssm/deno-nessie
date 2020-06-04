@@ -35,18 +35,31 @@ export type MigrationFile = {
 
 /** Client interface. Is to be implemented by every client. */
 export interface ClientI {
+  /** The current dialect, given by the Client e.g. pg, mysql, sqlite3 */
   dialect: string;
+  /** Migration folder given from the config file */
   migrationFolder: string;
+  /** Seed folder given from the config file */
   seedFolder: string;
+  /** Migration files read from the migration folder */
   migrationFiles: Deno.DirEntry[];
+  /** Seed files read from the seed folder */
   seedFiles: Deno.DirEntry[];
+  /** Toggle for whether or not the qb should be exposed in migration methods */
   exposeQueryBuilder: boolean;
+  /** Prepares the db connection */
   prepare: () => Promise<void>;
+  /** Closes the db connection */
   close: () => Promise<void>;
+  /** Handles the migration */
   migrate: (amount: AmountMigrateT) => Promise<void>;
+  /** Handles the rollback */
   rollback: (amount: AmountRollbackT) => Promise<void>;
+  /** Handles the seeding */
   seed: (matcher?: string) => Promise<void>;
+  /** Universal wrapper for db query execution */
   query: QueryHandler;
+  /** Sets the logger. Used by State */
   setLogger: LoggerFn;
 }
 

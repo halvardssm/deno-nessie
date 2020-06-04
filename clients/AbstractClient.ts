@@ -16,12 +16,14 @@ import {
 export class AbstractClient {
   static readonly MAX_FILE_NAME_LENGTH = 100;
 
-  protected TABLE_MIGRATIONS = "nessie_migrations";
-  protected COL_FILE_NAME = "file_name";
-  protected COL_CREATED_AT = "created_at";
-  protected REGEX_MIGRATION_FILE_NAME = /^\d{10,14}-.+.ts$/;
-  protected regexFileName = new RegExp(this.REGEX_MIGRATION_FILE_NAME);
+  protected readonly TABLE_MIGRATIONS = "nessie_migrations";
+  protected readonly COL_FILE_NAME = "file_name";
+  protected readonly COL_CREATED_AT = "created_at";
+  protected readonly REGEX_MIGRATION_FILE_NAME = /^\d{10,14}-.+.ts$/;
+  protected readonly regexFileName = new RegExp(this.REGEX_MIGRATION_FILE_NAME);
+
   protected logger: LoggerFn = () => undefined;
+
   migrationFiles: Deno.DirEntry[];
   seedFiles: Deno.DirEntry[];
   migrationFolder: string;
@@ -29,9 +31,9 @@ export class AbstractClient {
   exposeQueryBuilder: boolean = false;
   dialect?: DBDialects;
 
-  protected QUERY_GET_LATEST =
+  protected readonly QUERY_GET_LATEST =
     `SELECT ${this.COL_FILE_NAME} FROM ${this.TABLE_MIGRATIONS} ORDER BY ${this.COL_FILE_NAME} DESC LIMIT 1;`;
-  protected QUERY_GET_ALL =
+  protected readonly QUERY_GET_ALL =
     `SELECT ${this.COL_FILE_NAME} FROM ${this.TABLE_MIGRATIONS} ORDER BY ${this.COL_FILE_NAME} DESC;`;
 
   protected QUERY_MIGRATION_INSERT: QueryWithString = (fileName) =>
@@ -76,7 +78,7 @@ export class AbstractClient {
   ) {
     this.logger(amount, "Amount pre");
 
-    this.filterAndSortFiles(latestMigration);
+    this._filterAndSortFiles(latestMigration);
     amount = typeof amount === "number" ? amount : this.migrationFiles.length;
 
     this.logger(latestMigration, "Latest migrations");
@@ -158,8 +160,18 @@ export class AbstractClient {
     }
   }
 
+  /** Sets the logger for the client. Given by the State. */
+  setLogger(fn: LoggerFn) {
+    this.logger = fn;
+  }
+
+  /** Splits and trims queries. */
+  protected splitAndTrimQueries(query: string) {
+    return query.split(";").filter((el) => el.trim() !== "");
+  }
+
   /** Filters and sort files in ascending order. */
-  filterAndSortFiles(queryResult: string | undefined): void {
+  private _filterAndSortFiles(queryResult: string | undefined): void {
     this.migrationFiles = this.migrationFiles
       .filter((file: Deno.DirEntry): boolean => {
         if (!this.regexFileName.test(file.name)) return false;
@@ -169,17 +181,7 @@ export class AbstractClient {
       .sort((a, b) => parseInt(a?.name ?? "0") - parseInt(b?.name ?? "0"));
   }
 
-  /** Splits and trims queries. */
-  splitAndTrimQueries(query: string) {
-    return query.split(";").filter((el) => el.trim() !== "");
-  }
-
-  /** Sets the logger for the client. Given by the State. */
-  setLogger(fn: LoggerFn) {
-    this.logger = fn;
-  }
-
-  /** Hanldles migration files. */
+  /** Handles migration files. */
   private async _migrationHandler(
     fileName: string,
     queryHandler: QueryHandler,
