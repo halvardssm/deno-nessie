@@ -1,8 +1,8 @@
 import { Migration } from "https://deno.land/x/nessie/mod.ts";
 import { Schema } from "https://deno.land/x/nessie/qb.ts";
 
-export const up: Migration = () => {
-  const schema = new Schema("pg");
+export const up: Migration = ({ dialect }) => {
+  const schema = new Schema(dialect);
 
   schema.create("basic", (table) => {
     table.id();
@@ -19,6 +19,6 @@ export const up: Migration = () => {
   return schema.query;
 };
 
-export const down: Migration = () => {
-  return new Schema("pg").drop("basic");
+export const down: Migration = ({ dialect }) => {
+  return new Schema(dialect).drop("basic");
 };

@@ -1,15 +1,16 @@
 import { ClientMySQL } from "../clients/ClientMySQL.ts";
 
 const clientConfig = {
-  migrationFolder: "./tests/cli",
-  seedFolder: "./tests/cli",
+  migrationFolder: "./db/migrations",
+  seedFolder: "./db/seeds",
 };
+const connectionConfig = {
+  hostname: "localhost",
+  port: 3306,
+  username: "root",
+  db: "nessie",
+}
 
 export default {
-  client: new ClientMySQL(clientConfig, {
-    hostname: "localhost",
-    port: 3306,
-    username: "root",
-    db: "nessie",
-  }),
+  client: new ClientMySQL(clientConfig, connectionConfig),
 };
