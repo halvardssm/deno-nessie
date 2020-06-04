@@ -9,6 +9,7 @@ import {
   DBDialects,
 } from "../types.ts";
 
+/** MySQL client */
 export class ClientMySQL extends AbstractClient implements ClientI {
   private client: Client;
   private clientOptions: ClientConfig;

@@ -1,6 +1,7 @@
 import { State } from "./cli/state.ts";
 import { Denomander, resolve } from "./deps.ts";
 
+/** Initializes Denomander */
 const initDenomander = () => {
   const program = new Denomander({
     app_name: "Nessie Migrations",
@@ -35,6 +36,7 @@ const initDenomander = () => {
   return program;
 };
 
+/** Initializes Nessie */
 const initNessie = async () => {
   const responseFile = await fetch(
     "https://deno.land/x/nessie/cli/templates/config.ts",
@@ -51,6 +53,7 @@ const initNessie = async () => {
   await Deno.create(resolve(Deno.cwd(), "db/seeds/.gitkeep"));
 };
 
+/** Main application */
 const run = async () => {
   try {
     const prog = initDenomander();

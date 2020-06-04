@@ -5,12 +5,14 @@ import { parsePath } from "./utils.ts";
 import { NessieConfig, ClientI } from "../types.ts";
 
 const STD_CONFIG_FILE = "nessie.config.ts";
-
 const STD_CLIENT_OPTIONS = {
   seedFolder: "./db/seeds",
   migrationFolder: "./db/migrations",
 };
 
+/** The main state for the application.
+ * Contains the client, and handles the communication to the database.
+ */
 export class State {
   private enableDebug: boolean;
   private configFile: string;
@@ -24,6 +26,7 @@ export class State {
     this.logger([this.enableDebug, this.configFile], "State");
   }
 
+  /** Initializes the state with a client */
   async init() {
     this.logger("Checking config path");
     this.config = await this._safeConfigImport(this.configFile);
@@ -56,6 +59,7 @@ export class State {
     return this;
   }
 
+  /** Makes the migration */
   async makeMigration(migrationName: string = "migration") {
     if (
       migrationName.length > AbstractClient.MAX_FILE_NAME_LENGTH - 13
@@ -86,6 +90,7 @@ export class State {
     );
   }
 
+  /** Makes the seed */
   async makeSeed(seedName: string = "seed") {
     const fileName = `${seedName}.ts`;
     if (this.client?.seedFiles.find((el) => el.name === seedName)) {
@@ -110,6 +115,7 @@ export class State {
     );
   }
 
+  /** A logger to use throughout the application, outputs when the debugger is enabled */
   logger(output?: any, title?: string): void {
     try {
       if (this.enableDebug) {
@@ -121,6 +127,7 @@ export class State {
     }
   }
 
+  /** Method for importing the config files */
   private async _safeConfigImport(file: string): Promise<any | undefined> {
     try {
       const configRaw = await import(file);

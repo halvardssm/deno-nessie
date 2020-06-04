@@ -11,6 +11,8 @@ import {
   Info,
   DBDialects,
 } from "../types.ts";
+
+/** The abstract client which handles most of the logic related to database communication. */
 export class AbstractClient {
   static readonly MAX_FILE_NAME_LENGTH = 100;
 
@@ -66,6 +68,7 @@ export class AbstractClient {
     }
   }
 
+  /** Runs the `up` method on all available migrations after filtering and sorting. */
   protected async migrate(
     amount: AmountMigrateT,
     latestMigration: string | undefined,
@@ -99,16 +102,7 @@ export class AbstractClient {
     }
   }
 
-  filterAndSortFiles(queryResult: string | undefined): void {
-    this.migrationFiles = this.migrationFiles
-      .filter((file: Deno.DirEntry): boolean => {
-        if (!this.regexFileName.test(file.name)) return false;
-        if (queryResult === undefined) return true;
-        return file.name > queryResult;
-      })
-      .sort((a, b) => parseInt(a?.name ?? "0") - parseInt(b?.name ?? "0"));
-  }
-
+  /** Runs the `down` method on defined number of migrations after retrieving them from the DB. */
   async rollback(
     amount: AmountRollbackT,
     allMigrations: string[] | undefined,
@@ -139,14 +133,7 @@ export class AbstractClient {
     }
   }
 
-  splitAndTrimQueries(query: string) {
-    return query.split(";").filter((el) => el.trim() !== "");
-  }
-
-  setLogger(fn: LoggerFn) {
-    this.logger = fn;
-  }
-
+  /** Runs the `run` method on seed files. Filters on the matcher. */
   async seed(matcher: string = ".+.ts", queryHandler: QueryHandler) {
     const files = this.seedFiles.filter((el) =>
       el.isFile && (el.name === matcher || new RegExp(matcher).test(el.name))
@@ -171,6 +158,28 @@ export class AbstractClient {
     }
   }
 
+  /** Filters and sort files in ascending order. */
+  filterAndSortFiles(queryResult: string | undefined): void {
+    this.migrationFiles = this.migrationFiles
+      .filter((file: Deno.DirEntry): boolean => {
+        if (!this.regexFileName.test(file.name)) return false;
+        if (queryResult === undefined) return true;
+        return file.name > queryResult;
+      })
+      .sort((a, b) => parseInt(a?.name ?? "0") - parseInt(b?.name ?? "0"));
+  }
+
+  /** Splits and trims queries. */
+  splitAndTrimQueries(query: string) {
+    return query.split(";").filter((el) => el.trim() !== "");
+  }
+
+  /** Sets the logger for the client. Given by the State. */
+  setLogger(fn: LoggerFn) {
+    this.logger = fn;
+  }
+
+  /** Hanldles migration files. */
   private async _migrationHandler(
     fileName: string,
     queryHandler: QueryHandler,

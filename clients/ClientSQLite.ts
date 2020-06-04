@@ -10,6 +10,7 @@ import {
   DBDialects,
 } from "../types.ts";
 
+/** SQLite client */
 export class ClientSQLite extends AbstractClient implements ClientI {
   private client?: DB;
   dialect: DBDialects = "sqlite3";
