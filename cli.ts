@@ -45,8 +45,10 @@ const initNessie = async () => {
     await responseFile.text(),
   );
 
-  await Deno.mkdir(resolve(Deno.cwd(), "migrations"), { recursive: true });
-  await Deno.create(resolve(Deno.cwd(), "migrations/.gitkeep"));
+  await Deno.mkdir(resolve(Deno.cwd(), "db/migrations"), { recursive: true });
+  await Deno.create(resolve(Deno.cwd(), "db/migrations/.gitkeep"));
+  await Deno.mkdir(resolve(Deno.cwd(), "db/seeds"), { recursive: true });
+  await Deno.create(resolve(Deno.cwd(), "db/seeds/.gitkeep"));
 };
 
 const run = async () => {

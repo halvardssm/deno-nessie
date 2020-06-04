@@ -75,8 +75,20 @@ export class AbstractClient {
       );
       this.seedFolder = resolve(options.seedFolder || "./db/seeds");
     }
-    this.migrationFiles = Array.from(Deno.readDirSync(this.migrationFolder));
-    this.seedFiles = Array.from(Deno.readDirSync(this.seedFolder));
+
+    try {
+      this.migrationFiles = Array.from(Deno.readDirSync(this.migrationFolder));
+    } catch {
+      this.logger(`Migration folder not found at '${this.migrationFolder}'`);
+      this.migrationFiles = [];
+    }
+
+    try {
+      this.seedFiles = Array.from(Deno.readDirSync(this.seedFolder));
+    } catch {
+      this.logger(`Seed folder not found at '${this.seedFolder}'`);
+      this.seedFiles = [];
+    }
   }
 
   protected async migrate(
