@@ -1,5 +1,6 @@
 import { Column } from "./Column.ts";
-import { columnTypes, dbDialects, typeMap, typeMapEl } from "./TypeUtils.ts";
+import { columnTypes, typeMap, typeMapEl } from "./TypeUtils.ts";
+import { DBDialects } from "../types.ts";
 
 export interface EnumColumn {
   name: string;
@@ -21,7 +22,7 @@ export interface TableConstraints {
  * By using this exposed class, you can add columns and return it as a sql string using `toSql()`.
  */
 export class Table {
-  private dialect: dbDialects;
+  private dialect: DBDialects;
   private tableName: string;
   private columns: Column[];
   private customColumns?: string[];
@@ -32,7 +33,7 @@ export class Table {
     updatedAt: false,
   };
 
-  constructor(name: string, dbDialect: dbDialects = "pg") {
+  constructor(name: string, dbDialect: DBDialects = "pg") {
     this.tableName = name;
     this.columns = [];
     this.dialect = dbDialect;
@@ -97,9 +98,9 @@ export class Table {
       default:
         return `CREATE${
           this.constraints.isTemporary ? " TEMPORARY" : ""
-        } TABLE${
+          } TABLE${
           this.constraints.ifNotExists ? " IF NOT EXISTS" : ""
-        } ${this.tableName}`;
+          } ${this.tableName}`;
     }
   }
 
@@ -120,14 +121,14 @@ export class Table {
   /** Generates enum query dependent on dialect. In postgres, this will be stored as the column name */
   private _enumHandler(enumCol: EnumColumn): string {
     switch (this.dialect) {
-      case "sqlite":
+      case "sqlite3":
       case "mysql":
         return "";
       case "pg":
       default:
         return `CREATE TYPE ${enumCol.name} AS ENUM (${
           enumCol.columns.join(", ")
-        });`;
+          });`;
     }
   }
 
@@ -141,10 +142,10 @@ export class Table {
     if (!uniqueString) return "";
 
     switch (this.dialect) {
-      case "sqlite":
+      case "sqlite3":
         return uniqueArray
           ? ` CREATE UNIQUE INDEX ${this.tableName}_${
-            uniqueArray.join("_")
+          uniqueArray.join("_")
           } ON ${this.tableName} (${uniqueString});`
           : "";
       case "mysql":
@@ -157,7 +158,7 @@ export class Table {
   /** Generates index query dependent on dialect. */
   private _indexHandler(index: string) {
     switch (this.dialect) {
-      case "sqlite":
+      case "sqlite3":
         return ` CREATE INDEX ${this.tableName}_${index} ON ${this.tableName} (${index});`;
       case "mysql":
         return ` ALTER TABLE ${this.tableName} ADD INDEX ${index} (${index});`;
@@ -173,7 +174,7 @@ export class Table {
 
     switch (this.dialect) {
       case "mysql":
-      case "sqlite":
+      case "sqlite3":
         return "";
       case "pg":
       default:
@@ -188,7 +189,7 @@ export class Table {
     switch (this.dialect) {
       case "mysql":
         return "";
-      case "sqlite":
+      case "sqlite3":
         return ` DROP TRIGGER IF EXISTS set_timestamp; CREATE TRIGGER set_timestamp BEFORE UPDATE ON ${this.tableName} FOR EACH ROW BEGIN UPDATE ${this.tableName} SET updated_at = CURRENT_TIMESTAMP WHERE id=OLD.id\\; END;`;
       case "pg":
       default:
@@ -522,15 +523,15 @@ export class Table {
       this.dialect === "pg"
         ? typeName
         : this.dialect === "mysql"
-        ? "ENUM"
-        : "TEXT",
+          ? "ENUM"
+          : "TEXT",
       undefined,
       undefined,
       (col) =>
         this.dialect === "mysql" ? col.custom(`(${array.join(", ")})`)
-        : this.dialect === "sqlite"
-        ? col.custom(`CHECK(${name} IN (${array.join(", ")}) )`)
-        : col,
+          : this.dialect === "sqlite3"
+            ? col.custom(`CHECK(${name} IN (${array.join(", ")}) )`)
+            : col,
     );
   }
 

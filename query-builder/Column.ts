@@ -1,8 +1,9 @@
-import { columnTypes, dbDialects } from "./TypeUtils.ts";
+import { columnTypes } from "./TypeUtils.ts";
+import { DBDialects } from "../types.ts";
 
 /** The column class which stores the column information of a table class. */
 export class Column {
-  private dialect: dbDialects;
+  private dialect: DBDialects;
   private columnName: string;
   private columnType: columnTypes | string;
   private columnInput1?: number | string[];
@@ -22,7 +23,7 @@ export class Column {
     type: columnTypes | string,
     input1?: number | string[],
     input2?: number,
-    dbDialect: dbDialects = "pg",
+    dbDialect: DBDialects = "pg",
   ) {
     this.columnName = name;
     this.columnType = type;
@@ -45,7 +46,7 @@ export class Column {
     if (this.columnInput1 !== undefined) {
       string += ` (${this.columnInput1}${
         this.columnInput2 ? `, ${this.columnInput2}` : ""
-      })`;
+        })`;
     }
 
     if (this.isUnsigned && this.dialect === "mysql") {
@@ -61,7 +62,7 @@ export class Column {
     }
 
     if (this.isAutoIncrement) {
-      string += this.dialect === "sqlite" ? "" : " AUTO_INCREMENT";
+      string += this.dialect === "sqlite3" ? "" : " AUTO_INCREMENT";
     }
 
     if (this.isPrimary) {

@@ -6,12 +6,13 @@ import {
   ClientI,
   QueryT,
   ClientOptions,
+  DBDialects,
 } from "../types.ts";
 
 export class ClientMySQL extends AbstractClient implements ClientI {
   private client: Client;
   private clientOptions: ClientConfig;
-  dialect: string = "mysql"
+  dialect: DBDialects = "mysql"
 
   private QUERY_MIGRATION_TABLE_EXISTS =
     // `show tables like '${this.TABLE_MIGRATIONS}';`;

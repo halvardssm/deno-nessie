@@ -8,11 +8,12 @@ import {
   ClientI,
   QueryT,
   ClientOptions,
+  DBDialects,
 } from "../types.ts";
 
 export class ClientPostgreSQL extends AbstractClient implements ClientI {
   private client: Client;
-  dialect: string = "pg"
+  dialect: DBDialects = "pg"
 
   private QUERY_MIGRATION_TABLE_EXISTS =
     `SELECT to_regclass('${this.TABLE_MIGRATIONS}');`;

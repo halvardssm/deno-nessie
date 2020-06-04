@@ -1,5 +1,7 @@
+export type DBDialects = "pg" | "mysql" | "sqlite3";
+
 export type Info = {
-  dialect: string
+  dialect: DBDialects
   queryBuilder?: any
 }
 

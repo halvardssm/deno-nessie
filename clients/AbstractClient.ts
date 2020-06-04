@@ -1,7 +1,6 @@
 import { parsePath } from "../cli/utils.ts";
 import { resolve } from "../deps.ts";
-import { LoggerFn, QueryWithString, ClientOptions, AmountMigrateT, QueryHandler, MigrationFile, AmountRollbackT, Info } from "../types.ts";
-
+import { LoggerFn, QueryWithString, ClientOptions, AmountMigrateT, QueryHandler, MigrationFile, AmountRollbackT, Info, DBDialects } from "../types.ts";
 export class AbstractClient {
   static readonly MAX_FILE_NAME_LENGTH = 100;
 
@@ -16,7 +15,7 @@ export class AbstractClient {
   migrationFolder: string;
   seedFolder: string;
   exposeQueryBuilder: boolean = false
-  dialect: string = ""
+  dialect?: DBDialects
 
   protected QUERY_GET_LATEST =
     `SELECT ${this.COL_FILE_NAME} FROM ${this.TABLE_MIGRATIONS} ORDER BY ${this.COL_FILE_NAME} DESC LIMIT 1;`;
@@ -80,7 +79,7 @@ export class AbstractClient {
       for (let i = 0;i < amount;i++) {
         const file = this.migrationFiles[i];
 
-        await this._migrationHandler(file.name, queryHandler, true)
+        await this._migrationHandler(file.name, queryHandler)
 
         console.info(`Migrated ${file.name}`);
       }
@@ -168,11 +167,12 @@ export class AbstractClient {
     );
 
     const exposedObject: Info = {
-      dialect: this.dialect
+      dialect: this.dialect!
     }
 
     if (this.exposeQueryBuilder) {
-      exposedObject.queryBuilder = await import("https://deno.land/x/nessie/qb.ts")
+      const { Schema } = await import("https://deno.land/x/nessie/qb.ts")
+      exposedObject.queryBuilder = new Schema(this.dialect)
     }
 
     let query: string | string[]

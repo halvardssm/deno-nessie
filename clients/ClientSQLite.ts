@@ -7,11 +7,12 @@ import {
   ClientI,
   QueryT,
   ClientOptions,
+  DBDialects,
 } from "../types.ts";
 
 export class ClientSQLite extends AbstractClient implements ClientI {
   private client?: DB;
-  dialect: string = "sqlite3"
+  dialect: DBDialects = "sqlite3"
 
   private QUERY_MIGRATION_TABLE_EXISTS =
     `SELECT name FROM sqlite_master WHERE type='table' AND name='${this.TABLE_MIGRATIONS}';`;
