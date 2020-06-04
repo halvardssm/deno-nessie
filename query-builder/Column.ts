@@ -8,7 +8,9 @@ export class Column {
   private columnInput1?: number | string[];
   private columnInput2?: number;
   private isNullable: boolean = true;
-  private defaultValue?: string;
+  private defaultValue?: string | number | boolean | object | null | undefined =
+    undefined;
+  private defaultValueIsExpression?: boolean = false;
   private customCol?: string;
   private isAutoIncrement: boolean = false;
   private isPrimary: boolean = false;
@@ -50,8 +52,8 @@ export class Column {
       string += " UNSIGNED";
     }
 
-    if (this.defaultValue) {
-      string += ` DEFAULT ${this.defaultValue}`;
+    if (this.defaultValue !== undefined) {
+      string += this.processDefaultValue();
     }
 
     if (!this.isNullable) {
@@ -95,9 +97,15 @@ export class Column {
     return this;
   }
 
-  /** Adds a default value to the column */
-  default(value: string) {
+  /** Adds a default value to the column 
+   * If the input is string: please note by default it will be wrapped in a single quote string (ex: 'defaultValue'). In case you do not want it be wrapped in a single quote string please consider the optional arg(isExpression) to be set to true.
+  */
+  default(
+    value: string | number | boolean | object | null,
+    isExpression: boolean = false,
+  ) {
     this.defaultValue = value;
+    this.defaultValueIsExpression = isExpression;
     return this;
   }
 
@@ -129,6 +137,33 @@ export class Column {
   unsigned() {
     this.isUnsigned = true;
     return this;
+  }
+
+  /** 
+   * This function implementation is inspired by knex project
+   * file: https://github.com/knex/knex/blob/da54cf1ecf0acef4b3d3d51cd2656e4faf10d3e9/lib/schema/columncompiler.js, line: 151
+   * Yet it depends on the input type unlike the knex project which depends on the column type
+  */
+  private processDefaultValue(): string {
+    let val = ``;
+    if (this.defaultValue === null) {
+      val += ` DEFAULT NULL`;
+    } else if (typeof this.defaultValue == "number") {
+      val += ` DEFAULT ${this.defaultValue}`;
+    } else if (typeof this.defaultValue == "boolean") {
+      val += ` DEFAULT '${this.defaultValue ? 1 : 0}'`;
+    } else if (typeof this.defaultValue == "object") {
+      val += ` DEFAULT '${JSON.stringify(this.defaultValue)}'`;
+    } else if (
+      typeof this.defaultValue == "string" && !this.defaultValueIsExpression
+    ) {
+      val += ` DEFAULT '${this.defaultValue}'`;
+    } else if (
+      typeof this.defaultValue == "string" && this.defaultValueIsExpression
+    ) {
+      val += ` DEFAULT ${this.defaultValue}`;
+    }
+    return val;
   }
 }
 
