@@ -1,8 +1,9 @@
 import { ClientSQLite } from "../../../mod.ts";
 
 export default {
+  exposeQueryBuilder: true,
   client: new ClientSQLite(
-    "./tests/query-builder-migrations",
+    { migrationFolder: "./tests/query-builder-migrations" },
     "./tests/data/sqlite.db",
   ),
 };

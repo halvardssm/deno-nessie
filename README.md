@@ -79,24 +79,29 @@ All contributions are welcome, make sure to read the [contributing guideline](./
 
 ## Examples
 
-`nessie.config.ts`
+`nessie.config.ts` with all default values
 
 ```ts
-import { ClientPostgreSQL, nessieConfig } from "https://deno.land/x/nessie/mod.ts"; 
+import { ClientPostgreSQL } from "./clients/ClientPostgreSQL.ts";
 
-const migrationFolder = "./migrations";
-
-const config: nessieConfig = {
-  client: new ClientPostgreSQL(migrationFolder, {
-    database: "nessie",
-    hostname: "localhost",
-    port: 5432,
-    user: "root",
-    password: "pwd",
-  }),
+const nessieOptions = {
+  migrationFolder: "./db/migrations",
+  seedFolder: "./db/seeds",
 };
 
-export default config;
+const connectionOptions = {
+  database: "nessie",
+  hostname: "localhost",
+  port: 5432,
+  user: "root",
+  password: "pwd",
+};
+
+export default {
+  client: new ClientPostgreSQL(nessieOptions, connectionOptions),
+  exposeQueryBuilder: false,
+};
+
 ```
 
 Minimal example of a migration file
@@ -113,16 +118,14 @@ export const down: Migration = () => {
 };
 ```
 
-Using the native query builder
+Using the native query builder (`exposeQueryBuilder: true`)
 
 ```ts
 import { Migration } from "https://deno.land/x/nessie/mod.ts";
-import { Schema, dbDialects } from "https://deno.land/x/nessie/qb.ts";
+import { Schema } from "https://deno.land/x/nessie/qb.ts";
 
-const dialect: dbDialects = "mysql"
-
-export const up: Migration = () => {
-  const queryArray: string[] = new Schema(dialect).create("users", (table) => {
+export const up: Migration<Schema> = ({ queryBuilder }) => {
+  queryBuilder.create("users", (table) => {
     table.id();
     table.string("name", 100).nullable();
     table.boolean("is_true").default("false");
@@ -130,17 +133,15 @@ export const up: Migration = () => {
     table.timestamps();
   });
 
-  const queryString = new Schema(dialect).queryString(
+  queryBuilder.queryString(
     "INSERT INTO users VALUES (DEFAULT, 'Deno', true, 2, DEFAULT, DEFAULT);",
   )
   
-  queryArray.push(queryString);
-
-  return queryArray
+  return queryBuilder.query
 };
 
-export const down: Migration = () => {
-  return new Schema(dialect).drop("users");
+export const down: Migration<Schema> = ({ queryBuilder }) => {
+  return queryBuilder.drop("users");
 };
 ```
 

@@ -1,7 +1,7 @@
 import { assertEquals, assertArrayContains } from "../../deps.ts";
 import { Schema } from "../../qb.ts";
 
-const dialect = "sqlite";
+const dialect = "sqlite3";
 
 const strings = [
   {

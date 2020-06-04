@@ -1,6 +1,4 @@
-export type dbDialects = "pg" | "mysql" | "sqlite";
-
-export type columnTypeSql =
+export type ColumnTypeSql =
   | "BIGINT"
   | "BLOB"
   | "TEXT"
@@ -26,34 +24,34 @@ export type columnTypeSql =
   | "VARCHAR"
   | "YEAR";
 
-export type typePostgresBigInt = "bigint" | "int8";
-export type typePostgresBigSerial = "bigint" | "int8";
-export type typePostgresVarBit = "bit varying" | "varbit";
-export type typePostgresBoolean = "boolean" | "bool";
-export type typePostgresChar = "character" | "char";
-export type typePostgresVarChar = "character varying" | "varchar";
-export type typePostgresFloat8 = "double precision" | "float8";
-export type typePostgresInt = "integer" | "int" | "int4";
-export type typePostgresDecimal = "numeric" | "decimal";
-export type typePostgresReal = "real" | "float4";
-export type typePostgresSmallInt = "smallint" | "int2";
-export type typePostgresSmallSerial = "smallserial" | "serial2";
-export type typePostgresSerial = "serial" | "serial4";
+export type TypePostgresBigInt = "bigint" | "int8";
+export type TypePostgresBigSerial = "bigint" | "int8";
+export type TypePostgresVarBit = "bit varying" | "varbit";
+export type TypePostgresBoolean = "boolean" | "bool";
+export type TypePostgresChar = "character" | "char";
+export type TypePostgresVarChar = "character varying" | "varchar";
+export type TypePostgresFloat8 = "double precision" | "float8";
+export type TypePostgresInt = "integer" | "int" | "int4";
+export type TypePostgresDecimal = "numeric" | "decimal";
+export type TypePostgresReal = "real" | "float4";
+export type TypePostgresSmallInt = "smallint" | "int2";
+export type TypePostgresSmallSerial = "smallserial" | "serial2";
+export type TypePostgresSerial = "serial" | "serial4";
 
-export type columnTypePostgres =
-  | typePostgresBigInt
-  | typePostgresBigSerial
-  | typePostgresVarBit
-  | typePostgresBoolean
-  | typePostgresChar
-  | typePostgresVarChar
-  | typePostgresFloat8
-  | typePostgresInt
-  | typePostgresDecimal
-  | typePostgresReal
-  | typePostgresSmallInt
-  | typePostgresSmallSerial
-  | typePostgresSerial
+export type ColumnTypePostgres =
+  | TypePostgresBigInt
+  | TypePostgresBigSerial
+  | TypePostgresVarBit
+  | TypePostgresBoolean
+  | TypePostgresChar
+  | TypePostgresVarChar
+  | TypePostgresFloat8
+  | TypePostgresInt
+  | TypePostgresDecimal
+  | TypePostgresReal
+  | TypePostgresSmallInt
+  | TypePostgresSmallSerial
+  | TypePostgresSerial
   | "bigserial"
   | "bit"
   | "box"
@@ -85,7 +83,7 @@ export type columnTypePostgres =
   | "uuid"
   | "xml";
 
-export type columnTypeMySql =
+export type ColumnTypeMySql =
   | "tinyint"
   | "smallint"
   | "mediumint"
@@ -124,45 +122,49 @@ export type columnTypeMySql =
   | "multipoint"
   | "multipolygon"
   | "json";
-export type columnTypeSQLite = "integer" | "text" | "blob" | "real" | "numeric";
+export type ColumnTypeSQLite = "integer" | "text" | "blob" | "real" | "numeric";
 
-export type columnTypes =
-  | columnTypeSql
-  | columnTypePostgres
-  | columnTypeMySql
-  | columnTypeSQLite;
+export type ColumnTypes =
+  | ColumnTypeSql
+  | ColumnTypePostgres
+  | ColumnTypeMySql
+  | ColumnTypeSQLite;
 
-export type typeMapEl = {
-  pg: columnTypePostgres;
-  mysql: columnTypeMySql | columnTypes;
-  sqlite: columnTypes;
+export type TypeMapEl = {
+  pg: ColumnTypePostgres;
+  mysql: ColumnTypeMySql | ColumnTypes;
+  sqlite3: ColumnTypes;
 };
-export type typeMapType = {
-  [any: string]: typeMapEl;
+export type TypeMapType = {
+  [any: string]: TypeMapEl;
 };
 
-export const typeMap: typeMapType = {
-  bigIncrements: { pg: "bigserial", mysql: "bigint", sqlite: "bigint" },
-  bigInteger: { pg: "bigint", mysql: "bigint", sqlite: "bigint" },
-  binary: { pg: "bytea", mysql: "longblob", sqlite: "blob" },
-  bit: { pg: "bit", mysql: "bit", sqlite: "blob" },
-  boolean: { pg: "boolean", mysql: "tinyint", sqlite: "boolean" },
-  increments: { pg: "serial", mysql: "int", sqlite: "int" },
-  integer: { pg: "integer", mysql: "int", sqlite: "int" },
-  smallIncrements: { pg: "smallserial", mysql: "smallint", sqlite: "smallint" },
-  smallInteger: { pg: "smallint", mysql: "smallint", sqlite: "smallint" },
-  real: { pg: "real", mysql: "float", sqlite: "float" },
-  double: { pg: "float8", mysql: "double", sqlite: "double" },
-  numeric: { pg: "numeric", mysql: "numeric", sqlite: "decimal" },
-  money: { pg: "money", mysql: "decimal", sqlite: "decimal" },
-  char: { pg: "char", mysql: "char", sqlite: "char" },
-  string: { pg: "varchar", mysql: "varchar", sqlite: "varchar" },
-  text: { pg: "text", mysql: "longtext", sqlite: "text" },
-  jsonb: { pg: "jsonb", mysql: "json", sqlite: "json" },
-  date: { pg: "date", mysql: "date", sqlite: "date" },
-  dateTime: { pg: "timestamp", mysql: "datetime", sqlite: "datetime" },
-  time: { pg: "time", mysql: "time", sqlite: "time" },
-  timeTz: { pg: "timetz", mysql: "time", sqlite: "time" },
-  timestamp: { pg: "timestamp", mysql: "timestamp", sqlite: "timestamp" },
-  timestampTz: { pg: "timestamptz", mysql: "datetime", sqlite: "datetime" },
+export const typeMap: TypeMapType = {
+  bigIncrements: { pg: "bigserial", mysql: "bigint", sqlite3: "bigint" },
+  bigInteger: { pg: "bigint", mysql: "bigint", sqlite3: "bigint" },
+  binary: { pg: "bytea", mysql: "longblob", sqlite3: "blob" },
+  bit: { pg: "bit", mysql: "bit", sqlite3: "blob" },
+  boolean: { pg: "boolean", mysql: "tinyint", sqlite3: "boolean" },
+  increments: { pg: "serial", mysql: "int", sqlite3: "int" },
+  integer: { pg: "integer", mysql: "int", sqlite3: "int" },
+  smallIncrements: {
+    pg: "smallserial",
+    mysql: "smallint",
+    sqlite3: "smallint",
+  },
+  smallInteger: { pg: "smallint", mysql: "smallint", sqlite3: "smallint" },
+  real: { pg: "real", mysql: "float", sqlite3: "float" },
+  double: { pg: "float8", mysql: "double", sqlite3: "double" },
+  numeric: { pg: "numeric", mysql: "numeric", sqlite3: "decimal" },
+  money: { pg: "money", mysql: "decimal", sqlite3: "decimal" },
+  char: { pg: "char", mysql: "char", sqlite3: "char" },
+  string: { pg: "varchar", mysql: "varchar", sqlite3: "varchar" },
+  text: { pg: "text", mysql: "longtext", sqlite3: "text" },
+  jsonb: { pg: "jsonb", mysql: "json", sqlite3: "json" },
+  date: { pg: "date", mysql: "date", sqlite3: "date" },
+  dateTime: { pg: "timestamp", mysql: "datetime", sqlite3: "datetime" },
+  time: { pg: "time", mysql: "time", sqlite3: "time" },
+  timeTz: { pg: "timetz", mysql: "time", sqlite3: "time" },
+  timestamp: { pg: "timestamp", mysql: "timestamp", sqlite3: "timestamp" },
+  timestampTz: { pg: "timestamptz", mysql: "datetime", sqlite3: "datetime" },
 };

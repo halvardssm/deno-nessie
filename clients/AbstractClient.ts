@@ -1,43 +1,16 @@
 import { parsePath } from "../cli/utils.ts";
 import { resolve } from "../deps.ts";
-import { loggerFn } from "../cli/state.ts";
-import { Migration } from "../types.ts";
-
-export type QueryWithString = (string: string) => string;
-
-export type amountMigrateT = number | undefined;
-export type amountRollbackT = amountMigrateT | "all";
-export type queryT = string | string[];
-export type QueryHandler = (query: queryT) => Promise<any>;
-export type MigrationFile = {
-  up: Migration;
-  down: Migration;
-};
-
-export interface ClientI {
-  migrationFolder: string;
-  seedFolder: string;
-  migrationFiles: Deno.DirEntry[];
-  seedFiles: Deno.DirEntry[];
-  prepare: () => Promise<void>;
-  close: () => Promise<void>;
-  migrate: (amount: amountMigrateT) => Promise<void>;
-  rollback: (amount: amountRollbackT) => Promise<void>;
-  seed: (matcher?: string) => Promise<void>;
-  query: QueryHandler;
-  setLogger: loggerFn;
-}
-
-export interface nessieConfig {
-  client: ClientI;
-}
-
-export interface ClientOptions {
-  migrationFolder: string;
-  seedFolder: string;
-  [option: string]: any;
-}
-
+import {
+  LoggerFn,
+  QueryWithString,
+  ClientOptions,
+  AmountMigrateT,
+  QueryHandler,
+  MigrationFile,
+  AmountRollbackT,
+  Info,
+  DBDialects,
+} from "../types.ts";
 export class AbstractClient {
   static readonly MAX_FILE_NAME_LENGTH = 100;
 
@@ -46,11 +19,13 @@ export class AbstractClient {
   protected COL_CREATED_AT = "created_at";
   protected REGEX_MIGRATION_FILE_NAME = /^\d{10,14}-.+.ts$/;
   protected regexFileName = new RegExp(this.REGEX_MIGRATION_FILE_NAME);
-  protected logger: loggerFn = () => undefined;
+  protected logger: LoggerFn = () => undefined;
   migrationFiles: Deno.DirEntry[];
   seedFiles: Deno.DirEntry[];
   migrationFolder: string;
   seedFolder: string;
+  exposeQueryBuilder: boolean = false;
+  dialect?: DBDialects;
 
   protected QUERY_GET_LATEST =
     `SELECT ${this.COL_FILE_NAME} FROM ${this.TABLE_MIGRATIONS} ORDER BY ${this.COL_FILE_NAME} DESC LIMIT 1;`;
@@ -71,9 +46,9 @@ export class AbstractClient {
       this.seedFolder = resolve("./db/seeds");
     } else {
       this.migrationFolder = resolve(
-        options.migrationFolder || "./db/migrations",
+        options?.migrationFolder || "./db/migrations",
       );
-      this.seedFolder = resolve(options.seedFolder || "./db/seeds");
+      this.seedFolder = resolve(options?.seedFolder || "./db/seeds");
     }
 
     try {
@@ -92,7 +67,7 @@ export class AbstractClient {
   }
 
   protected async migrate(
-    amount: amountMigrateT,
+    amount: AmountMigrateT,
     latestMigration: string | undefined,
     queryHandler: QueryHandler,
   ) {
@@ -113,18 +88,8 @@ export class AbstractClient {
 
       for (let i = 0; i < amount; i++) {
         const file = this.migrationFiles[i];
-        let { up }: MigrationFile = await import(
-          parsePath(this.migrationFolder, file.name)
-        );
 
-        let query = await up();
-
-        if (!query) query = [];
-        else if (typeof query === "string") query = [query];
-
-        query.push(this.QUERY_MIGRATION_INSERT(file.name));
-
-        await queryHandler(query);
+        await this._migrationHandler(file.name, queryHandler);
 
         console.info(`Migrated ${file.name}`);
       }
@@ -145,7 +110,7 @@ export class AbstractClient {
   }
 
   async rollback(
-    amount: amountRollbackT,
+    amount: AmountRollbackT,
     allMigrations: string[] | undefined,
     queryHandler: QueryHandler,
   ) {
@@ -164,18 +129,8 @@ export class AbstractClient {
 
       for (let i = 0; i < amount; i++) {
         const fileName = allMigrations[i];
-        let { down }: MigrationFile = await import(
-          parsePath(this.migrationFolder, fileName)
-        );
 
-        let query = await down();
-
-        if (!query) query = [];
-        else if (typeof query === "string") query = [query];
-
-        query.push(this.QUERY_MIGRATION_DELETE(fileName));
-
-        await queryHandler(query);
+        await this._migrationHandler(fileName, queryHandler, true);
 
         console.info(`Rolled back ${fileName}`);
       }
@@ -188,7 +143,7 @@ export class AbstractClient {
     return query.split(";").filter((el) => el.trim() !== "");
   }
 
-  setLogger(fn: loggerFn) {
+  setLogger(fn: LoggerFn) {
     this.logger = fn;
   }
 
@@ -214,5 +169,43 @@ export class AbstractClient {
 
       console.info("Seeding complete");
     }
+  }
+
+  private async _migrationHandler(
+    fileName: string,
+    queryHandler: QueryHandler,
+    isDown: boolean = false,
+  ) {
+    let { up, down }: MigrationFile = await import(
+      parsePath(this.migrationFolder, fileName)
+    );
+
+    const exposedObject: Info = {
+      dialect: this.dialect!,
+    };
+
+    if (this.exposeQueryBuilder) {
+      const { Schema } = await import("https://deno.land/x/nessie/qb.ts");
+      exposedObject.queryBuilder = new Schema(this.dialect);
+    }
+
+    let query: string | string[];
+
+    if (isDown) {
+      query = await down(exposedObject);
+    } else {
+      query = await up(exposedObject);
+    }
+
+    if (!query) query = [];
+    else if (typeof query === "string") query = [query];
+
+    if (isDown) {
+      query.push(this.QUERY_MIGRATION_DELETE(fileName));
+    } else {
+      query.push(this.QUERY_MIGRATION_INSERT(fileName));
+    }
+
+    await queryHandler(query);
   }
 }

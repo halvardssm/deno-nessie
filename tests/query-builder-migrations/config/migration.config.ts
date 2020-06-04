@@ -3,7 +3,7 @@ export const TYPE_ROLLBACK = "rollback";
 
 export const DIALECT_PG = "pg";
 export const DIALECT_MYSQL = "mysql";
-export const DIALECT_SQLITE = "sqlite";
+export const DIALECT_SQLITE = "sqlite3";
 export const DIALECTS = [DIALECT_PG, DIALECT_MYSQL, DIALECT_SQLITE];
 
 export const decoder = new TextDecoder();
@@ -24,9 +24,6 @@ export const runner = async (dialect: string, type: string[]) => {
       // "-d",
     ],
     stdout: "piped",
-    env: {
-      DB_DIALECT: dialect,
-    },
   });
 
   const { code } = await r.status();

@@ -1,8 +1,8 @@
 import { ClientSQLite } from "../clients/ClientSQLite.ts";
 
 const clientConfig = {
-  migrationFolder: "./tests/cli",
-  seedFolder: "./tests/cli",
+  migrationFolder: "./db/migrations",
+  seedFolder: "./db/seeds",
 };
 const dbFile = "./sqlite.db";
 

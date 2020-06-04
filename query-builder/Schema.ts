@@ -1,5 +1,5 @@
 import { Table } from "./Table.ts";
-import { dbDialects } from "./TypeUtils.ts";
+import { DBDialects } from "../types.ts";
 
 /** The schema class used to create the queries.
  * 
@@ -7,9 +7,9 @@ import { dbDialects } from "./TypeUtils.ts";
  */
 export class Schema {
   query: string[] = [];
-  dialect: dbDialects;
+  dialect: DBDialects;
 
-  constructor(dialenct: dbDialects = "pg") {
+  constructor(dialenct: DBDialects = "pg") {
     this.dialect = dialenct;
   }
 
@@ -66,7 +66,7 @@ export class Schema {
       case "mysql":
         //SELECT 1 FROM testtable LIMIT 1;
         return `show tables like '${name}';`;
-      case "sqlite":
+      case "sqlite3":
         return `SELECT name FROM sqlite_master WHERE type='table' AND name='${name}';`;
       case "pg":
       default:
@@ -80,7 +80,7 @@ export class Schema {
       case "mysql":
         this.query.push(`RENAME TABLE ${from} TO ${to};`);
         break;
-      case "sqlite":
+      case "sqlite3":
       case "pg":
       default:
         this.query.push(`ALTER TABLE ${from} RENAME TO ${to};`);
@@ -101,7 +101,7 @@ export class Schema {
 
   /** Drops column */
   dropColumn(table: string, column: string): string[] {
-    if (this.dialect !== "sqlite") {
+    if (this.dialect !== "sqlite3") {
       this.query.push(`ALTER TABLE ${table} DROP ${column};`);
     }
 
