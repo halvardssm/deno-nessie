@@ -2,10 +2,13 @@ import { ClientPostgreSQL } from "https://deno.land/x/nessie/mod.ts";
 import { ClientMySQL } from "https://deno.land/x/nessie/mod.ts";
 import { ClientSQLite } from "https://deno.land/x/nessie/mod.ts";
 
-const migrationFolder = "./migrations";
+const clientOptions = {
+  migrationFolder: "./db/migrations",
+  seedFolder: "./db/seeds",
+};
 
 const configPg = {
-  client: new ClientPostgreSQL(migrationFolder, {
+  client: new ClientPostgreSQL(clientOptions, {
     database: "nessie",
     hostname: "localhost",
     port: 5432,
@@ -14,7 +17,7 @@ const configPg = {
   }),
 };
 const configMySql = {
-  client: new ClientMySQL(migrationFolder, {
+  client: new ClientMySQL(clientOptions, {
     hostname: "localhost",
     port: 3306,
     username: "root",
@@ -23,7 +26,7 @@ const configMySql = {
   }),
 };
 const configSqLite = {
-  client: new ClientSQLite(migrationFolder, "./sqlite.db"),
+  client: new ClientSQLite(clientOptions, "./sqlite.db"),
 };
 
 export default configPg;
