@@ -181,11 +181,10 @@ export class AbstractClient {
   }
 
   async seed(matcher: string = ".+.ts", queryHandler: QueryHandler) {
-    console.log(matcher);
     const files = this.seedFiles.filter((el) =>
       el.isFile && (el.name === matcher || new RegExp(matcher).test(el.name))
     );
-    console.log(files);
+
     if (!files) {
       console.info(
         `No seed file found at '${this.seedFolder}' with matcher '${matcher}'`,
@@ -194,10 +193,10 @@ export class AbstractClient {
     } else {
       for await (const file of files) {
         const filePath = parsePath(this.seedFolder, file.name);
-        console.log(filePath);
+
         const { run } = await import(filePath);
         const sql = await run();
-        console.log(sql);
+
         await queryHandler(sql);
       }
 
