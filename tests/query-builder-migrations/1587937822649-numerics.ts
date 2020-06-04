@@ -1,9 +1,7 @@
-import { Migration, DBDialects } from "../../mod.ts";
+import { Migration } from "../../mod.ts";
 import { Schema } from "../../qb.ts";
 
-const dialect = Deno.env.get("DB_DIALECT") as DBDialects;
-
-export const up: Migration = () => {
+export const up: Migration = ({ dialect }) => {
   return new Schema(dialect).create("numerics", (table) => {
     table.custom("col_1 integer");
 
@@ -29,6 +27,6 @@ export const up: Migration = () => {
   });
 };
 
-export const down: Migration = () => {
+export const down: Migration = ({ dialect }) => {
   return new Schema(dialect).drop("numerics");
 };

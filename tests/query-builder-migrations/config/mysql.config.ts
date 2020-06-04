@@ -1,6 +1,7 @@
 import { ClientMySQL } from "../../../mod.ts";
 
 export default {
+  exposeQueryBuilder: true,
   client: new ClientMySQL(
     { migrationFolder: "./tests/query-builder-migrations" },
     {

@@ -1,6 +1,7 @@
 import { ClientPostgreSQL } from "../../../mod.ts";
 
 export default {
+  exposeQueryBuilder: true,
   client: new ClientPostgreSQL(
     { migrationFolder: "./tests/query-builder-migrations" },
     {

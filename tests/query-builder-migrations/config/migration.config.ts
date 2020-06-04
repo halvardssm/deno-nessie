@@ -24,9 +24,6 @@ export const runner = async (dialect: string, type: string[]) => {
       // "-d",
     ],
     stdout: "piped",
-    env: {
-      DB_DIALECT: dialect,
-    },
   });
 
   const { code } = await r.status();

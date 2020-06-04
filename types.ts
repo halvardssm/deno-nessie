@@ -1,12 +1,12 @@
 export type DBDialects = "pg" | "mysql" | "sqlite3";
 
-export type Info = {
+export type Info<T = any> = {
   dialect: DBDialects;
-  queryBuilder?: any;
+  queryBuilder?: T;
 };
 
-export type Migration = (
-  info?: Info,
+export type Migration<T = any> = (
+  info: Info<T>,
 ) => string | string[] | Promise<string | string[]>;
 export type Seed = Migration;
 export type LoggerFn = (output?: any, title?: string) => void;
