@@ -1,5 +1,5 @@
 import { Column } from "./Column.ts";
-import { columnTypes, typeMap, typeMapEl } from "./TypeUtils.ts";
+import { ColumnTypes, typeMap, TypeMapEl } from "./TypeUtils.ts";
 import { DBDialects } from "../types.ts";
 
 export interface EnumColumn {
@@ -71,7 +71,7 @@ export class Table {
   /** Helper method for pushing to column. */
   private _pushColumn(
     name: string,
-    type: columnTypes | string | typeMapEl,
+    type: ColumnTypes | string | TypeMapEl,
     input1?: number | string[],
     input2?: number,
     columnfn?: (column: Column) => Column | void,

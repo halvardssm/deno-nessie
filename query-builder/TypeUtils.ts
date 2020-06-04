@@ -1,4 +1,4 @@
-export type columnTypeSql =
+export type ColumnTypeSql =
   | "BIGINT"
   | "BLOB"
   | "TEXT"
@@ -24,34 +24,34 @@ export type columnTypeSql =
   | "VARCHAR"
   | "YEAR";
 
-export type typePostgresBigInt = "bigint" | "int8";
-export type typePostgresBigSerial = "bigint" | "int8";
-export type typePostgresVarBit = "bit varying" | "varbit";
-export type typePostgresBoolean = "boolean" | "bool";
-export type typePostgresChar = "character" | "char";
-export type typePostgresVarChar = "character varying" | "varchar";
-export type typePostgresFloat8 = "double precision" | "float8";
-export type typePostgresInt = "integer" | "int" | "int4";
-export type typePostgresDecimal = "numeric" | "decimal";
-export type typePostgresReal = "real" | "float4";
-export type typePostgresSmallInt = "smallint" | "int2";
-export type typePostgresSmallSerial = "smallserial" | "serial2";
-export type typePostgresSerial = "serial" | "serial4";
+export type TypePostgresBigInt = "bigint" | "int8";
+export type TypePostgresBigSerial = "bigint" | "int8";
+export type TypePostgresVarBit = "bit varying" | "varbit";
+export type TypePostgresBoolean = "boolean" | "bool";
+export type TypePostgresChar = "character" | "char";
+export type TypePostgresVarChar = "character varying" | "varchar";
+export type TypePostgresFloat8 = "double precision" | "float8";
+export type TypePostgresInt = "integer" | "int" | "int4";
+export type TypePostgresDecimal = "numeric" | "decimal";
+export type TypePostgresReal = "real" | "float4";
+export type TypePostgresSmallInt = "smallint" | "int2";
+export type TypePostgresSmallSerial = "smallserial" | "serial2";
+export type TypePostgresSerial = "serial" | "serial4";
 
-export type columnTypePostgres =
-  | typePostgresBigInt
-  | typePostgresBigSerial
-  | typePostgresVarBit
-  | typePostgresBoolean
-  | typePostgresChar
-  | typePostgresVarChar
-  | typePostgresFloat8
-  | typePostgresInt
-  | typePostgresDecimal
-  | typePostgresReal
-  | typePostgresSmallInt
-  | typePostgresSmallSerial
-  | typePostgresSerial
+export type ColumnTypePostgres =
+  | TypePostgresBigInt
+  | TypePostgresBigSerial
+  | TypePostgresVarBit
+  | TypePostgresBoolean
+  | TypePostgresChar
+  | TypePostgresVarChar
+  | TypePostgresFloat8
+  | TypePostgresInt
+  | TypePostgresDecimal
+  | TypePostgresReal
+  | TypePostgresSmallInt
+  | TypePostgresSmallSerial
+  | TypePostgresSerial
   | "bigserial"
   | "bit"
   | "box"
@@ -83,7 +83,7 @@ export type columnTypePostgres =
   | "uuid"
   | "xml";
 
-export type columnTypeMySql =
+export type ColumnTypeMySql =
   | "tinyint"
   | "smallint"
   | "mediumint"
@@ -122,24 +122,24 @@ export type columnTypeMySql =
   | "multipoint"
   | "multipolygon"
   | "json";
-export type columnTypeSQLite = "integer" | "text" | "blob" | "real" | "numeric";
+export type ColumnTypeSQLite = "integer" | "text" | "blob" | "real" | "numeric";
 
-export type columnTypes =
-  | columnTypeSql
-  | columnTypePostgres
-  | columnTypeMySql
-  | columnTypeSQLite;
+export type ColumnTypes =
+  | ColumnTypeSql
+  | ColumnTypePostgres
+  | ColumnTypeMySql
+  | ColumnTypeSQLite;
 
-export type typeMapEl = {
-  pg: columnTypePostgres;
-  mysql: columnTypeMySql | columnTypes;
-  sqlite3: columnTypes;
+export type TypeMapEl = {
+  pg: ColumnTypePostgres;
+  mysql: ColumnTypeMySql | ColumnTypes;
+  sqlite3: ColumnTypes;
 };
-export type typeMapType = {
-  [any: string]: typeMapEl;
+export type TypeMapType = {
+  [any: string]: TypeMapEl;
 };
 
-export const typeMap: typeMapType = {
+export const typeMap: TypeMapType = {
   bigIncrements: { pg: "bigserial", mysql: "bigint", sqlite3: "bigint" },
   bigInteger: { pg: "bigint", mysql: "bigint", sqlite3: "bigint" },
   binary: { pg: "bytea", mysql: "longblob", sqlite3: "blob" },
