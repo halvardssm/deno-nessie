@@ -1,6 +1,16 @@
 import { parsePath } from "../cli/utils.ts";
 import { resolve } from "../deps.ts";
-import { LoggerFn, QueryWithString, ClientOptions, AmountMigrateT, QueryHandler, MigrationFile, AmountRollbackT, Info, DBDialects } from "../types.ts";
+import {
+  LoggerFn,
+  QueryWithString,
+  ClientOptions,
+  AmountMigrateT,
+  QueryHandler,
+  MigrationFile,
+  AmountRollbackT,
+  Info,
+  DBDialects,
+} from "../types.ts";
 export class AbstractClient {
   static readonly MAX_FILE_NAME_LENGTH = 100;
 
@@ -14,8 +24,8 @@ export class AbstractClient {
   seedFiles: Deno.DirEntry[];
   migrationFolder: string;
   seedFolder: string;
-  exposeQueryBuilder: boolean = false
-  dialect?: DBDialects
+  exposeQueryBuilder: boolean = false;
+  dialect?: DBDialects;
 
   protected QUERY_GET_LATEST =
     `SELECT ${this.COL_FILE_NAME} FROM ${this.TABLE_MIGRATIONS} ORDER BY ${this.COL_FILE_NAME} DESC LIMIT 1;`;
@@ -76,10 +86,10 @@ export class AbstractClient {
 
       amount = Math.min(this.migrationFiles.length, amount);
 
-      for (let i = 0;i < amount;i++) {
+      for (let i = 0; i < amount; i++) {
         const file = this.migrationFiles[i];
 
-        await this._migrationHandler(file.name, queryHandler)
+        await this._migrationHandler(file.name, queryHandler);
 
         console.info(`Migrated ${file.name}`);
       }
@@ -109,7 +119,7 @@ export class AbstractClient {
     amount = typeof amount === "number"
       ? amount
       : (amount === "all" ? (allMigrations?.length ? allMigrations.length : 0)
-        : 1);
+      : 1);
 
     this.logger(amount, "Received amount to rollback");
     this.logger(allMigrations, "Files to rollback");
@@ -117,10 +127,10 @@ export class AbstractClient {
     if (allMigrations && allMigrations.length > 0) {
       amount = Math.min(allMigrations.length, amount);
 
-      for (let i = 0;i < amount;i++) {
+      for (let i = 0; i < amount; i++) {
         const fileName = allMigrations[i];
 
-        await this._migrationHandler(fileName, queryHandler, true)
+        await this._migrationHandler(fileName, queryHandler, true);
 
         console.info(`Rolled back ${fileName}`);
       }
@@ -161,26 +171,30 @@ export class AbstractClient {
     }
   }
 
-  private async _migrationHandler(fileName: string, queryHandler: QueryHandler, isDown: boolean = false) {
+  private async _migrationHandler(
+    fileName: string,
+    queryHandler: QueryHandler,
+    isDown: boolean = false,
+  ) {
     let { up, down }: MigrationFile = await import(
       parsePath(this.migrationFolder, fileName)
     );
 
     const exposedObject: Info = {
-      dialect: this.dialect!
-    }
+      dialect: this.dialect!,
+    };
 
     if (this.exposeQueryBuilder) {
-      const { Schema } = await import("https://deno.land/x/nessie/qb.ts")
-      exposedObject.queryBuilder = new Schema(this.dialect)
+      const { Schema } = await import("https://deno.land/x/nessie/qb.ts");
+      exposedObject.queryBuilder = new Schema(this.dialect);
     }
 
-    let query: string | string[]
+    let query: string | string[];
 
     if (isDown) {
       query = await down(exposedObject);
     } else {
-      query = await up(exposedObject)
+      query = await up(exposedObject);
     }
 
     if (!query) query = [];

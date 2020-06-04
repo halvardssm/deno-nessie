@@ -2,7 +2,7 @@ import { AbstractClient } from "../clients/AbstractClient.ts";
 import { ClientPostgreSQL } from "../clients/ClientPostgreSQL.ts";
 import { Denomander } from "../deps.ts";
 import { parsePath } from "./utils.ts";
-import { NessieConfig, ClientI } from '../types.ts';
+import { NessieConfig, ClientI } from "../types.ts";
 
 const STD_CONFIG_FILE = "nessie.config.ts";
 
@@ -48,7 +48,7 @@ export class State {
     }
 
     if (this.config?.exposeQueryBuilder) {
-      this.client.exposeQueryBuilder = this.config.exposeQueryBuilder
+      this.client.exposeQueryBuilder = this.config.exposeQueryBuilder;
     }
 
     this.client.setLogger(this.logger.bind(this));

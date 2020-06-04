@@ -1,5 +1,5 @@
 import { DB } from "https://deno.land/x/sqlite@v2.0.0/mod.ts";
-import { AbstractClient, } from "./AbstractClient.ts";
+import { AbstractClient } from "./AbstractClient.ts";
 import { resolve } from "../deps.ts";
 import {
   AmountMigrateT,
@@ -12,7 +12,7 @@ import {
 
 export class ClientSQLite extends AbstractClient implements ClientI {
   private client?: DB;
-  dialect: DBDialects = "sqlite3"
+  dialect: DBDialects = "sqlite3";
 
   private QUERY_MIGRATION_TABLE_EXISTS =
     `SELECT name FROM sqlite_master WHERE type='table' AND name='${this.TABLE_MIGRATIONS}';`;

@@ -1,11 +1,13 @@
 export type DBDialects = "pg" | "mysql" | "sqlite3";
 
 export type Info = {
-  dialect: DBDialects
-  queryBuilder?: any
-}
+  dialect: DBDialects;
+  queryBuilder?: any;
+};
 
-export type Migration = (info?: Info) => string | string[] | Promise<string | string[]>;
+export type Migration = (
+  info?: Info,
+) => string | string[] | Promise<string | string[]>;
 export type Seed = Migration;
 export type LoggerFn = (output?: any, title?: string) => void;
 export type QueryWithString = (string: string) => string;
@@ -24,7 +26,7 @@ export interface ClientI {
   seedFolder: string;
   migrationFiles: Deno.DirEntry[];
   seedFiles: Deno.DirEntry[];
-  exposeQueryBuilder: boolean
+  exposeQueryBuilder: boolean;
   prepare: () => Promise<void>;
   close: () => Promise<void>;
   migrate: (amount: AmountMigrateT) => Promise<void>;
@@ -36,7 +38,7 @@ export interface ClientI {
 
 export interface NessieConfig {
   client: ClientI;
-  exposeQueryBuilder?: boolean
+  exposeQueryBuilder?: boolean;
 }
 
 export interface ClientOptions {

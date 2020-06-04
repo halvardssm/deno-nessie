@@ -9,7 +9,7 @@ const connectionConfig = {
   port: 3306,
   username: "root",
   db: "nessie",
-}
+};
 
 export default {
   client: new ClientMySQL(clientConfig, connectionConfig),

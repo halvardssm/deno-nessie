@@ -12,7 +12,7 @@ import {
 export class ClientMySQL extends AbstractClient implements ClientI {
   private client: Client;
   private clientOptions: ClientConfig;
-  dialect: DBDialects = "mysql"
+  dialect: DBDialects = "mysql";
 
   private QUERY_MIGRATION_TABLE_EXISTS =
     // `show tables like '${this.TABLE_MIGRATIONS}';`;

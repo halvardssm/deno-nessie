@@ -13,7 +13,7 @@ import {
 
 export class ClientPostgreSQL extends AbstractClient implements ClientI {
   private client: Client;
-  dialect: DBDialects = "pg"
+  dialect: DBDialects = "pg";
 
   private QUERY_MIGRATION_TABLE_EXISTS =
     `SELECT to_regclass('${this.TABLE_MIGRATIONS}');`;
