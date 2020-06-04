@@ -98,9 +98,9 @@ export class Table {
       default:
         return `CREATE${
           this.constraints.isTemporary ? " TEMPORARY" : ""
-          } TABLE${
+        } TABLE${
           this.constraints.ifNotExists ? " IF NOT EXISTS" : ""
-          } ${this.tableName}`;
+        } ${this.tableName}`;
     }
   }
 
@@ -128,7 +128,7 @@ export class Table {
       default:
         return `CREATE TYPE ${enumCol.name} AS ENUM (${
           enumCol.columns.join(", ")
-          });`;
+        });`;
     }
   }
 
@@ -145,7 +145,7 @@ export class Table {
       case "sqlite3":
         return uniqueArray
           ? ` CREATE UNIQUE INDEX ${this.tableName}_${
-          uniqueArray.join("_")
+            uniqueArray.join("_")
           } ON ${this.tableName} (${uniqueString});`
           : "";
       case "mysql":
@@ -523,15 +523,15 @@ export class Table {
       this.dialect === "pg"
         ? typeName
         : this.dialect === "mysql"
-          ? "ENUM"
-          : "TEXT",
+        ? "ENUM"
+        : "TEXT",
       undefined,
       undefined,
       (col) =>
         this.dialect === "mysql" ? col.custom(`(${array.join(", ")})`)
-          : this.dialect === "sqlite3"
-            ? col.custom(`CHECK(${name} IN (${array.join(", ")}) )`)
-            : col,
+        : this.dialect === "sqlite3"
+        ? col.custom(`CHECK(${name} IN (${array.join(", ")}) )`)
+        : col,
     );
   }
 

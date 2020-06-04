@@ -1,7 +1,7 @@
-import { Migration } from "../../mod.ts";
-import { dbDialects, Schema } from "../../qb.ts";
+import { Migration, DBDialects } from "../../mod.ts";
+import { Schema } from "../../qb.ts";
 
-const dialect = Deno.env.get("DB_DIALECT") as dbDialects;
+const dialect = Deno.env.get("DB_DIALECT") as DBDialects;
 
 export const up: Migration = () => {
   return new Schema(dialect).create("basics", (table) => {

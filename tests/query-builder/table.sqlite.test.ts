@@ -1,7 +1,7 @@
 import { assertEquals } from "../../deps.ts";
 import { Table } from "../../qb.ts";
 
-const dialect = "sqlite";
+const dialect = "sqlite3";
 
 const strings = [
   {

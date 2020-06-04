@@ -53,7 +53,7 @@ export class Schema {
       name.join(
         ", ",
       )
-      }${cascade ? " CASCADE" : ""};`;
+    }${cascade ? " CASCADE" : ""};`;
 
     this.query.push(sql);
 
@@ -92,7 +92,7 @@ export class Schema {
   renameColumn(table: string, from: string, to: string): string[] {
     this.query.push(
       `ALTER TABLE ${table} RENAME${
-      this.dialect !== "pg" ? " COLUMN" : ""
+        this.dialect !== "pg" ? " COLUMN" : ""
       } ${from} TO ${to};`,
     );
 

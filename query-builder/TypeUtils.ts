@@ -147,7 +147,11 @@ export const typeMap: typeMapType = {
   boolean: { pg: "boolean", mysql: "tinyint", sqlite3: "boolean" },
   increments: { pg: "serial", mysql: "int", sqlite3: "int" },
   integer: { pg: "integer", mysql: "int", sqlite3: "int" },
-  smallIncrements: { pg: "smallserial", mysql: "smallint", sqlite3: "smallint" },
+  smallIncrements: {
+    pg: "smallserial",
+    mysql: "smallint",
+    sqlite3: "smallint",
+  },
   smallInteger: { pg: "smallint", mysql: "smallint", sqlite3: "smallint" },
   real: { pg: "real", mysql: "float", sqlite3: "float" },
   double: { pg: "float8", mysql: "double", sqlite3: "double" },

@@ -46,7 +46,7 @@ export class Column {
     if (this.columnInput1 !== undefined) {
       string += ` (${this.columnInput1}${
         this.columnInput2 ? `, ${this.columnInput2}` : ""
-        })`;
+      })`;
     }
 
     if (this.isUnsigned && this.dialect === "mysql") {
