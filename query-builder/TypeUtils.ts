@@ -1,3 +1,5 @@
+export type DefaultValueT = string | number | boolean | object | null
+
 export type ColumnTypeSql =
   | "BIGINT"
   | "BLOB"
@@ -138,6 +140,21 @@ export type TypeMapEl = {
 export type TypeMapType = {
   [any: string]: TypeMapEl;
 };
+
+export interface EnumColumn {
+  name: string;
+  columns: string[];
+}
+
+export interface TableConstraints {
+  unique: string[][];
+  primary?: string[];
+  index: string[];
+  enums: EnumColumn[];
+  updatedAt: boolean;
+  ifNotExists?: boolean;
+  isTemporary?: boolean;
+}
 
 export const typeMap: TypeMapType = {
   bigIncrements: { pg: "bigserial", mysql: "bigint", sqlite3: "bigint" },
