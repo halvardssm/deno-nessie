@@ -14,5 +14,6 @@ const connectionOptions = {
 };
 
 export default {
+  exposeQueryBuilder: true,
   client: new ClientPostgreSQL(nessieOptions, connectionOptions),
 };

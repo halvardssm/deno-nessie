@@ -1,13 +1,8 @@
-import {
-  AbstractClient,
-  ClientI,
-  nessieConfig,
-} from "../clients/AbstractClient.ts";
+import { AbstractClient } from "../clients/AbstractClient.ts";
 import { ClientPostgreSQL } from "../clients/ClientPostgreSQL.ts";
 import { Denomander } from "../deps.ts";
 import { parsePath } from "./utils.ts";
-
-export type loggerFn = (output?: any, title?: string) => void;
+import { NessieConfig, ClientI } from '../types.ts';
 
 const STD_CONFIG_FILE = "nessie.config.ts";
 
@@ -19,7 +14,7 @@ const STD_CLIENT_OPTIONS = {
 export class State {
   private enableDebug: boolean;
   private configFile: string;
-  private config?: nessieConfig;
+  private config?: NessieConfig;
   client?: ClientI;
 
   constructor(prog: Denomander) {
@@ -52,7 +47,11 @@ export class State {
       this.client = this.config.client;
     }
 
-    this.client?.setLogger(this.logger.bind(this));
+    if (this.config?.exposeQueryBuilder) {
+      this.client.exposeQueryBuilder = this.config.exposeQueryBuilder
+    }
+
+    this.client.setLogger(this.logger.bind(this));
 
     return this;
   }

@@ -1,16 +1,17 @@
 import { Client, ClientConfig } from "https://deno.land/x/mysql@2.2.0/mod.ts";
+import { AbstractClient } from "./AbstractClient.ts";
 import {
-  AbstractClient,
-  amountMigrateT,
-  amountRollbackT,
+  AmountMigrateT,
+  AmountRollbackT,
   ClientI,
-  queryT,
+  QueryT,
   ClientOptions,
-} from "./AbstractClient.ts";
+} from "../types.ts";
 
 export class ClientMySQL extends AbstractClient implements ClientI {
   private client: Client;
   private clientOptions: ClientConfig;
+  dialect: string = "mysql"
 
   private QUERY_MIGRATION_TABLE_EXISTS =
     // `show tables like '${this.TABLE_MIGRATIONS}';`;
@@ -39,7 +40,7 @@ export class ClientMySQL extends AbstractClient implements ClientI {
     }
   }
 
-  async query(query: queryT) {
+  async query(query: QueryT) {
     if (typeof query === "string") query = this.splitAndTrimQueries(query);
     const ra = [];
 
@@ -69,7 +70,7 @@ export class ClientMySQL extends AbstractClient implements ClientI {
     await this.client.close();
   }
 
-  async migrate(amount: amountMigrateT) {
+  async migrate(amount: AmountMigrateT) {
     const latestMigration = await this.query(this.QUERY_GET_LATEST);
     await super.migrate(
       amount,
@@ -78,7 +79,7 @@ export class ClientMySQL extends AbstractClient implements ClientI {
     );
   }
 
-  async rollback(amount: amountRollbackT) {
+  async rollback(amount: AmountRollbackT) {
     const allMigrations = await this.query(this.QUERY_GET_ALL);
 
     const parsedMigrations: string[] = allMigrations?.[0].map((el: any) =>

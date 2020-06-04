@@ -1,16 +1,17 @@
 import { DB } from "https://deno.land/x/sqlite@v2.0.0/mod.ts";
-import {
-  AbstractClient,
-  amountMigrateT,
-  amountRollbackT,
-  ClientI,
-  queryT,
-  ClientOptions,
-} from "./AbstractClient.ts";
+import { AbstractClient, } from "./AbstractClient.ts";
 import { resolve } from "../deps.ts";
+import {
+  AmountMigrateT,
+  AmountRollbackT,
+  ClientI,
+  QueryT,
+  ClientOptions,
+} from "../types.ts";
 
 export class ClientSQLite extends AbstractClient implements ClientI {
   private client?: DB;
+  dialect: string = "sqlite3"
 
   private QUERY_MIGRATION_TABLE_EXISTS =
     `SELECT name FROM sqlite_master WHERE type='table' AND name='${this.TABLE_MIGRATIONS}';`;
@@ -34,7 +35,7 @@ export class ClientSQLite extends AbstractClient implements ClientI {
     }
   }
 
-  async query(query: queryT) {
+  async query(query: QueryT) {
     if (typeof query === "string") query = this.splitAndTrimQueries(query);
     const ra = [];
 
@@ -57,7 +58,7 @@ export class ClientSQLite extends AbstractClient implements ClientI {
     this.client?.close();
   }
 
-  async migrate(amount: amountMigrateT) {
+  async migrate(amount: AmountMigrateT) {
     const latestMigration = await this.query(this.QUERY_GET_LATEST);
     await super.migrate(
       amount,
@@ -66,7 +67,7 @@ export class ClientSQLite extends AbstractClient implements ClientI {
     );
   }
 
-  async rollback(amount: amountRollbackT) {
+  async rollback(amount: AmountRollbackT) {
     const allMigrations = await this.query(this.QUERY_GET_ALL);
 
     await super.rollback(
