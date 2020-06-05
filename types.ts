@@ -4,14 +4,14 @@ export type DBDialects = "pg" | "mysql" | "sqlite3";
 /** Exposed object in migration files. available in `up`/`down` methods.
  * queryBuilder is available when passing `exposeQueryBuilder: true` to the config file.
  */
-export type Info<T = any> = {
+export type Info<T = undefined> = {
   dialect: DBDialects;
   connection: QueryHandler;
-  queryBuilder?: T;
+  queryBuilder: T;
 };
 
 /** `up`/`down` methods in migration files. */
-export type Migration<T = any> = (
+export type Migration<T = undefined> = (
   info: Info<T>,
 ) => string | string[] | Promise<string | string[]>;
 /** `run` method in seed files. */
