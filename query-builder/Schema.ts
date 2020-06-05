@@ -13,7 +13,7 @@ export class Schema {
     this.dialect = dialenct;
   }
 
-  /** Method for exposing a Table instance for creating a table with columns */
+  /** Generates an array to create a table with columns */
   create(
     name: string,
     createfn: (table: Table) => void,
@@ -37,6 +37,34 @@ export class Schema {
     return this.query;
   }
 
+  /** Generates a string for checking if a table exists */
+  hasTable(name: string): string {
+    switch (this.dialect) {
+      case "mysql":
+        //SELECT 1 FROM testtable LIMIT 1;
+        return `show tables like '${name}';`;
+      case "sqlite3":
+        return `SELECT name FROM sqlite_master WHERE type='table' AND name='${name}';`;
+      case "pg":
+      default:
+        return `SELECT to_regclass('${name}');`;
+    }
+  }
+
+  /** Renames table */
+  renameTable(from: string, to: string): string[] {
+    switch (this.dialect) {
+      case "mysql":
+        this.query.push(`RENAME TABLE ${from} TO ${to};`);
+        break;
+      case "sqlite3":
+      case "pg":
+      default:
+        this.query.push(`ALTER TABLE ${from} RENAME TO ${to};`);
+    }
+    return this.query;
+  }
+
   /** Drops a table */
   drop(
     name: string | string[],
@@ -56,21 +84,7 @@ export class Schema {
     return this.query;
   }
 
-  /** Generates a string for checking if a table exists */
-  hasTable(name: string): string {
-    switch (this.dialect) {
-      case "mysql":
-        //SELECT 1 FROM testtable LIMIT 1;
-        return `show tables like '${name}';`;
-      case "sqlite3":
-        return `SELECT name FROM sqlite_master WHERE type='table' AND name='${name}';`;
-      case "pg":
-      default:
-        return `SELECT to_regclass('${name}');`;
-    }
-  }
-
-  /** Generates a string for checking if a column exists, will */
+  /** Generates a string for checking if a column exists */
   hasColumn(tableName: string, columnName: string): string {
     switch (this.dialect) {
       case "mysql":
@@ -81,20 +95,6 @@ export class Schema {
       default:
         return `SELECT EXISTS (SELECT column_name FROM information_schema.columns WHERE table_name='${tableName}' and column_name='${columnName}');`;
     }
-  }
-
-  /** Renames table */
-  renameTable(from: string, to: string): string[] {
-    switch (this.dialect) {
-      case "mysql":
-        this.query.push(`RENAME TABLE ${from} TO ${to};`);
-        break;
-      case "sqlite3":
-      case "pg":
-      default:
-        this.query.push(`ALTER TABLE ${from} RENAME TO ${to};`);
-    }
-    return this.query;
   }
 
   /** Renames column */
