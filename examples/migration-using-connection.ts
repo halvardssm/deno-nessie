@@ -7,7 +7,7 @@ export const up: Migration<Schema> = async ({ queryBuilder, connection }) => {
     queryBuilder!.hasColumn("basics", "col_1"),
   );
 
-  // Using postgres as example, will differe between clients
+  // Using Postgres as an example, will differ between clients
   console.log(hasTable.rows[0][0], hasColumn.rows[0][0]);
 
   if (!hasTable && !hasColumn) {
