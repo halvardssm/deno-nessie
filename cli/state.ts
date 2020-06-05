@@ -11,6 +11,7 @@ const STD_CLIENT_OPTIONS = {
 };
 
 /** The main state for the application.
+ *
  * Contains the client, and handles the communication to the database.
  */
 export class State {
