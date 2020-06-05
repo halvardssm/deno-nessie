@@ -7,7 +7,7 @@ const strings = [
   {
     name: "Standard Table",
     string: new Table("testTable", dialect)
-      .toSql(),
+      .toString(),
     solution: "CREATE TABLE testTable ();",
   },
   {
@@ -15,7 +15,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.custom("testCol testType");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol testType);",
   },
@@ -25,7 +25,7 @@ const strings = [
       const table = new Table("testTable", dialect);
       table.custom("testCol testType");
       table.custom("testCol2 testType2");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol testType, testCol2 testType2);",
   },
@@ -35,7 +35,7 @@ const strings = [
       const table = new Table("testTable", dialect);
       table.integer("testCol");
       table.unique("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
       "CREATE TABLE testTable (testCol int); CREATE UNIQUE INDEX testTable_testCol ON testTable (testCol);",
@@ -47,7 +47,7 @@ const strings = [
       table.integer("testCol");
       table.integer("testCol2");
       table.unique(["testCol", "testCol2"]);
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
       "CREATE TABLE testTable (testCol int, testCol2 int); CREATE UNIQUE INDEX testTable_testCol_testCol2 ON testTable (testCol, testCol2);",
@@ -58,7 +58,7 @@ const strings = [
       const table = new Table("testTable", dialect);
       table.integer("testCol");
       table.primary("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol int);",
   },
@@ -69,7 +69,7 @@ const strings = [
       table.integer("testCol");
       table.integer("testCol2");
       table.primary("testCol", "testCol2");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol int, testCol2 int);",
   },
@@ -79,7 +79,7 @@ const strings = [
       const table = new Table("testTable", dialect);
       table.integer("testCol");
       table.index("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
       "CREATE TABLE testTable (testCol int); CREATE INDEX testTable_testCol ON testTable (testCol);",
@@ -92,7 +92,7 @@ const strings = [
       table.integer("testCol2");
       table.index("testCol");
       table.index("testCol2");
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
       "CREATE TABLE testTable (testCol int, testCol2 int); CREATE INDEX testTable_testCol ON testTable (testCol); CREATE INDEX testTable_testCol2 ON testTable (testCol2);",
@@ -104,7 +104,7 @@ const strings = [
       table.integer("testCol");
       table.integer("testCol2");
       table.index("testCol", "testCol2");
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
       "CREATE TABLE testTable (testCol int, testCol2 int); CREATE INDEX testTable_testCol ON testTable (testCol); CREATE INDEX testTable_testCol2 ON testTable (testCol2);",
@@ -114,7 +114,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.id();
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (id bigint PRIMARY KEY);",
   },
@@ -123,7 +123,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.bigIncrements("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol bigint);",
   },
@@ -132,7 +132,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.binary("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol blob);",
   },
@@ -141,7 +141,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.boolean("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol boolean);",
   },
@@ -150,7 +150,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.char("testCol", 1);
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol char (1));",
   },
@@ -159,7 +159,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.createdAt();
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
       "CREATE TABLE testTable (created_at timestamp (0) DEFAULT current_timestamp);",
@@ -169,7 +169,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.createdAtTz();
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
       "CREATE TABLE testTable (created_at datetime (0) DEFAULT current_timestamp);",
@@ -179,7 +179,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.date("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol date);",
   },
@@ -188,7 +188,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.dateTime("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol timestamp (0));",
   },
@@ -197,7 +197,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.numeric("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol decimal (8, 2));",
   },
@@ -206,7 +206,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.double("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol double (8, 2));",
   },
@@ -215,7 +215,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.enum("testCol", ["one", "two", "three"]);
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
       "CREATE TABLE testTable (testCol TEXT CHECK(testCol IN ('one', 'two', 'three') ));",
@@ -225,7 +225,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.real("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol float (8, 2));",
   },
@@ -234,7 +234,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.increments("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol int);",
   },
@@ -243,7 +243,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.integer("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol int);",
   },
@@ -252,7 +252,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.ipAddress("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol varchar (50));",
   },
@@ -261,7 +261,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.json("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol json);",
   },
@@ -270,7 +270,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.jsonb("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol json);",
   },
@@ -279,7 +279,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.macAddress("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol varchar (17));",
   },
@@ -288,7 +288,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.macAddress8("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol varchar (23));",
   },
@@ -297,7 +297,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.point("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol point);",
   },
@@ -306,7 +306,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.polygon("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol polygon);",
   },
@@ -315,7 +315,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.smallIncrements("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol smallint);",
   },
@@ -324,7 +324,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.smallInteger("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol smallint);",
   },
@@ -333,7 +333,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.string("testCol", 1);
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol varchar (1));",
   },
@@ -342,7 +342,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.text("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol text);",
   },
@@ -351,7 +351,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.time("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol time (0));",
   },
@@ -360,7 +360,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.timeTz("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol time (0));",
   },
@@ -369,7 +369,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.timestamp("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol timestamp (0));",
   },
@@ -378,7 +378,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.timestampTz("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol datetime (0));",
   },
@@ -387,37 +387,37 @@ const strings = [
     string: (() => {
       const table = new Table("testTable", dialect);
       table.timestamps();
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
-      "CREATE TABLE testTable (created_at timestamp (0) DEFAULT current_timestamp, updated_at timestamp (0) DEFAULT current_timestamp); DROP TRIGGER IF EXISTS set_timestamp; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW BEGIN UPDATE testTable SET updated_at = CURRENT_TIMESTAMP WHERE id=OLD.id\\; END;",
+      "CREATE TABLE testTable (created_at timestamp (0) DEFAULT current_timestamp, updated_at timestamp (0) DEFAULT current_timestamp); DROP TRIGGER IF EXISTS set_timestamp; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW BEGIN UPDATE testTable SET updated_at = CURRENT_TIMESTAMP WHERE id=OLD.id; END;",
   },
   {
     name: "Table with timestampsTz",
     string: (() => {
       const table = new Table("testTable", dialect);
       table.timestampsTz();
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
-      "CREATE TABLE testTable (created_at datetime (0) DEFAULT current_timestamp, updated_at datetime (0) DEFAULT current_timestamp); DROP TRIGGER IF EXISTS set_timestamp; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW BEGIN UPDATE testTable SET updated_at = CURRENT_TIMESTAMP WHERE id=OLD.id\\; END;",
+      "CREATE TABLE testTable (created_at datetime (0) DEFAULT current_timestamp, updated_at datetime (0) DEFAULT current_timestamp); DROP TRIGGER IF EXISTS set_timestamp; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW BEGIN UPDATE testTable SET updated_at = CURRENT_TIMESTAMP WHERE id=OLD.id; END;",
   },
   {
     name: "Table with updatedAtTz",
     string: (() => {
       const table = new Table("testTable", dialect);
       table.updatedAtTz();
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
-      "CREATE TABLE testTable (updated_at datetime (0) DEFAULT current_timestamp); DROP TRIGGER IF EXISTS set_timestamp; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW BEGIN UPDATE testTable SET updated_at = CURRENT_TIMESTAMP WHERE id=OLD.id\\; END;",
+      "CREATE TABLE testTable (updated_at datetime (0) DEFAULT current_timestamp); DROP TRIGGER IF EXISTS set_timestamp; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW BEGIN UPDATE testTable SET updated_at = CURRENT_TIMESTAMP WHERE id=OLD.id; END;",
   },
   {
     name: "Table with text",
     string: (() => {
       const table = new Table("testTable", dialect);
       table.uuid("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol varchar (36));",
   },
