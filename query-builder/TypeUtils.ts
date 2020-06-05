@@ -1,4 +1,4 @@
-export type DefaultValueT = string | number | boolean | object | null
+export type DefaultValueT = string | number | boolean | object | null;
 
 export type ColumnTypeSql =
   | "BIGINT"
