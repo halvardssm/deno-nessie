@@ -117,5 +117,3 @@ export class Schema {
     return this.query;
   }
 }
-
-export default Schema;
