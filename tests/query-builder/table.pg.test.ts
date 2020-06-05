@@ -5,7 +5,7 @@ const strings = [
   {
     name: "Standard Table",
     string: new Table("testTable")
-      .toSql(),
+      .toString(),
     solution: "CREATE TABLE testTable ();",
   },
   {
@@ -13,7 +13,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.custom("testCol testType");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol testType);",
   },
@@ -23,7 +23,7 @@ const strings = [
       const table = new Table("testTable");
       table.custom("testCol testType");
       table.custom("testCol2 testType2");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol testType, testCol2 testType2);",
   },
@@ -33,7 +33,7 @@ const strings = [
       const table = new Table("testTable");
       table.integer("testCol");
       table.unique("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
       "CREATE TABLE testTable (testCol integer); ALTER TABLE testTable ADD UNIQUE (testCol);",
@@ -45,7 +45,7 @@ const strings = [
       table.integer("testCol");
       table.integer("testCol2");
       table.unique(["testCol", "testCol2"]);
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
       "CREATE TABLE testTable (testCol integer, testCol2 integer); ALTER TABLE testTable ADD UNIQUE (testCol, testCol2);",
@@ -56,7 +56,7 @@ const strings = [
       const table = new Table("testTable");
       table.integer("testCol");
       table.primary("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
       "CREATE TABLE testTable (testCol integer); ALTER TABLE testTable ADD PRIMARY KEY (testCol);",
@@ -68,7 +68,7 @@ const strings = [
       table.integer("testCol");
       table.integer("testCol2");
       table.primary("testCol", "testCol2");
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
       "CREATE TABLE testTable (testCol integer, testCol2 integer); ALTER TABLE testTable ADD PRIMARY KEY (testCol, testCol2);",
@@ -79,7 +79,7 @@ const strings = [
       const table = new Table("testTable");
       table.integer("testCol");
       table.index("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
       "CREATE TABLE testTable (testCol integer); CREATE INDEX ON testTable (testCol);",
@@ -92,7 +92,7 @@ const strings = [
       table.integer("testCol2");
       table.index("testCol");
       table.index("testCol2");
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
       "CREATE TABLE testTable (testCol integer, testCol2 integer); CREATE INDEX ON testTable (testCol); CREATE INDEX ON testTable (testCol2);",
@@ -104,7 +104,7 @@ const strings = [
       table.integer("testCol");
       table.integer("testCol2");
       table.index("testCol", "testCol2");
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
       "CREATE TABLE testTable (testCol integer, testCol2 integer); CREATE INDEX ON testTable (testCol); CREATE INDEX ON testTable (testCol2);",
@@ -114,7 +114,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.id();
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (id bigserial PRIMARY KEY);",
   },
@@ -123,7 +123,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.bigIncrements("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol bigserial);",
   },
@@ -132,7 +132,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.binary("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol bytea);",
   },
@@ -141,7 +141,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.boolean("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol boolean);",
   },
@@ -150,7 +150,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.char("testCol", 1);
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol char (1));",
   },
@@ -159,7 +159,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.createdAt();
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
       "CREATE TABLE testTable (created_at timestamp (0) DEFAULT current_timestamp);",
@@ -169,7 +169,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.createdAtTz();
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
       "CREATE TABLE testTable (created_at timestamptz (0) DEFAULT current_timestamp);",
@@ -179,7 +179,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.date("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol date);",
   },
@@ -188,7 +188,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.dateTime("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol timestamp (0));",
   },
@@ -197,7 +197,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.numeric("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol numeric (8, 2));",
   },
@@ -206,7 +206,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.double("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol float8);",
   },
@@ -215,17 +215,17 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.enum("testCol", ["one", "two", "three"]);
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
-      "CREATE TYPE testCol AS ENUM ('one', 'two', 'three');CREATE TABLE testTable (testCol testCol);",
+      "CREATE TYPE testCol AS ENUM ('one', 'two', 'three'); CREATE TABLE testTable (testCol testCol);",
   },
   {
     name: "Table with float",
     string: (() => {
       const table = new Table("testTable");
       table.real("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol real);",
   },
@@ -234,7 +234,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.increments("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol serial);",
   },
@@ -243,7 +243,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.integer("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol integer);",
   },
@@ -252,7 +252,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.ipAddress("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol inet);",
   },
@@ -261,7 +261,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.json("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol json);",
   },
@@ -270,7 +270,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.jsonb("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol jsonb);",
   },
@@ -279,7 +279,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.macAddress("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol macaddr);",
   },
@@ -288,7 +288,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.macAddress8("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol macaddr8);",
   },
@@ -297,7 +297,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.point("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol point);",
   },
@@ -306,7 +306,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.polygon("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol polygon);",
   },
@@ -315,7 +315,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.smallIncrements("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol smallserial);",
   },
@@ -324,7 +324,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.smallInteger("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol smallint);",
   },
@@ -333,7 +333,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.string("testCol", 1);
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol varchar (1));",
   },
@@ -342,7 +342,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.text("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol text);",
   },
@@ -351,7 +351,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.time("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol time (0));",
   },
@@ -360,7 +360,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.timeTz("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol timetz (0));",
   },
@@ -369,7 +369,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.timestamp("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol timestamp (0));",
   },
@@ -378,7 +378,7 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.timestampTz("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol timestamptz (0));",
   },
@@ -387,47 +387,47 @@ const strings = [
     string: (() => {
       const table = new Table("testTable");
       table.timestamps();
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
-      "CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now()\\; RETURN NEW\\; END\\; $$ language 'plpgsql';CREATE TABLE testTable (created_at timestamp (0) DEFAULT current_timestamp, updated_at timestamp (0) DEFAULT current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on testTable; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
+      "CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now(); RETURN NEW; END; $$ language 'plpgsql'; CREATE TABLE testTable (created_at timestamp (0) DEFAULT current_timestamp, updated_at timestamp (0) DEFAULT current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on testTable; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
   },
   {
     name: "Table with timestampsTz",
     string: (() => {
       const table = new Table("testTable");
       table.timestampsTz();
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
-      "CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now()\\; RETURN NEW\\; END\\; $$ language 'plpgsql';CREATE TABLE testTable (created_at timestamptz (0) DEFAULT current_timestamp, updated_at timestamptz (0) DEFAULT current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on testTable; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
+      "CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now(); RETURN NEW; END; $$ language 'plpgsql'; CREATE TABLE testTable (created_at timestamptz (0) DEFAULT current_timestamp, updated_at timestamptz (0) DEFAULT current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on testTable; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
   },
   {
     name: "Table with updatedAt",
     string: (() => {
       const table = new Table("testTable");
       table.updatedAt();
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
-      "CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now()\\; RETURN NEW\\; END\\; $$ language 'plpgsql';CREATE TABLE testTable (updated_at timestamp (0) DEFAULT current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on testTable; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
+      "CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now(); RETURN NEW; END; $$ language 'plpgsql'; CREATE TABLE testTable (updated_at timestamp (0) DEFAULT current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on testTable; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
   },
   {
     name: "Table with updatedAtTz",
     string: (() => {
       const table = new Table("testTable");
       table.updatedAtTz();
-      return table.toSql();
+      return table.toString();
     })(),
     solution:
-      "CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now()\\; RETURN NEW\\; END\\; $$ language 'plpgsql';CREATE TABLE testTable (updated_at timestamptz (0) DEFAULT current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on testTable; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
+      "CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now(); RETURN NEW; END; $$ language 'plpgsql'; CREATE TABLE testTable (updated_at timestamptz (0) DEFAULT current_timestamp); DROP TRIGGER IF EXISTS set_timestamp on testTable; CREATE TRIGGER set_timestamp BEFORE UPDATE ON testTable FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();",
   },
   {
     name: "Table with text",
     string: (() => {
       const table = new Table("testTable");
       table.uuid("testCol");
-      return table.toSql();
+      return table.toString();
     })(),
     solution: "CREATE TABLE testTable (testCol uuid);",
   },

@@ -13,7 +13,7 @@ export class Schema {
     this.dialect = dialenct;
   }
 
-  /** Method for exposing a Table instance for creating a table with columns */
+  /** Generates an array to create a table with columns */
   create(
     name: string,
     createfn: (table: Table) => void,
@@ -22,11 +22,7 @@ export class Schema {
 
     createfn(table);
 
-    const sql = table.toSql();
-
-    const sqlArray = this._queryHandler(sql);
-
-    this.query.push(...sqlArray);
+    this.query.push(...table.toArray());
 
     return this.query;
   }
@@ -38,25 +34,6 @@ export class Schema {
       queryString += ";";
     }
     this.query.push(queryString);
-    return this.query;
-  }
-
-  /** Drops a table */
-  drop(
-    name: string | string[],
-    ifExists: boolean = false,
-    cascade: boolean = false,
-  ): string[] {
-    if (typeof name === "string") name = [name];
-
-    const sql = `DROP TABLE${ifExists ? " IF EXISTS" : ""} ${
-      name.join(
-        ", ",
-      )
-    }${cascade ? " CASCADE" : ""};`;
-
-    this.query.push(sql);
-
     return this.query;
   }
 
@@ -88,6 +65,38 @@ export class Schema {
     return this.query;
   }
 
+  /** Drops a table */
+  drop(
+    name: string | string[],
+    ifExists: boolean = false,
+    cascade: boolean = false,
+  ): string[] {
+    if (typeof name === "string") name = [name];
+
+    const sql = `DROP TABLE${ifExists ? " IF EXISTS" : ""} ${
+      name.join(
+        ", ",
+      )
+    }${cascade ? " CASCADE" : ""};`;
+
+    this.query.push(sql);
+
+    return this.query;
+  }
+
+  /** Generates a string for checking if a column exists */
+  hasColumn(tableName: string, columnName: string): string {
+    switch (this.dialect) {
+      case "mysql":
+        return `SELECT EXISTS (SHOW COLUMNS FROM '${tableName}' LIKE '${columnName}');`;
+      case "sqlite3":
+        return `SELECT EXISTS (SELECT * FROM sqlite_master WHERE tbl_name = '${tableName}' AND sql = '${columnName}');`;
+      case "pg":
+      default:
+        return `SELECT EXISTS (SELECT column_name FROM information_schema.columns WHERE table_name='${tableName}' and column_name='${columnName}');`;
+    }
+  }
+
   /** Renames column */
   renameColumn(table: string, from: string, to: string): string[] {
     this.query.push(
@@ -107,15 +116,4 @@ export class Schema {
 
     return this.query;
   }
-
-  /** TODO(halvardssm) This is a temporary fix which will have to be sorted out before v1.0 */
-  private _queryHandler(queryString: string): string[] {
-    let queries = queryString.trim().split(/(?<!\\);/);
-    queries = queries
-      .filter((el) => el.trim() !== "" && el.trim() !== undefined)
-      .map((el) => `${el.trim().replace(/\\;/g, ";")};`);
-    return queries;
-  }
 }
-
-export default Schema;

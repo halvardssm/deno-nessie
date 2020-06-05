@@ -8,20 +8,13 @@
 
 <p align="center"><img src="./.github/logo.png" alt="Nessie logo" width="200" height="200"></p>
 
-A modular database migration tool for [Deno](https://deno.land) inspired by [Laravel](https://github.com/laravel/laravel). Supports PostgreSQL,  MySQL and SQLite. 
+A modular database migration tool for [Deno](https://deno.land) inspired by [Laravel](https://github.com/laravel/laravel). Currently supports PostgreSQL,  MySQL and SQLite.
 
-See documentation for the [query builder](https://doc.deno.land/https/deno.land/x/nessie/qb.ts). \
+If you would like to see your DB flavor supported, take a look at how to make a client plugin with examples in the [clients folder](./clients) or in the section [How to make a client](#how-to-make-a-client).
+
+See documentation for the [query builder](https://doc.deno.land/https/deno.land/x/nessie/qb.ts).
+
 See documentation for the [clients](https://doc.deno.land/https/deno.land/x/nessie/mod.ts).
-
-## Supported databases
-
-* [x] PostgreSQL
-* [x] MySQL - Currently it works with password for 5.*, but for >=8 you have to send a blank password, see [Deno MySQL](https://deno.land/x/mysql/) for version support
-* [x] SQLite
-
-If you have a database system you would like to see in this list, feel free to make an issue or create a pr with your implementation. 
-
-You can see examples of how to make a client plugin in the [clients folder](./clients) or in the section [How to make a client](#how-to-make-a-client).
 
 ## Usage
 
@@ -68,13 +61,13 @@ You can see examples of how to make a client plugin in the [clients folder](./cl
 
 ## Contributing
 
-All contributions are welcome, make sure to read the [contributing guideline](./.github/CONTRIBUTING.md).
+All contributions are welcome, make sure to read the [contribution guideline](./.github/CONTRIBUTING.md).
 
 ## Uses
 
 * [Denomander](https://deno.land/x/denomander/)
 * [Deno Postgres](https://deno.land/x/postgres/)
-* [Deno MySQL](https://deno.land/x/mysql/)
+* [Deno MySQL](https://deno.land/x/mysql/) - Currently it works with password for 5.*, but for >=8 you have to send a blank password, see [issue 37](https://github.com/manyuanrong/deno_mysql/issues/37)
 * [Deno SQLite](https://deno.land/x/sqlite/)
 
 ## Examples

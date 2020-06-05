@@ -11,6 +11,7 @@ import {
   DBDialects,
 } from "../types.ts";
 
+/** PostgreSQL client */
 export class ClientPostgreSQL extends AbstractClient implements ClientI {
   private client: Client;
   dialect: DBDialects = "pg";

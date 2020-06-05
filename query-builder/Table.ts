@@ -1,21 +1,12 @@
 import { Column } from "./Column.ts";
-import { ColumnTypes, typeMap, TypeMapEl } from "./TypeUtils.ts";
+import {
+  ColumnTypes,
+  typeMap,
+  TypeMapEl,
+  EnumColumn,
+  TableConstraints,
+} from "./TypeUtils.ts";
 import { DBDialects } from "../types.ts";
-
-export interface EnumColumn {
-  name: string;
-  columns: string[];
-}
-
-export interface TableConstraints {
-  unique: string[][];
-  primary?: string[];
-  index: string[];
-  enums: EnumColumn[];
-  updatedAt: boolean;
-  ifNotExists?: boolean;
-  isTemporary?: boolean;
-}
 
 /** The table class exposed in the second argument `schema.create()` method.
  * 
@@ -32,6 +23,7 @@ export class Table {
     enums: [],
     updatedAt: false,
   };
+  private sql: string[] = [];
 
   constructor(name: string, dbDialect: DBDialects = "pg") {
     this.tableName = name;
@@ -40,32 +32,46 @@ export class Table {
   }
 
   /** Outputs the SQL query. */
-  toSql(): string {
-    let sql = "";
+  toString(pretty?: boolean): string {
+    if (pretty) {
+      return this.toArray().join("\n");
+    } else {
+      return this.toArray().join(" ");
+    }
+  }
 
-    sql += this._addUpdatedAtFunction();
+  /** Outputs the SQL query. */
+  toArray(): string[] {
+    this.sql = [];
 
-    this.constraints.enums.forEach((enumCol) => {
-      sql += this._enumHandler(enumCol);
-    });
+    this._pushToSqlArray(this._addUpdatedAtFunction());
 
-    sql += this._tableHandler();
+    this._pushToSqlArray(
+      ...this.constraints.enums.map((enumCol) => this._enumHandler(enumCol)),
+    );
 
-    sql += this._columnHandler();
+    let table = this._tableHandler() + this._columnHandler();
 
-    this.constraints.unique.forEach((el: string[]) => {
-      sql += this._uniqueHandler(el);
-    });
+    this._pushToSqlArray(table);
 
-    sql += this._uniqueHandler();
+    this._pushToSqlArray(
+      ...this.constraints.unique.map((el) => this._uniqueHandler(el)),
+    );
 
-    this.constraints.index.forEach((el) => {
-      sql += this._indexHandler(el);
-    });
+    this._pushToSqlArray(this._uniqueHandler());
 
-    sql += this._updatedAtHandler();
+    this._pushToSqlArray(
+      ...this.constraints.index.map((el) => this._indexHandler(el)),
+    );
 
-    return sql;
+    this._pushToSqlArray(...this._updatedAtHandler());
+
+    return this.sql;
+  }
+
+  private _pushToSqlArray(...queries: string[]) {
+    queries = queries.filter((el) => el !== "");
+    this.sql.push(...queries);
   }
 
   /** Helper method for pushing to column. */
@@ -92,43 +98,29 @@ export class Table {
 
   /** Generates create table query dependent on dialect. */
   private _tableHandler() {
-    switch (this.dialect) {
-      case "mysql":
-      case "pg":
-      default:
-        return `CREATE${
-          this.constraints.isTemporary ? " TEMPORARY" : ""
-        } TABLE${
-          this.constraints.ifNotExists ? " IF NOT EXISTS" : ""
-        } ${this.tableName}`;
-    }
+    return `CREATE${this.constraints.isTemporary ? " TEMPORARY" : ""} TABLE${
+      this.constraints.ifNotExists ? " IF NOT EXISTS" : ""
+    } ${this.tableName}`;
   }
 
   /** Generates column query dependent on dialect. */
   private _columnHandler() {
-    const allColumns = [...this.columns.map((el) => el.toSql())];
+    const allColumns = this.columns.map((el) => el.toSql());
 
     if (this.customColumns) allColumns.push(...this.customColumns);
 
-    switch (this.dialect) {
-      case "mysql":
-      case "pg":
-      default:
-        return ` (${allColumns.join(", ")});`;
-    }
+    return ` (${allColumns.join(", ")});`;
   }
 
   /** Generates enum query dependent on dialect. In postgres, this will be stored as the column name */
   private _enumHandler(enumCol: EnumColumn): string {
     switch (this.dialect) {
-      case "sqlite3":
-      case "mysql":
-        return "";
       case "pg":
-      default:
         return `CREATE TYPE ${enumCol.name} AS ENUM (${
           enumCol.columns.join(", ")
         });`;
+      default:
+        return "";
     }
   }
 
@@ -144,14 +136,12 @@ export class Table {
     switch (this.dialect) {
       case "sqlite3":
         return uniqueArray
-          ? ` CREATE UNIQUE INDEX ${this.tableName}_${
+          ? `CREATE UNIQUE INDEX ${this.tableName}_${
             uniqueArray.join("_")
           } ON ${this.tableName} (${uniqueString});`
           : "";
-      case "mysql":
-      case "pg":
       default:
-        return ` ALTER TABLE ${this.tableName} ADD ${uniqueType} (${uniqueString});`;
+        return `ALTER TABLE ${this.tableName} ADD ${uniqueType} (${uniqueString});`;
     }
   }
 
@@ -159,12 +149,12 @@ export class Table {
   private _indexHandler(index: string) {
     switch (this.dialect) {
       case "sqlite3":
-        return ` CREATE INDEX ${this.tableName}_${index} ON ${this.tableName} (${index});`;
+        return `CREATE INDEX ${this.tableName}_${index} ON ${this.tableName} (${index});`;
       case "mysql":
-        return ` ALTER TABLE ${this.tableName} ADD INDEX ${index} (${index});`;
+        return `ALTER TABLE ${this.tableName} ADD INDEX ${index} (${index});`;
       case "pg":
       default:
-        return ` CREATE INDEX ON ${this.tableName} (${index});`;
+        return `CREATE INDEX ON ${this.tableName} (${index});`;
     }
   }
 
@@ -173,12 +163,10 @@ export class Table {
     if (!this.constraints.updatedAt) return "";
 
     switch (this.dialect) {
-      case "mysql":
-      case "sqlite3":
-        return "";
       case "pg":
+        return `CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now(); RETURN NEW; END; $$ language 'plpgsql';`;
       default:
-        return `CREATE OR REPLACE FUNCTION trigger_set_timestamp() RETURNS TRIGGER AS $$ BEGIN NEW.updated_at = now()\\; RETURN NEW\\; END\\; $$ language 'plpgsql';`;
+        return "";
     }
   }
 
@@ -187,13 +175,19 @@ export class Table {
     if (!this.constraints.updatedAt) return "";
 
     switch (this.dialect) {
-      case "mysql":
-        return "";
       case "sqlite3":
-        return ` DROP TRIGGER IF EXISTS set_timestamp; CREATE TRIGGER set_timestamp BEFORE UPDATE ON ${this.tableName} FOR EACH ROW BEGIN UPDATE ${this.tableName} SET updated_at = CURRENT_TIMESTAMP WHERE id=OLD.id\\; END;`;
+        return [
+          "DROP TRIGGER IF EXISTS set_timestamp;",
+          `CREATE TRIGGER set_timestamp BEFORE UPDATE ON ${this.tableName} FOR EACH ROW BEGIN UPDATE ${this.tableName} SET updated_at = CURRENT_TIMESTAMP WHERE id=OLD.id; END;`,
+        ];
       case "pg":
+        return [
+          `DROP TRIGGER IF EXISTS set_timestamp on ${this.tableName};`,
+          `CREATE TRIGGER set_timestamp BEFORE UPDATE ON ${this.tableName} FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();`,
+        ];
+      case "mysql":
       default:
-        return ` DROP TRIGGER IF EXISTS set_timestamp on ${this.tableName}; CREATE TRIGGER set_timestamp BEFORE UPDATE ON ${this.tableName} FOR EACH ROW EXECUTE PROCEDURE trigger_set_timestamp();`;
+        return [];
     }
   }
 
@@ -202,7 +196,6 @@ export class Table {
     switch (this.dialect) {
       case "mysql":
         return "on update current_timestamp";
-      case "pg":
       default:
         return "";
     }
@@ -577,5 +570,3 @@ export class Table {
     }
   }
 }
-
-export default Table;

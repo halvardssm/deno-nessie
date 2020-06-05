@@ -1,4 +1,4 @@
-import { ColumnTypes } from "./TypeUtils.ts";
+import { ColumnTypes, DefaultValueT } from "./TypeUtils.ts";
 import { DBDialects } from "../types.ts";
 
 /** The column class which stores the column information of a table class. */
@@ -9,8 +9,7 @@ export class Column {
   private columnInput1?: number | string[];
   private columnInput2?: number;
   private isNullable: boolean = true;
-  private defaultValue?: string | number | boolean | object | null | undefined =
-    undefined;
+  private defaultValue?: DefaultValueT = undefined;
   private defaultValueIsExpression?: boolean = false;
   private customCol?: string;
   private isAutoIncrement: boolean = false;
@@ -54,7 +53,7 @@ export class Column {
     }
 
     if (this.defaultValue !== undefined) {
-      string += this.processDefaultValue();
+      string += this._defaultValueHandler();
     }
 
     if (!this.isNullable) {
@@ -102,7 +101,7 @@ export class Column {
    * If the input is string: please note by default it will be wrapped in a single quote string (ex: 'defaultValue'). In case you do not want it be wrapped in a single quote string please consider the optional arg(isExpression) to be set to true.
   */
   default(
-    value: string | number | boolean | object | null,
+    value: DefaultValueT,
     isExpression: boolean = false,
   ) {
     this.defaultValue = value;
@@ -145,7 +144,7 @@ export class Column {
    * file: https://github.com/knex/knex/blob/da54cf1ecf0acef4b3d3d51cd2656e4faf10d3e9/lib/schema/columncompiler.js, line: 151
    * Yet it depends on the input type unlike the knex project which depends on the column type
   */
-  private processDefaultValue(): string {
+  private _defaultValueHandler(): string {
     let val = ``;
     if (this.defaultValue === null) {
       val += ` DEFAULT NULL`;
@@ -167,5 +166,3 @@ export class Column {
     return val;
   }
 }
-
-export default { Column };
