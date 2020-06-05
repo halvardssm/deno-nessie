@@ -193,6 +193,7 @@ export class AbstractClient {
 
     const exposedObject: Info = {
       dialect: this.dialect!,
+      connection: queryHandler,
     };
 
     if (this.exposeQueryBuilder) {

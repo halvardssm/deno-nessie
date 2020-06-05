@@ -6,6 +6,7 @@ export type DBDialects = "pg" | "mysql" | "sqlite3";
  */
 export type Info<T = any> = {
   dialect: DBDialects;
+  connection: QueryHandler;
   queryBuilder?: T;
 };
 
