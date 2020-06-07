@@ -2,9 +2,9 @@ import { Migration } from "https://deno.land/x/nessie/mod.ts";
 import { Schema } from "https://deno.land/x/nessie/qb.ts";
 
 export const up: Migration<Schema> = async ({ queryBuilder, connection }) => {
-  const hasTable = await connection(queryBuilder!.hasTable("basics"));
+  const hasTable = await connection(queryBuilder.hasTable("basics"));
   const hasColumn = await connection(
-    queryBuilder!.hasColumn("basics", "col_1"),
+    queryBuilder.hasColumn("basics", "col_1"),
   );
 
   // Using Postgres as an example, will differ between clients
@@ -16,9 +16,9 @@ export const up: Migration<Schema> = async ({ queryBuilder, connection }) => {
     });
   }
 
-  return queryBuilder;
+  return queryBuilder.query;
 };
 
-export const down: Migration = ({ dialect, queryBuilder }) => {
+export const down: Migration<Schema> = ({ dialect, queryBuilder }) => {
   return queryBuilder.drop("basics");
 };

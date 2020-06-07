@@ -9,6 +9,6 @@ export const up: Migration = ({ dialect }) => { // The dialect depends on which 
   });
 };
 
-export const down: Migration = () => {
+export const down: Migration = ({ dialect }) => {
   return Dex({ client: dialect }).schema.dropTable("test");
 };
