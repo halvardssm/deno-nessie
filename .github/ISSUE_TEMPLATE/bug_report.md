@@ -7,6 +7,11 @@ assignees: ''
 
 ---
 
+**System (please complete the following information):**
+ - OS: [e.g. macos]
+ - Deno version [e.g. 1.0.0]
+ - Nessie version [e.g. 1.0.0]
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 
@@ -22,11 +27,6 @@ A clear and concise description of what you expected to happen.
 
 **Screenshots or error log**
 If applicable, add screenshots or error log to help explain your problem.
-
-**System (please complete the following information):**
- - OS: [e.g. macos]
- - Deno version [e.g. 1.0.0]
- - Nessie version [e.g. 1.0.0]
 
 **Additional context**
 Add any other context about the problem here.
