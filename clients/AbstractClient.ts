@@ -191,9 +191,10 @@ export class AbstractClient {
       parsePath(this.migrationFolder, fileName)
     );
 
-    const exposedObject: Info = {
+    const exposedObject: Info<any> = {
       dialect: this.dialect!,
       connection: queryHandler,
+      queryBuilder: undefined,
     };
 
     if (this.exposeQueryBuilder) {
