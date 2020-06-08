@@ -9,7 +9,7 @@
 
 <p align="center"><img src="./.github/logo.png" alt="Nessie logo" width="200" height="200"></p>
 
-A modular database migration tool for [Deno](https://deno.land) inspired by [Laravel](https://github.com/laravel/laravel). Currently supports PostgreSQL,  MySQL and SQLite.
+A modular database migration tool for [Deno](https://deno.land) inspired by [Laravel](https://github.com/laravel/laravel). Currently supports PostgreSQL, MySQL and SQLite.
 
 If you would like to see your DB flavor supported, take a look at how to make a client plugin with examples in the [clients folder](./clients) or in the section [How to make a client](#how-to-make-a-client).
 
