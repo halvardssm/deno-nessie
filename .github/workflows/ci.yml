@@ -7,12 +7,10 @@ on:
   pull_request:
     branches:
       - master
-  release:
-    types: [ published ]
 
 jobs:
-  get-diff:
-    name: Get Diff
+  info:
+    name: Get Info
     runs-on: ubuntu-latest
 
     outputs:
@@ -47,8 +45,8 @@ jobs:
 
   cli:
     name: Test CLI
-    needs: get-diff
-    if: needs.get-diff.outputs.cli
+    needs: info
+    if: needs.info.outputs.cli
     runs-on: ubuntu-latest
     
     steps:
@@ -74,8 +72,8 @@ jobs:
 
   cli-migrations:
     name: Test CLI Migrations
-    needs: get-diff
-    if: needs.get-diff.outputs.cli
+    needs: info
+    if: needs.info.outputs.cli
     runs-on: ubuntu-latest
 
     services:
@@ -123,8 +121,8 @@ jobs:
 
   query-builder:
     name: Test Query Builder
-    needs: get-diff
-    if: needs.get-diff.outputs.qb
+    needs: info
+    if: needs.info.outputs.qb
     runs-on: ubuntu-latest
 
     steps:
@@ -141,8 +139,8 @@ jobs:
 
   query-builder-migrations:
     name: Test Query Builder Migration
-    needs: [get-diff, query-builder]
-    if: needs.get-diff.outputs.qb
+    needs: [info, query-builder]
+    if: needs.info.outputs.qb
     runs-on: ubuntu-latest
 
     services:
