@@ -107,7 +107,7 @@ export class State {
     );
 
     await Deno.writeTextFile(
-      `${this.client!.migrationFolder}/${fileName}`,
+      `${this.client!.seedFolder}/${fileName}`,
       await responseFile.text(),
     );
 
