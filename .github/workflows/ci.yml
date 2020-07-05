@@ -1,5 +1,8 @@
 name: CI
 
+env:
+  DENO_VERSION: 1.1.3
+
 on:
   push:
     branches:
@@ -46,14 +49,14 @@ jobs:
   cli:
     name: Test CLI
     needs: info
-    if: needs.info.outputs.cli
+    if: needs.info.outputs.cli || contains(github.ref, 'master')
     runs-on: ubuntu-latest
     
     steps:
       - name: Install deno
         uses: denolib/setup-deno@master
         with: 
-          deno-version: 1.0.5
+          deno-version: ${{env.DENO_VERSION}}
           
       - name: Nessie Init
         run: deno run --allow-read --allow-write --allow-net https://raw.githubusercontent.com/$URL_PATH/cli.ts init
@@ -73,7 +76,7 @@ jobs:
   cli-migrations:
     name: Test CLI Migrations
     needs: info
-    if: needs.info.outputs.cli
+    if: needs.info.outputs.cli || contains(github.ref, 'master')
     runs-on: ubuntu-latest
 
     services:
@@ -111,7 +114,7 @@ jobs:
       - name: Install deno
         uses: denolib/setup-deno@master
         with: 
-          deno-version: 1.0.5
+          deno-version: ${{env.DENO_VERSION}}
 
       - name: Create SQLite db
         run: make db-sqlite-start
@@ -122,7 +125,7 @@ jobs:
   query-builder:
     name: Test Query Builder
     needs: info
-    if: needs.info.outputs.qb
+    if: needs.info.outputs.qb || contains(github.ref, 'master')
     runs-on: ubuntu-latest
 
     steps:
@@ -132,7 +135,7 @@ jobs:
       - name: Install deno
         uses: denolib/setup-deno@master
         with:
-          deno-version: 1.0.5
+          deno-version: ${{env.DENO_VERSION}}
 
       - name: Test query builder
         run: make test-qb
@@ -140,7 +143,7 @@ jobs:
   query-builder-migrations:
     name: Test Query Builder Migration
     needs: [info, query-builder]
-    if: needs.info.outputs.qb
+    if: needs.info.outputs.qb || contains(github.ref, 'master')
     runs-on: ubuntu-latest
 
     services:
@@ -178,7 +181,7 @@ jobs:
       - name: Install deno
         uses: denolib/setup-deno@master
         with:
-          deno-version: 1.0.5
+          deno-version: ${{env.DENO_VERSION}}
 
       - name: Create SQLite db
         run: make db-sqlite-start
