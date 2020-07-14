@@ -1,4 +1,4 @@
-import { Client, ClientConfig } from "https://deno.land/x/mysql@2.2.0/mod.ts";
+import { Client, ClientConfig } from "https://deno.land/x/mysql@v2.3.0/mod.ts";
 import { AbstractClient } from "./AbstractClient.ts";
 import {
   AmountMigrateT,

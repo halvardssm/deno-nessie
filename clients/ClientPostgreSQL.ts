@@ -1,6 +1,6 @@
-import { ConnectionOptions } from "https://deno.land/x/postgres@v0.4.1/connection_params.ts";
-import { Client } from "https://deno.land/x/postgres@v0.4.1/mod.ts";
-import { QueryResult } from "https://deno.land/x/postgres@v0.4.1/query.ts";
+import { ConnectionOptions } from "https://raw.githubusercontent.com/deno-postgres/deno-postgres/e13d42979acc009aa361e1f12edd1aae7d8532c4/connection_params.ts";
+import { Client } from "https://raw.githubusercontent.com/deno-postgres/deno-postgres/e13d42979acc009aa361e1f12edd1aae7d8532c4/mod.ts";
+import { QueryResult } from "https://raw.githubusercontent.com/deno-postgres/deno-postgres/e13d42979acc009aa361e1f12edd1aae7d8532c4/query.ts";
 import { AbstractClient } from "./AbstractClient.ts";
 import {
   AmountMigrateT,
