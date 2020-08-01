@@ -1,6 +1,6 @@
-import { ConnectionOptions } from "https://deno.land/x/postgres@v0.4.1/connection_params.ts";
-import { Client } from "https://deno.land/x/postgres@v0.4.1/mod.ts";
-import { QueryResult } from "https://deno.land/x/postgres@v0.4.1/query.ts";
+import { ConnectionOptions } from "https://deno.land/x/postgres@v0.4.2/connection_params.ts";
+import { Client } from "https://deno.land/x/postgres@v0.4.2/mod.ts";
+import { QueryResult } from "https://deno.land/x/postgres@v0.4.2/query.ts";
 import { AbstractClient } from "./AbstractClient.ts";
 import {
   AmountMigrateT,
@@ -16,15 +16,13 @@ export class ClientPostgreSQL extends AbstractClient implements ClientI {
   private client: Client;
   dialect: DBDialects = "pg";
 
-  private QUERY_MIGRATION_TABLE_EXISTS =
-    `SELECT to_regclass('${this.TABLE_MIGRATIONS}');`;
+  private QUERY_MIGRATION_TABLE_EXISTS = `SELECT to_regclass('${this.TABLE_MIGRATIONS}');`;
 
-  private QUERY_CREATE_MIGRATION_TABLE =
-    `CREATE TABLE ${this.TABLE_MIGRATIONS} (id bigserial PRIMARY KEY, ${this.COL_FILE_NAME} varchar(${AbstractClient.MAX_FILE_NAME_LENGTH}) UNIQUE, ${this.COL_CREATED_AT} timestamp (0) default current_timestamp);`;
+  private QUERY_CREATE_MIGRATION_TABLE = `CREATE TABLE ${this.TABLE_MIGRATIONS} (id bigserial PRIMARY KEY, ${this.COL_FILE_NAME} varchar(${AbstractClient.MAX_FILE_NAME_LENGTH}) UNIQUE, ${this.COL_CREATED_AT} timestamp (0) default current_timestamp);`;
 
   constructor(
     options: string | ClientOptions,
-    connectionOptions: ConnectionOptions,
+    connectionOptions: ConnectionOptions
   ) {
     super(options);
     this.client = new Client(connectionOptions);
@@ -33,9 +31,9 @@ export class ClientPostgreSQL extends AbstractClient implements ClientI {
   async prepare() {
     await this.client.connect();
 
-    const queryResult = await this.query(
-      this.QUERY_MIGRATION_TABLE_EXISTS,
-    ) as QueryResult;
+    const queryResult = (await this.query(
+      this.QUERY_MIGRATION_TABLE_EXISTS
+    )) as QueryResult;
 
     const migrationTableExists =
       queryResult.rows?.[0]?.[0] === this.TABLE_MIGRATIONS;
@@ -63,23 +61,23 @@ export class ClientPostgreSQL extends AbstractClient implements ClientI {
   }
 
   async migrate(amount: AmountMigrateT) {
-    const latestMigration = await this.query(
-      this.QUERY_GET_LATEST,
-    ) as QueryResult;
+    const latestMigration = (await this.query(
+      this.QUERY_GET_LATEST
+    )) as QueryResult;
     await super.migrate(
       amount,
       latestMigration.rows?.[0]?.[0],
-      this.query.bind(this),
+      this.query.bind(this)
     );
   }
 
   async rollback(amount: AmountRollbackT) {
-    const allMigrations = await this.query(this.QUERY_GET_ALL) as QueryResult;
+    const allMigrations = (await this.query(this.QUERY_GET_ALL)) as QueryResult;
 
     await super.rollback(
       amount,
       allMigrations.rows?.flatMap((el) => el?.[0]),
-      this.query.bind(this),
+      this.query.bind(this)
     );
   }
 

@@ -1,4 +1,4 @@
-import { Client, ClientConfig } from "https://deno.land/x/mysql@2.2.0/mod.ts";
+import { Client, ClientConfig } from "https://deno.land/x/mysql@v2.3.0/mod.ts";
 import { AbstractClient } from "./AbstractClient.ts";
 import {
   AmountMigrateT,
@@ -18,12 +18,11 @@ export class ClientMySQL extends AbstractClient implements ClientI {
   private QUERY_MIGRATION_TABLE_EXISTS =
     // `show tables like '${this.TABLE_MIGRATIONS}';`;
     `SELECT * FROM information_schema.tables WHERE table_name = '${this.TABLE_MIGRATIONS}' LIMIT 1;`;
-  private QUERY_CREATE_MIGRATION_TABLE =
-    `CREATE TABLE ${this.TABLE_MIGRATIONS} (id bigint UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, ${this.COL_FILE_NAME} varchar(${AbstractClient.MAX_FILE_NAME_LENGTH}) NOT NULL UNIQUE, ${this.COL_CREATED_AT} datetime NOT NULL DEFAULT CURRENT_TIMESTAMP);`;
+  private QUERY_CREATE_MIGRATION_TABLE = `CREATE TABLE ${this.TABLE_MIGRATIONS} (id bigint UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, ${this.COL_FILE_NAME} varchar(${AbstractClient.MAX_FILE_NAME_LENGTH}) NOT NULL UNIQUE, ${this.COL_CREATED_AT} datetime NOT NULL DEFAULT CURRENT_TIMESTAMP);`;
 
   constructor(
     options: string | ClientOptions,
-    connectionOptions: ClientConfig,
+    connectionOptions: ClientConfig
   ) {
     super(options);
     this.clientOptions = connectionOptions;
@@ -77,22 +76,18 @@ export class ClientMySQL extends AbstractClient implements ClientI {
     await super.migrate(
       amount,
       latestMigration?.[0]?.[0]?.[this.COL_FILE_NAME],
-      this.query.bind(this),
+      this.query.bind(this)
     );
   }
 
   async rollback(amount: AmountRollbackT) {
     const allMigrations = await this.query(this.QUERY_GET_ALL);
 
-    const parsedMigrations: string[] = allMigrations?.[0].map((el: any) =>
-      el?.[this.COL_FILE_NAME]
+    const parsedMigrations: string[] = allMigrations?.[0].map(
+      (el: any) => el?.[this.COL_FILE_NAME]
     );
 
-    await super.rollback(
-      amount,
-      parsedMigrations,
-      this.query.bind(this),
-    );
+    await super.rollback(amount, parsedMigrations, this.query.bind(this));
   }
 
   async seed(matcher?: string) {

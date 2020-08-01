@@ -1,4 +1,4 @@
-import { DB } from "https://deno.land/x/sqlite@v2.0.0/mod.ts";
+import { DB } from "https://deno.land/x/sqlite@v2.3.0/mod.ts";
 import { AbstractClient } from "./AbstractClient.ts";
 import { resolve } from "../deps.ts";
 import {
@@ -15,10 +15,8 @@ export class ClientSQLite extends AbstractClient implements ClientI {
   private client?: DB;
   dialect: DBDialects = "sqlite3";
 
-  private QUERY_MIGRATION_TABLE_EXISTS =
-    `SELECT name FROM sqlite_master WHERE type='table' AND name='${this.TABLE_MIGRATIONS}';`;
-  private QUERY_CREATE_MIGRATION_TABLE =
-    `CREATE TABLE ${this.TABLE_MIGRATIONS} (id integer NOT NULL PRIMARY KEY autoincrement, ${this.COL_FILE_NAME} varchar(${AbstractClient.MAX_FILE_NAME_LENGTH}) UNIQUE, ${this.COL_CREATED_AT} datetime NOT NULL DEFAULT CURRENT_TIMESTAMP);`;
+  private QUERY_MIGRATION_TABLE_EXISTS = `SELECT name FROM sqlite_master WHERE type='table' AND name='${this.TABLE_MIGRATIONS}';`;
+  private QUERY_CREATE_MIGRATION_TABLE = `CREATE TABLE ${this.TABLE_MIGRATIONS} (id integer NOT NULL PRIMARY KEY autoincrement, ${this.COL_FILE_NAME} varchar(${AbstractClient.MAX_FILE_NAME_LENGTH}) UNIQUE, ${this.COL_CREATED_AT} datetime NOT NULL DEFAULT CURRENT_TIMESTAMP);`;
 
   constructor(options: string | ClientOptions, connectionOptions: string) {
     super(options);
@@ -65,7 +63,7 @@ export class ClientSQLite extends AbstractClient implements ClientI {
     await super.migrate(
       amount,
       latestMigration?.[0]?.[0]?.[0],
-      this.query.bind(this),
+      this.query.bind(this)
     );
   }
 
@@ -75,7 +73,7 @@ export class ClientSQLite extends AbstractClient implements ClientI {
     await super.rollback(
       amount,
       allMigrations?.[0]?.flatMap((el) => el?.[0]),
-      this.query.bind(this),
+      this.query.bind(this)
     );
   }
 
