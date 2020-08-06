@@ -1,7 +1,7 @@
 {
 	"name": "Nessie",
 	"description": "A modular database migration module for Deno.",
-	"version": "1.0.1",
+	"version": "1.0.3",
 	"stable": true,
 	"repository": "https://github.com/halvardssm/deno-nessie",
 	"files": [
