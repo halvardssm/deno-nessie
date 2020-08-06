@@ -16,9 +16,11 @@ jobs:
         with:
           deno-version: ${{env.DENO_VERSION}}
       - name: Install Nest
-        run: deno install -A -f --unstable -n eggs https://x.nest.land/eggs/mod.ts
+        run: deno install -A -f --unstable -n eggs https://x.nest.land/eggs@0.2.1/mod.ts
       - name: Export path
         run: export PATH="/home/runner/.deno/bin:$PATH"
+      - name: Upgrade Eggs
+        run: eggs upgrade
       - name: Link API key
         run: eggs link --key ${{ secrets.NESTAPIKEY }}
       - name: Publish to Nest
