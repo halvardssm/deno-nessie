@@ -48,3 +48,6 @@ db-sqlite-start:
 	mkdir -p tests/data && touch tests/data/sqlite.db
 db-sqlite-stop:
 	rm -rf tests/data/sqlite.db
+
+bump-%: # version number and deno version separated by `:` e.g. 1.2.3:1.2.3
+	deno run --allow-read --allow-write prepare_release.ts $*

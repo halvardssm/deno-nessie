@@ -523,8 +523,8 @@ export class Table {
       (col) =>
         this.dialect === "mysql" ? col.custom(`(${array.join(", ")})`)
         : this.dialect === "sqlite3"
-        ? col.custom(`CHECK(${name} IN (${array.join(", ")}) )`)
-        : col,
+          ? col.custom(`CHECK(${name} IN (${array.join(", ")}) )`)
+          : col,
     );
   }
 
