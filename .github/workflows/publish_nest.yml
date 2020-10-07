@@ -19,5 +19,5 @@ jobs:
 
       - name: Publish module
         run: |
-          deno run -A --unstable https://x.nest.land/eggs/mod.ts link ${{ secrets.NESTAPIKEY }}
-          deno run -A --unstable https://x.nest.land/eggs/mod.ts publish
+          deno run -A --unstable https://x.nest.land/eggs@0.2.3/mod.ts link ${{ secrets.NESTAPIKEY }}
+          deno run -A --unstable https://x.nest.land/eggs@0.2.3/mod.ts publish
