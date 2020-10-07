@@ -1,9 +1,9 @@
 import { parsePath } from "../cli/utils.ts";
 import { resolve } from "../deps.ts";
 import type {
+  AbstractClientOptions,
   AmountMigrateT,
   AmountRollbackT,
-  AbstractClientOptions,
   DBDialects,
   Info,
   LoggerFn,

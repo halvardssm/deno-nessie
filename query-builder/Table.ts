@@ -1,10 +1,10 @@
 import { Column } from "./Column.ts";
 import {
   ColumnTypes,
-  typeMap,
-  TypeMapEl,
   EnumColumn,
   TableConstraints,
+  typeMap,
+  TypeMapEl,
 } from "./TypeUtils.ts";
 import { DBDialects } from "../types.ts";
 

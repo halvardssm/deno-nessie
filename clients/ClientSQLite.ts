@@ -5,9 +5,9 @@ import type {
   AmountMigrateT,
   AmountRollbackT,
   ClientI,
-  QueryT,
   ClientOptions,
   DBDialects,
+  QueryT,
 } from "../types.ts";
 
 /** SQLite client */

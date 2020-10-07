@@ -50,21 +50,7 @@ export class ClientPostgreSQL extends AbstractClient<Client>
     }
   }
 
-  /** For fetching information e.g. SELECT statement */
   async query(query: QueryT) {
-    try {
-      if (typeof query === "string") {
-        return await this.client.query(query);
-      } else {
-        return await this.client.multiQuery(query.map((el) => ({ text: el })));
-      }
-    } catch (e) {
-      throw new Error("Error:" + query + "\n" + e);
-    }
-  }
-
-  /** For fetching information e.g. SELECT statement */
-  async execute(query: QueryT) {
     try {
       if (typeof query === "string") {
         return await this.client.query(query);

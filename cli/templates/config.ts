@@ -1,8 +1,8 @@
 import {
-  ClientPostgreSQL,
   ClientMySQL,
-  ClientSQLite,
   ClientOptions,
+  ClientPostgreSQL,
+  ClientSQLite,
 } from "https://deno.land/x/nessie/mod.ts";
 
 /** These are the default config options. */

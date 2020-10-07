@@ -1,4 +1,4 @@
-import { assertEquals, assertArrayContains } from "../../deps.ts";
+import { assertArrayContains, assertEquals } from "../../deps.ts";
 import { Schema } from "../../qb.ts";
 
 const dialect = "mysql";

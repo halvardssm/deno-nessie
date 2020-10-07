@@ -1,6 +1,6 @@
 import {
-  ClientPostgreSQL,
   ClientOptions,
+  ClientPostgreSQL,
 } from "https://deno.land/x/nessie/mod.ts";
 import type { ConnectionOptions } from "https://deno.land/x/postgres@v0.4.5/connection_params.ts";
 
