@@ -1,6 +1,3 @@
-import { readJson } from "https://deno.land/std/fs/read_json.ts";
-import { writeJson } from "https://deno.land/std/fs/write_json.ts";
-
 const REG_EXP_VERSION = /^\d+.\d+.\d+$/;
 const REG_EXP_README_VERSION = /shields\.io\/badge\/deno-v\d+.\d+.\d+/;
 const REG_EXP_CLI_VERSION = /app_version: \"\d+.\d+.\d\"/;
@@ -35,11 +32,14 @@ if (!REG_EXP_VERSION.test(versionDeno)) {
 }
 
 const setEggConfig = async (version: string) => {
-  const eggFile = await readJson(FILE_JSON_EGG) as any;
+  const eggFile = JSON.parse(await Deno.readTextFile(FILE_JSON_EGG)) as any;
 
   eggFile.version = version;
 
-  await writeJson(FILE_JSON_EGG, eggFile, { spaces: 2 });
+  await Deno.writeTextFile(
+    FILE_JSON_EGG,
+    JSON.stringify(eggFile, undefined, 2),
+  );
 
   console.info(`egg.json updated to ${version}`);
 };

@@ -1,13 +1,14 @@
 import { AbstractClient } from "../clients/AbstractClient.ts";
 import { ClientPostgreSQL } from "../clients/ClientPostgreSQL.ts";
-import { Denomander } from "../deps.ts";
+import type { Denomander } from "../deps.ts";
 import { parsePath } from "./utils.ts";
-import { NessieConfig, ClientI } from "../types.ts";
+import type { ClientI, NessieConfig } from "../types.ts";
 
 const STD_CONFIG_FILE = "nessie.config.ts";
 const STD_CLIENT_OPTIONS = {
   seedFolder: "./db/seeds",
   migrationFolder: "./db/migrations",
+  experimental: true,
 };
 
 /** The main state for the application.
@@ -15,14 +16,14 @@ const STD_CLIENT_OPTIONS = {
  * Contains the client, and handles the communication to the database.
  */
 export class State {
-  private enableDebug: boolean;
-  private configFile: string;
+  private readonly enableDebug: boolean;
+  private readonly configFile: string;
   private config?: NessieConfig;
   client?: ClientI;
 
-  constructor(prog: Denomander) {
-    this.enableDebug = prog.debug;
-    this.configFile = parsePath(prog.config || STD_CONFIG_FILE);
+  constructor(args: Denomander) {
+    this.enableDebug = args.debug;
+    this.configFile = parsePath(args.config || STD_CONFIG_FILE);
 
     this.logger([this.enableDebug, this.configFile], "State");
   }
@@ -61,7 +62,7 @@ export class State {
   }
 
   /** Makes the migration */
-  async makeMigration(migrationName: string = "migration") {
+  async makeMigration(migrationName = "migration") {
     if (
       migrationName.length > AbstractClient.MAX_FILE_NAME_LENGTH - 13
     ) {
@@ -92,7 +93,7 @@ export class State {
   }
 
   /** Makes the seed */
-  async makeSeed(seedName: string = "seed") {
+  async makeSeed(seedName = "seed") {
     const fileName = `${seedName}.ts`;
     if (this.client?.seedFiles.find((el) => el.name === seedName)) {
       console.info(`Seed with name '${seedName}' already exists.`);

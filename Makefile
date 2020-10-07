@@ -20,6 +20,8 @@ test-all:
 	make test-qb-migrations
 	make test-clean
 	make test-cli-migrations
+	make test-clean
+	make test-cli-migrations-experimental
 
 test-qb:
 	deno test tests/query-builder
@@ -27,6 +29,8 @@ test-qb-migrations:
 	deno test --allow-write --allow-run --allow-read tests/query-builder-migrations
 test-cli-migrations:
 	deno test --allow-write --allow-run --allow-read tests/cli
+test-cli-migrations-experimental:
+	deno test --allow-write --allow-run --allow-read tests/cli-experimental
 sleeper:
 	sleep 45s
 
