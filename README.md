@@ -86,6 +86,7 @@ import { ClientPostgreSQL } from "./clients/ClientPostgreSQL.ts";
 const nessieOptions = {
   migrationFolder: "./db/migrations",
   seedFolder: "./db/seeds",
+  experimental: true,
 };
 
 const connectionOptions = {
@@ -98,12 +99,43 @@ const connectionOptions = {
 
 export default {
   client: new ClientPostgreSQL(nessieOptions, connectionOptions),
-  exposeQueryBuilder: false,
 };
 
 ```
 
-Minimal example of a migration file
+**We are moving towards class based migration files**, so please consider taking a look at the new syntax. If you are seeking the legacy methods, please look in the example folder or further down on this page. 
+
+Minimal example of a migration file (experimental)
+
+```ts
+import { AbstractMigration, Info } from "https://deno.land/x/nessie/mod.ts";
+import type { Client } from "https://deno.land/x/postgres@v0.4.5/mod.ts";
+
+export default class ExperimentalMigration extends AbstractMigration<Client> {
+  async up({ dialect }: Info): Promise<void> {
+    this.client.query("CREATE TABLE table1 (id int)");
+  }
+
+  async down({ dialect }: Info): Promise<void> {
+    this.client.query("DROP TABLE table1");
+  }
+}
+```
+
+Seed file (experimental)
+
+```ts
+import { AbstractSeed, Info } from "https://deno.land/x/nessie/mod.ts";
+import type { Client } from "https://deno.land/x/postgres@v0.4.5/mod.ts";
+
+export default class ExperimentalSeed extends AbstractSeed<Client> {
+  async run({ dialect }: Info): Promise<void> {
+    this.client.query("INSERT INTO table1 VALUES (1234)");
+  }
+}
+```
+
+Minimal example of a migration file (legacy)
 
 ```ts
 import { Migration } from "https://deno.land/x/nessie/mod.ts";
@@ -117,7 +149,7 @@ export const down: Migration = () => {
 };
 ```
 
-Using the native query builder (`exposeQueryBuilder: true`)
+Using the native query builder (`exposeQueryBuilder: true`) (legacy)
 
 ```ts
 import { Migration } from "https://deno.land/x/nessie/mod.ts";
@@ -144,7 +176,7 @@ export const down: Migration<Schema> = ({ queryBuilder }) => {
 };
 ```
 
-Seed file
+Seed file (legacy)
 
 ```ts
 import { Seed } from "https://deno.land/x/nessie/mod.ts";
