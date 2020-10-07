@@ -78,6 +78,8 @@ All contributions are welcome, make sure to read the [contribution guideline](./
 
 ## Examples
 
+Previously Nessie required the functions to return a string (or array of strings), but this will be changed in the next major release. There now exists an abstract migration class which you can extend to access the client and its properties. This enables better flexibility in migrations and allows a more complex workflow. To check this feature out and to help discover bugs, you can already take this new syntax for a test by checking out the example folder, or the examples below with the `experimental` tag.
+
 `nessie.config.ts` with all default values
 
 ```ts

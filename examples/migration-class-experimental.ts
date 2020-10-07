@@ -15,6 +15,19 @@ export default class ExperimentalMigration extends AbstractMigration<Client> {
     );
 
     this.client.query(query);
+
+    this.client.query(
+      'insert into test (file_name) values ("test1"), ("test2")',
+    );
+
+    const res = await this.client.query("select * from test");
+
+    for await (const row of res.rowsOfObjects()) {
+      this.client.query(
+        `update test set file_name = ${row.file_name +
+          "_some_suffix"} where id = ${row.id}`,
+      );
+    }
   }
 
   async down({ dialect }: Info): Promise<void> {
