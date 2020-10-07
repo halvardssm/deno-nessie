@@ -1,6 +1,6 @@
-import { Client, ClientConfig } from "https://deno.land/x/mysql@v2.3.0/mod.ts";
+import { Client, ClientConfig } from "https://deno.land/x/mysql@v2.4.0/mod.ts";
 import { AbstractClient } from "./AbstractClient.ts";
-import {
+import type {
   AmountMigrateT,
   AmountRollbackT,
   ClientI,
@@ -10,8 +10,7 @@ import {
 } from "../types.ts";
 
 /** MySQL client */
-export class ClientMySQL extends AbstractClient implements ClientI {
-  private client: Client;
+export class ClientMySQL extends AbstractClient<Client> implements ClientI {
   private clientOptions: ClientConfig;
   dialect: DBDialects = "mysql";
 
@@ -22,12 +21,14 @@ export class ClientMySQL extends AbstractClient implements ClientI {
     `CREATE TABLE ${this.TABLE_MIGRATIONS} (id bigint UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, ${this.COL_FILE_NAME} varchar(${AbstractClient.MAX_FILE_NAME_LENGTH}) NOT NULL UNIQUE, ${this.COL_CREATED_AT} datetime NOT NULL DEFAULT CURRENT_TIMESTAMP);`;
 
   constructor(
-    options: string | ClientOptions,
+    options: ClientOptions,
     connectionOptions: ClientConfig,
   ) {
-    super(options);
+    super({
+      ...options,
+      client: new Client(),
+    });
     this.clientOptions = connectionOptions;
-    this.client = new Client();
   }
 
   async prepare() {

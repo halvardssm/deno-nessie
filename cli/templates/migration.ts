@@ -1,13 +1,12 @@
-import { Migration } from "https://deno.land/x/nessie/mod.ts";
-import { Schema } from "https://deno.land/x/nessie/qb.ts";
-import Dex from "https://deno.land/x/dex/mod.ts";
+import { Info, AbstractMigration } from "https://deno.land/x/nessie/mod.ts";
+// import Dex from "https://deno.land/x/dex/mod.ts";
 
-/** Runs on migrate */
-export const up: Migration = () => {
-  // return new Schema()
-  // return Dex
-};
+export default class ExperimentalMigration extends AbstractMigration {
+  /** Runs on migrate */
+  async up(info: Info): Promise<void> {
+  }
 
-/** Runs on rollback */
-export const down: Migration = () => {
-};
+  /** Runs on rollback */
+  async down(info: Info): Promise<void> {
+  }
+}

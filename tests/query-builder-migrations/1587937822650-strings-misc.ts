@@ -1,4 +1,4 @@
-import { Migration } from "../../mod.ts";
+import type { Migration } from "../../mod.ts";
 import { Schema } from "../../qb.ts";
 
 export const up: Migration = ({ dialect }) => {

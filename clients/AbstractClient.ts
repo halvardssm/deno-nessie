@@ -1,19 +1,23 @@
 import { parsePath } from "../cli/utils.ts";
 import { resolve } from "../deps.ts";
-import {
-  LoggerFn,
-  QueryWithString,
-  ClientOptions,
+import type {
   AmountMigrateT,
-  QueryHandler,
-  MigrationFile,
   AmountRollbackT,
-  Info,
+  AbstractClientOptions,
   DBDialects,
+  Info,
+  LoggerFn,
+  MigrationFile,
+  QueryHandler,
+  QueryWithString,
 } from "../types.ts";
+import type {
+  AbstractMigration,
+  AbstractMigrationProps,
+} from "../wrappers/AbstractMigration.ts";
 
 /** The abstract client which handles most of the logic related to database communication. */
-export class AbstractClient {
+export abstract class AbstractClient<Client> {
   static readonly MAX_FILE_NAME_LENGTH = 100;
 
   protected readonly TABLE_MIGRATIONS = "nessie_migrations";
@@ -24,11 +28,13 @@ export class AbstractClient {
 
   protected logger: LoggerFn = () => undefined;
 
+  client: Client;
   migrationFiles: Deno.DirEntry[];
   seedFiles: Deno.DirEntry[];
   migrationFolder: string;
   seedFolder: string;
-  exposeQueryBuilder: boolean = false;
+  experimental: boolean;
+  exposeQueryBuilder = false;
   dialect?: DBDialects;
 
   protected readonly QUERY_GET_LATEST =
@@ -41,19 +47,13 @@ export class AbstractClient {
   protected QUERY_MIGRATION_DELETE: QueryWithString = (fileName) =>
     `DELETE FROM ${this.TABLE_MIGRATIONS} WHERE ${this.COL_FILE_NAME} = '${fileName}';`;
 
-  constructor(options: string | ClientOptions) {
-    if (typeof options === "string") {
-      console.info(
-        "DEPRECATED: Using string as the client option is deprecated, please use a config object instead.",
-      );
-      this.migrationFolder = resolve(options);
-      this.seedFolder = resolve("./db/seeds");
-    } else {
-      this.migrationFolder = resolve(
-        options?.migrationFolder || "./db/migrations",
-      );
-      this.seedFolder = resolve(options?.seedFolder || "./db/seeds");
-    }
+  constructor(options: AbstractClientOptions<Client>) {
+    this.migrationFolder = resolve(
+      options.migrationFolder || "./db/migrations",
+    );
+    this.seedFolder = resolve(options.seedFolder || "./db/seeds");
+    this.client = options.client;
+    this.experimental = options.experimental || false;
 
     try {
       this.migrationFiles = Array.from(Deno.readDirSync(this.migrationFolder));
@@ -136,7 +136,7 @@ export class AbstractClient {
   }
 
   /** Runs the `run` method on seed files. Filters on the matcher. */
-  async seed(matcher: string = ".+.ts", queryHandler: QueryHandler) {
+  async seed(matcher = ".+.ts", queryHandler: QueryHandler) {
     const files = this.seedFiles.filter((el) =>
       el.isFile && (el.name === matcher || new RegExp(matcher).test(el.name))
     );
@@ -181,16 +181,16 @@ export class AbstractClient {
       .sort((a, b) => parseInt(a?.name ?? "0") - parseInt(b?.name ?? "0"));
   }
 
-  /** Handles migration files. */
+  /** 
+   * Handles migration files. 
+   * 
+   * TODO on next major bump, remove non expreimental code
+   */
   private async _migrationHandler(
     fileName: string,
     queryHandler: QueryHandler,
-    isDown: boolean = false,
+    isDown = false,
   ) {
-    let { up, down }: MigrationFile = await import(
-      parsePath(this.migrationFolder, fileName)
-    );
-
     const exposedObject: Info<any> = {
       dialect: this.dialect!,
       connection: queryHandler,
@@ -202,23 +202,47 @@ export class AbstractClient {
       exposedObject.queryBuilder = new Schema(this.dialect);
     }
 
-    let query: string | string[];
+    if (this.experimental) {
+      const MigrationClass: new (
+        props: AbstractMigrationProps<Client>,
+      ) => AbstractMigration<Client> = await import(
+        parsePath(
+          this.migrationFolder,
+          fileName,
+        )
+      );
 
-    if (isDown) {
-      query = await down(exposedObject);
+      const migration = new MigrationClass({ client: this.client });
+
+      if (isDown) {
+        await migration.down(exposedObject);
+      } else {
+        await migration.up(exposedObject);
+      }
     } else {
-      query = await up(exposedObject);
+      let { up, down }: MigrationFile = await import(parsePath(
+        this.migrationFolder,
+        fileName,
+      ));
+
+      let query: string | string[];
+
+      if (isDown) {
+        query = await down(exposedObject);
+      } else {
+        query = await up(exposedObject);
+      }
+
+      if (!query) query = [];
+      else if (typeof query === "string") query = [query];
+
+      if (isDown) {
+        query.push(this.QUERY_MIGRATION_DELETE(fileName));
+      } else {
+        query.push(this.QUERY_MIGRATION_INSERT(fileName));
+      }
+
+      await queryHandler(query);
     }
-
-    if (!query) query = [];
-    else if (typeof query === "string") query = [query];
-
-    if (isDown) {
-      query.push(this.QUERY_MIGRATION_DELETE(fileName));
-    } else {
-      query.push(this.QUERY_MIGRATION_INSERT(fileName));
-    }
-
-    await queryHandler(query);
   }
 }

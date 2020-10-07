@@ -6,11 +6,17 @@ export type DBDialects = "pg" | "mysql" | "sqlite3";
  */
 export type Info<T = undefined> = {
   dialect: DBDialects;
+  /** @deprecated Will be removed as connection will be exposed in the wrapper class */
   connection: QueryHandler;
+  /** @deprecated Will be removed */
   queryBuilder: T;
 };
 
-/** `up`/`down` methods in migration files. */
+/**
+ * @deprecated Please consider using the class migrations.
+ *
+ * `up`/`down` methods in migration files.
+ */
 export type Migration<T = undefined> = (
   info: Info<T>,
 ) => string | string[] | Promise<string | string[]>;
@@ -28,7 +34,12 @@ export type AmountRollbackT = AmountMigrateT | "all";
 export type QueryT = string | string[];
 /** Qhuery handler function. */
 export type QueryHandler = (query: QueryT) => Promise<any>;
-/** Type for migration files. */
+
+/**
+ * @deprecated Consider using migration classes. 
+ * 
+ * Type for migration files. 
+ */
 export type MigrationFile = {
   up: Migration;
   down: Migration;
@@ -68,11 +79,16 @@ export interface ClientI {
 export interface NessieConfig {
   client: ClientI;
   exposeQueryBuilder?: boolean;
+  experimental?: boolean;
 }
 
 /** Client config options. */
 export interface ClientOptions {
   migrationFolder?: string;
   seedFolder?: string;
+  experimental?: boolean;
   [option: string]: any;
+}
+export interface AbstractClientOptions<Client> extends ClientOptions {
+  client: Client;
 }

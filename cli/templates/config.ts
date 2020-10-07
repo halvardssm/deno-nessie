@@ -1,11 +1,15 @@
-import { ClientPostgreSQL } from "https://deno.land/x/nessie/mod.ts";
-import { ClientMySQL } from "https://deno.land/x/nessie/mod.ts";
-import { ClientSQLite } from "https://deno.land/x/nessie/mod.ts";
+import {
+  ClientPostgreSQL,
+  ClientMySQL,
+  ClientSQLite,
+  ClientOptions,
+} from "https://deno.land/x/nessie/mod.ts";
 
 /** These are the default config options. */
-const clientOptions = {
+const clientOptions: ClientOptions = {
   migrationFolder: "./db/migrations",
   seedFolder: "./db/seeds",
+  experimental: true,
 };
 
 /** Select one of the supported clients */
@@ -16,6 +20,7 @@ const clientPg = new ClientPostgreSQL(clientOptions, {
   user: "root",
   password: "pwd",
 });
+
 const clientMySql = new ClientMySQL(clientOptions, {
   hostname: "localhost",
   port: 3306,
@@ -23,6 +28,7 @@ const clientMySql = new ClientMySQL(clientOptions, {
   // password: "pwd", // uncomment this line for <8
   db: "nessie",
 });
+
 const clientSqLite = new ClientSQLite(clientOptions, "./sqlite.db");
 
 /** This is the final config object */
