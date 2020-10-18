@@ -191,6 +191,7 @@ export abstract class AbstractClient<Client> {
     queryHandler: QueryHandler,
     isDown = false,
   ) {
+    // deno-lint-ignore no-explicit-any
     const exposedObject: Info<any> = {
       dialect: this.dialect!,
       connection: queryHandler,
@@ -205,12 +206,12 @@ export abstract class AbstractClient<Client> {
     if (this.experimental) {
       const MigrationClass: new (
         props: AbstractMigrationProps<Client>,
-      ) => AbstractMigration<Client> = await import(
+      ) => AbstractMigration<Client> = (await import(
         parsePath(
           this.migrationFolder,
           fileName,
         )
-      );
+      )).default;
 
       const migration = new MigrationClass({ client: this.client });
 
@@ -220,7 +221,7 @@ export abstract class AbstractClient<Client> {
         await migration.up(exposedObject);
       }
     } else {
-      let { up, down }: MigrationFile = await import(parsePath(
+      const { up, down }: MigrationFile = await import(parsePath(
         this.migrationFolder,
         fileName,
       ));
