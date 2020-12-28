@@ -1,7 +1,7 @@
 export { relative, resolve } from "https://deno.land/std@0.82.0/path/mod.ts";
 export {
   assert,
-  assertArrayContains,
+  assertArrayIncludes,
   assertEquals,
 } from "https://deno.land/std@0.82.0/testing/asserts.ts";
 
