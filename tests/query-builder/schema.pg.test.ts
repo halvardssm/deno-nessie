@@ -1,4 +1,4 @@
-import { assertArrayContains, assertEquals } from "../../deps.ts";
+import { assertArrayIncludes, assertEquals } from "../../deps.ts";
 import { Schema } from "../../qb.ts";
 
 const strings = [
@@ -86,7 +86,7 @@ strings.forEach(({ name, string, solution }) =>
     name: "PG: " + (name || "Empty"),
     fn(): void {
       if (Array.isArray(string)) {
-        assertArrayContains(string, solution as string[]);
+        assertArrayIncludes(string, solution as string[]);
       }
       assertEquals(string, solution);
     },

@@ -1,4 +1,4 @@
-import { assert, assertArrayContains } from "../../deps.ts";
+import { assert, assertArrayIncludes } from "../../deps.ts";
 import {
   DIALECTS,
   runner,
@@ -38,7 +38,7 @@ for await (const dialect of DIALECTS) {
       hasFailed = response[response.length - 1].includes("Code was");
 
       assert(!hasFailed, response.join("\n"));
-      assertArrayContains(response, solution);
+      assertArrayIncludes(response, solution);
     });
   }
 }
