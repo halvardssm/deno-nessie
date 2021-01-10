@@ -5,6 +5,6 @@ export {
   assertEquals,
 } from "https://deno.land/std@0.83.0/testing/asserts.ts";
 
-import Denomander from "https://deno.land/x/denomander@0.6.3/mod.ts";
+import Denomander from "https://deno.land/x/denomander/mod.ts";
 
 export { Denomander };
