@@ -6,7 +6,7 @@ const initDenomander = () => {
   const program = new Denomander({
     app_name: "Nessie Migrations",
     app_description: "A database migration tool for Deno.",
-    app_version: "1.1.1",
+    app_version: "1.1.2",
   });
 
   program
