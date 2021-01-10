@@ -1,10 +1,10 @@
-export { relative, resolve } from "https://deno.land/std@0.73.0/path/mod.ts";
+export { relative, resolve } from "https://deno.land/std@0.83.0/path/mod.ts";
 export {
   assert,
-  assertArrayContains,
+  assertArrayIncludes,
   assertEquals,
-} from "https://deno.land/std@0.73.0/testing/asserts.ts";
+} from "https://deno.land/std@0.83.0/testing/asserts.ts";
 
-import Denomander from "https://deno.land/x/denomander@0.6.3/mod.ts";
+import Denomander from "https://raw.githubusercontent.com/siokas/denomander/master/mod.ts";
 
 export { Denomander };

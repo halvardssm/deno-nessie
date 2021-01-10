@@ -1,4 +1,4 @@
-import { assertArrayContains, assertEquals } from "../../deps.ts";
+import { assertArrayIncludes, assertEquals } from "../../deps.ts";
 import { Schema } from "../../qb.ts";
 
 const dialect = "mysql";
@@ -88,7 +88,7 @@ strings.forEach(({ name, string, solution }) =>
     name: "MySQL: " + (name || "Empty"),
     fn(): void {
       if (Array.isArray(string)) {
-        assertArrayContains(string, solution as string[]);
+        assertArrayIncludes(string, solution as string[]);
       }
       assertEquals(string, solution);
     },

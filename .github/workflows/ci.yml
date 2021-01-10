@@ -1,7 +1,7 @@
 name: CI
 
 env:
-  DENO_VERSION: 1.4.6
+  DENO_VERSION: 1.6.3
 
 on:
   push:
@@ -26,7 +26,7 @@ jobs:
 
       - name: Check Query Builder
         id: qb
-        uses: technote-space/get-diff-action@v1.2.8
+        uses: technote-space/get-diff-action@v4.0.5
         with:
           PREFIX_FILTER: |
             query-builder/
@@ -36,7 +36,7 @@ jobs:
 
       - name: Check CLI
         id: cli
-        uses: technote-space/get-diff-action@v1.2.8
+        uses: technote-space/get-diff-action@v4.0.5
         with:
           PREFIX_FILTER: |
             cli.ts
