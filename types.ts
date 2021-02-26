@@ -32,13 +32,13 @@ export type AmountMigrateT = number | undefined;
 export type AmountRollbackT = AmountMigrateT | "all";
 /** Query type. */
 export type QueryT = string | string[];
-/** Qhuery handler function. */
+/** Query handler function. */
 export type QueryHandler = (query: QueryT) => Promise<any>;
 
 /**
- * @deprecated Consider using migration classes. 
- * 
- * Type for migration files. 
+ * @deprecated Consider using migration classes.
+ *
+ * Type for migration files.
  */
 export type MigrationFile = {
   up: Migration;

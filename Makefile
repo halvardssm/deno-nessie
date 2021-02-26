@@ -15,13 +15,7 @@ rollback:
 	deno run --allow-net --allow-read cli.ts rollback -c ${CONFIG_FILE}
 
 test-clean: db-all-restart sleeper
-test-all:
-	make test-qb & make test-clean
-	make test-qb-migrations
-	make test-clean
-	make test-cli-migrations
-	make test-clean
-	make test-cli-migrations-experimental
+test-all: test-qb test-clean test-qb-migrations test-clean test-cli-migrations test-clean test-cli-migrations-experimental
 
 test-qb:
 	deno test tests/query-builder
@@ -35,7 +29,7 @@ sleeper:
 	sleep 45s
 
 db-all-restart: db-all-stop db-all-start
-db-all-start: db-pg-start db-mysql-start db-sqlite-start
+db-all-start: db-sqlite-start db-pg-start db-mysql-start
 db-all-stop: db-pg-stop db-mysql-stop db-sqlite-stop
 db-pg-start:
 	docker run -d -p $(DB_PG_PORT):5432 -e POSTGRES_USER=$(DB_USER) -e POSTGRES_PASSWORD=$(DB_PWD) -e POSTGRES_DB=${DB_NAME} -v `pwd`/tests/data/pg:/var/lib/postgresql/data --rm --name $(DB_NAME)-pg postgres:latest
