@@ -16,16 +16,17 @@ import type {
   AbstractMigrationProps,
 } from "../wrappers/AbstractMigration.ts";
 import { AbstractSeed, AbstractSeedProps } from "../wrappers/AbstractSeed.ts";
+import {
+  COL_FILE_NAME,
+  DEFAULT_MIGRATION_FOLDER,
+  DEFAULT_SEED_FOLDER,
+  REGEX_MIGRATION_FILE_NAME,
+  TABLE_MIGRATIONS,
+} from "../consts.ts";
 
 /** The abstract client which handles most of the logic related to database communication. */
 export abstract class AbstractClient<Client> {
-  static readonly MAX_FILE_NAME_LENGTH = 100;
-
-  protected readonly TABLE_MIGRATIONS = "nessie_migrations";
-  protected readonly COL_FILE_NAME = "file_name";
-  protected readonly COL_CREATED_AT = "created_at";
-  protected readonly REGEX_MIGRATION_FILE_NAME = /^\d{10,14}-.+.ts$/;
-  protected readonly regexFileName = new RegExp(this.REGEX_MIGRATION_FILE_NAME);
+  protected readonly regexFileName = new RegExp(REGEX_MIGRATION_FILE_NAME);
 
   protected logger: LoggerFn = () => undefined;
 
@@ -38,20 +39,20 @@ export abstract class AbstractClient<Client> {
   dialect?: DBDialects;
 
   protected readonly QUERY_GET_LATEST =
-    `SELECT ${this.COL_FILE_NAME} FROM ${this.TABLE_MIGRATIONS} ORDER BY ${this.COL_FILE_NAME} DESC LIMIT 1;`;
+    `SELECT ${COL_FILE_NAME} FROM ${TABLE_MIGRATIONS} ORDER BY ${COL_FILE_NAME} DESC LIMIT 1;`;
   protected readonly QUERY_GET_ALL =
-    `SELECT ${this.COL_FILE_NAME} FROM ${this.TABLE_MIGRATIONS} ORDER BY ${this.COL_FILE_NAME} DESC;`;
+    `SELECT ${COL_FILE_NAME} FROM ${TABLE_MIGRATIONS} ORDER BY ${COL_FILE_NAME} DESC;`;
 
   protected QUERY_MIGRATION_INSERT: QueryWithString = (fileName) =>
-    `INSERT INTO ${this.TABLE_MIGRATIONS} (${this.COL_FILE_NAME}) VALUES ('${fileName}');`;
+    `INSERT INTO ${TABLE_MIGRATIONS} (${COL_FILE_NAME}) VALUES ('${fileName}');`;
   protected QUERY_MIGRATION_DELETE: QueryWithString = (fileName) =>
-    `DELETE FROM ${this.TABLE_MIGRATIONS} WHERE ${this.COL_FILE_NAME} = '${fileName}';`;
+    `DELETE FROM ${TABLE_MIGRATIONS} WHERE ${COL_FILE_NAME} = '${fileName}';`;
 
   constructor(options: AbstractClientOptions<Client>) {
     this.migrationFolder = resolve(
-      options.migrationFolder || "./db/migrations",
+      options.migrationFolder || DEFAULT_MIGRATION_FOLDER,
     );
-    this.seedFolder = resolve(options.seedFolder || "./db/seeds");
+    this.seedFolder = resolve(options.seedFolder || DEFAULT_SEED_FOLDER);
     this.client = options.client;
     this.experimental = options.experimental || false;
 

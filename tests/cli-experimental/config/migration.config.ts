@@ -22,6 +22,7 @@ export const runner = async (dialect: string, type: any[]) => {
       "--allow-read",
       "--allow-write",
       "--allow-env",
+      "--unstable",
       "cli.ts",
       ...type,
       "-c",

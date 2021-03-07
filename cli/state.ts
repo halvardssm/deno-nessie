@@ -1,15 +1,11 @@
-import { AbstractClient } from "../clients/AbstractClient.ts";
-import { ClientPostgreSQL } from "../clients/ClientPostgreSQL.ts";
-import type { Denomander } from "../deps.ts";
-import { parsePath } from "./utils.ts";
+import { Denomander, exists } from "../deps.ts";
+import { isUrl, parsePath } from "./utils.ts";
 import type { ClientI, NessieConfig } from "../types.ts";
-
-const STD_CONFIG_FILE = "nessie.config.ts";
-const STD_CLIENT_OPTIONS = {
-  seedFolder: "./db/seeds",
-  migrationFolder: "./db/migrations",
-  experimental: true,
-};
+import {
+  DEFAULT_CONFIG_FILE,
+  MAX_FILE_NAME_LENGTH,
+  URL_TEMPLATE_BASE,
+} from "../consts.ts";
 
 /** The main state for the application.
  *
@@ -23,7 +19,7 @@ export class State {
 
   constructor(args: Denomander) {
     this.enableDebug = args.debug;
-    this.configFile = parsePath(args.config || STD_CONFIG_FILE);
+    this.configFile = parsePath(args.config || DEFAULT_CONFIG_FILE);
 
     this.logger([this.enableDebug, this.configFile], "State");
   }
@@ -31,26 +27,21 @@ export class State {
   /** Initializes the state with a client */
   async init() {
     this.logger("Checking config path");
-    this.config = await this._safeConfigImport(this.configFile);
 
-    if (!this.config) {
+    if (isUrl(this.configFile) || exists(this.configFile)) {
+      const configRaw = await import(this.configFile);
+      this.config = configRaw.default;
+    } else if (
+      isUrl(parsePath(DEFAULT_CONFIG_FILE)) ||
+      exists(parsePath(DEFAULT_CONFIG_FILE))
+    ) {
       this.logger("Checking project root");
-      this.config = await this._safeConfigImport(parsePath(STD_CONFIG_FILE));
-    }
-
-    if (!this.config?.client) {
-      this.logger("Using standard config");
-
-      this.client = new ClientPostgreSQL(STD_CLIENT_OPTIONS, {
-        database: "nessie",
-        hostname: "localhost",
-        port: 5432,
-        user: "root",
-        password: "pwd",
-      });
+      this.config = await import(parsePath(DEFAULT_CONFIG_FILE));
     } else {
-      this.client = this.config.client;
+      throw new Error("Config file is not found");
     }
+
+    this.client = this.config!.client;
 
     this.client.setLogger(this.logger.bind(this));
 
@@ -60,11 +51,10 @@ export class State {
   /** Makes the migration */
   async makeMigration(migrationName = "migration") {
     if (
-      migrationName.length > AbstractClient.MAX_FILE_NAME_LENGTH - 13
+      migrationName.length > MAX_FILE_NAME_LENGTH - 13
     ) {
       throw new Error(
-        `Migration name can't be longer than ${AbstractClient
-          .MAX_FILE_NAME_LENGTH - 13}`,
+        `Migration name can't be longer than ${MAX_FILE_NAME_LENGTH - 13}`,
       );
     }
 
@@ -74,9 +64,7 @@ export class State {
 
     await Deno.mkdir(this.client!.migrationFolder, { recursive: true });
 
-    const responseFile = await fetch(
-      "https://deno.land/x/nessie/cli/templates/migration.ts",
-    );
+    const responseFile = await fetch(URL_TEMPLATE_BASE + "/migration.ts");
 
     await Deno.writeTextFile(
       `${this.client!.migrationFolder}/${fileName}`,
@@ -99,9 +87,7 @@ export class State {
 
     await Deno.mkdir(this.client!.seedFolder, { recursive: true });
 
-    const responseFile = await fetch(
-      "https://deno.land/x/nessie/cli/templates/seed.ts",
-    );
+    const responseFile = await fetch(URL_TEMPLATE_BASE + "seed.ts");
 
     await Deno.writeTextFile(
       `${this.client!.seedFolder}/${fileName}`,
@@ -122,17 +108,6 @@ export class State {
       }
     } catch {
       console.error("Error at: " + title);
-    }
-  }
-
-  /** Method for importing the config files */
-  private async _safeConfigImport(file: string): Promise<any | undefined> {
-    try {
-      const configRaw = await import(file);
-      return configRaw.default;
-    } catch (e) {
-      this.logger(e);
-      return;
     }
   }
 }

@@ -7,9 +7,9 @@ DB_NAME=nessie
 test-all: db-all-restart test-cli-migrations db-all-restart test-cli-migrations-experimental
 
 test-cli-migrations:
-	deno test --allow-write --allow-run --allow-read tests/cli
+	deno test --allow-write --allow-run --allow-read --unstable tests/cli
 test-cli-migrations-experimental:
-	deno test --allow-write --allow-run --allow-read tests/cli-experimental
+	deno test --allow-write --allow-run --allow-read --unstable tests/cli-experimental
 
 db-all-restart: db-all-stop db-all-start
 db-all-start: db-pg-start db-mysql-start db-sqlite-start

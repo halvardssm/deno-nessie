@@ -10,6 +10,12 @@ import type {
   DBDialects,
   QueryT,
 } from "../types.ts";
+import {
+  COL_CREATED_AT,
+  COL_FILE_NAME,
+  MAX_FILE_NAME_LENGTH,
+  TABLE_MIGRATIONS,
+} from "../consts.ts";
 
 export type { ConnectionOptions };
 
@@ -19,10 +25,10 @@ export class ClientPostgreSQL extends AbstractClient<Client>
   dialect: DBDialects = "pg";
 
   private QUERY_MIGRATION_TABLE_EXISTS =
-    `SELECT to_regclass('${this.TABLE_MIGRATIONS}');`;
+    `SELECT to_regclass('${TABLE_MIGRATIONS}');`;
 
   private QUERY_CREATE_MIGRATION_TABLE =
-    `CREATE TABLE ${this.TABLE_MIGRATIONS} (id bigserial PRIMARY KEY, ${this.COL_FILE_NAME} varchar(${AbstractClient.MAX_FILE_NAME_LENGTH}) UNIQUE, ${this.COL_CREATED_AT} timestamp (0) default current_timestamp);`;
+    `CREATE TABLE ${TABLE_MIGRATIONS} (id bigserial PRIMARY KEY, ${COL_FILE_NAME} varchar(${MAX_FILE_NAME_LENGTH}) UNIQUE, ${COL_CREATED_AT} timestamp (0) default current_timestamp);`;
 
   constructor(
     options: ClientOptions,
@@ -42,7 +48,7 @@ export class ClientPostgreSQL extends AbstractClient<Client>
     ) as QueryResult;
 
     const migrationTableExists =
-      queryResult.rows?.[0]?.[0] === this.TABLE_MIGRATIONS;
+      queryResult.rows?.[0]?.[0] === TABLE_MIGRATIONS;
 
     if (!migrationTableExists) {
       await this.client.query(this.QUERY_CREATE_MIGRATION_TABLE);

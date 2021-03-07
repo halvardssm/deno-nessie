@@ -9,15 +9,21 @@ import type {
   DBDialects,
   QueryT,
 } from "../types.ts";
+import {
+  COL_CREATED_AT,
+  COL_FILE_NAME,
+  MAX_FILE_NAME_LENGTH,
+  TABLE_MIGRATIONS,
+} from "../consts.ts";
 
 /** SQLite client */
 export class ClientSQLite extends AbstractClient<DB> implements ClientI {
   dialect: DBDialects = "sqlite3";
 
   private QUERY_MIGRATION_TABLE_EXISTS =
-    `SELECT name FROM sqlite_master WHERE type='table' AND name='${this.TABLE_MIGRATIONS}';`;
+    `SELECT name FROM sqlite_master WHERE type='table' AND name='${TABLE_MIGRATIONS}';`;
   private QUERY_CREATE_MIGRATION_TABLE =
-    `CREATE TABLE ${this.TABLE_MIGRATIONS} (id integer NOT NULL PRIMARY KEY autoincrement, ${this.COL_FILE_NAME} varchar(${AbstractClient.MAX_FILE_NAME_LENGTH}) UNIQUE, ${this.COL_CREATED_AT} datetime NOT NULL DEFAULT CURRENT_TIMESTAMP);`;
+    `CREATE TABLE ${TABLE_MIGRATIONS} (id integer NOT NULL PRIMARY KEY autoincrement, ${COL_FILE_NAME} varchar(${MAX_FILE_NAME_LENGTH}) UNIQUE, ${COL_CREATED_AT} datetime NOT NULL DEFAULT CURRENT_TIMESTAMP);`;
 
   constructor(options: ClientOptions, connectionOptions: string) {
     super({
@@ -30,7 +36,7 @@ export class ClientSQLite extends AbstractClient<DB> implements ClientI {
     const queryResult = await this.query(this.QUERY_MIGRATION_TABLE_EXISTS);
 
     const migrationTableExists =
-      queryResult?.[0]?.[0]?.[0] === this.TABLE_MIGRATIONS;
+      queryResult?.[0]?.[0]?.[0] === TABLE_MIGRATIONS;
 
     if (!migrationTableExists) {
       await this.query(this.QUERY_CREATE_MIGRATION_TABLE);

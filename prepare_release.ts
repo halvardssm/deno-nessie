@@ -1,10 +1,10 @@
 const REG_EXP_VERSION = /^\d+.\d+.\d+$/;
 const REG_EXP_README_VERSION = /shields\.io\/badge\/deno-v\d+.\d+.\d+/;
-const REG_EXP_CLI_VERSION = /app_version: \"\d+.\d+.\d\"/;
+const REG_EXP_PROGRAM_VERSION = /export const VERSION = \"\d+.\d+.\d\";/;
 const REG_EXP_CI = /DENO_VERSION: \d+.\d+.\d/;
 const FILE_JSON_EGG = "egg.json";
 const FILE_README = "README.md";
-const FILE_CLI = "cli.ts";
+const FILE_PROGRAM = "consts.ts";
 const FILES_CI = [
   ".github/workflows/ci.yml",
   ".github/workflows/publish_nest.yml",
@@ -45,7 +45,7 @@ const setEggConfig = async (version: string) => {
 };
 
 const setReadMe = async (version: string) => {
-  let readme = await Deno.readTextFile(FILE_README);
+  const readme = await Deno.readTextFile(FILE_README);
 
   const res = readme.replace(
     REG_EXP_README_VERSION,
@@ -57,14 +57,17 @@ const setReadMe = async (version: string) => {
   console.info(`README.md updated to ${version}`);
 };
 
-const setCli = async (version: string) => {
-  const cli = await Deno.readTextFile(FILE_CLI);
+const setProgram = async (version: string) => {
+  const cli = await Deno.readTextFile(FILE_PROGRAM);
 
-  const res = cli.replace(REG_EXP_CLI_VERSION, `app_version: "${version}"`);
+  const res = cli.replace(
+    REG_EXP_PROGRAM_VERSION,
+    `export const VERSION = "${version}";`,
+  );
 
-  await Deno.writeTextFile(FILE_CLI, res);
+  await Deno.writeTextFile(FILE_PROGRAM, res);
 
-  console.info(`cli.ts updated to ${version}`);
+  console.info(`consts.ts updated to ${version}`);
 };
 
 const setCI = async (version: string) => {
@@ -84,7 +87,7 @@ if (versionNessie) {
 }
 
 if (versionNessie) {
-  await setCli(versionNessie);
+  await setProgram(versionNessie);
 }
 
 if (versionDeno) {

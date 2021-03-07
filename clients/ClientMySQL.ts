@@ -8,6 +8,12 @@ import type {
   DBDialects,
   QueryT,
 } from "../types.ts";
+import {
+  COL_CREATED_AT,
+  COL_FILE_NAME,
+  MAX_FILE_NAME_LENGTH,
+  TABLE_MIGRATIONS,
+} from "../consts.ts";
 
 /** MySQL client */
 export class ClientMySQL extends AbstractClient<Client> implements ClientI {
@@ -16,9 +22,9 @@ export class ClientMySQL extends AbstractClient<Client> implements ClientI {
 
   private QUERY_MIGRATION_TABLE_EXISTS =
     // `show tables like '${this.TABLE_MIGRATIONS}';`;
-    `SELECT * FROM information_schema.tables WHERE table_name = '${this.TABLE_MIGRATIONS}' LIMIT 1;`;
+    `SELECT * FROM information_schema.tables WHERE table_name = '${TABLE_MIGRATIONS}' LIMIT 1;`;
   private QUERY_CREATE_MIGRATION_TABLE =
-    `CREATE TABLE ${this.TABLE_MIGRATIONS} (id bigint UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, ${this.COL_FILE_NAME} varchar(${AbstractClient.MAX_FILE_NAME_LENGTH}) NOT NULL UNIQUE, ${this.COL_CREATED_AT} datetime NOT NULL DEFAULT CURRENT_TIMESTAMP);`;
+    `CREATE TABLE ${TABLE_MIGRATIONS} (id bigint UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, ${COL_FILE_NAME} varchar(${MAX_FILE_NAME_LENGTH}) NOT NULL UNIQUE, ${COL_CREATED_AT} datetime NOT NULL DEFAULT CURRENT_TIMESTAMP);`;
 
   constructor(
     options: ClientOptions,
@@ -77,7 +83,7 @@ export class ClientMySQL extends AbstractClient<Client> implements ClientI {
     const latestMigration = await this.query(this.QUERY_GET_LATEST);
     await super.migrate(
       amount,
-      latestMigration?.[0]?.[0]?.[this.COL_FILE_NAME],
+      latestMigration?.[0]?.[0]?.[COL_FILE_NAME],
       this.query.bind(this),
     );
   }
@@ -86,7 +92,7 @@ export class ClientMySQL extends AbstractClient<Client> implements ClientI {
     const allMigrations = await this.query(this.QUERY_GET_ALL);
 
     const parsedMigrations: string[] = allMigrations?.[0].map((el: any) =>
-      el?.[this.COL_FILE_NAME]
+      el?.[COL_FILE_NAME]
     );
 
     await super.rollback(

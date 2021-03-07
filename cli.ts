@@ -1,12 +1,13 @@
 import { State } from "./cli/state.ts";
-import { Denomander, resolve } from "./deps.ts";
+import { Denomander, DenomanderConfig, resolve } from "./deps.ts";
+import { URL_TEMPLATE_BASE, VERSION } from "./consts.ts";
 
 /** Initializes Denomander */
 const initDenomander = () => {
   const program = new Denomander({
     app_name: "Nessie Migrations",
     app_description: "A database migration tool for Deno.",
-    app_version: "1.1.3",
+    app_version: VERSION,
   });
 
   program
@@ -38,9 +39,7 @@ const initDenomander = () => {
 
 /** Initializes Nessie */
 const initNessie = async () => {
-  const responseFile = await fetch(
-    "https://deno.land/x/nessie/cli/templates/config.ts",
-  );
+  const responseFile = await fetch(URL_TEMPLATE_BASE + "config.ts");
 
   await Deno.writeTextFile(
     resolve(Deno.cwd(), "nessie.config.ts"),

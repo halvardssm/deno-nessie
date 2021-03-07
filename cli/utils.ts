@@ -6,11 +6,17 @@ import { resolve } from "../deps.ts";
  * Else, the path will be prefixed by `file://` and resolved. 
  */
 export const parsePath = (...path: string[]): string => {
-  if (
-    path.length === 1 &&
-    (path[0]?.startsWith("http://") || path[0]?.startsWith("https://"))
-  ) {
+  if (path.length === 1 && isUrl(path[0])) {
     return path[0];
   }
+
   return "file://" + resolve(...path);
+};
+
+export const isUrl = (path: string) => {
+  if (path?.startsWith("http://") || path?.startsWith("https://")) {
+    return true;
+  }
+
+  return false;
 };
