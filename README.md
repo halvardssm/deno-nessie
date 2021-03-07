@@ -9,11 +9,11 @@
 
 <p align="center"><img src="./.github/logo.png" alt="Nessie logo" width="200" height="200"></p>
 
-A modular database migration tool for [Deno](https://deno.land) inspired by [Laravel](https://github.com/laravel/laravel). Currently supports PostgreSQL, MySQL and SQLite.
+A modular database migration tool for [Deno](https://deno.land) inspired by [Laravel](https://github.com/laravel/laravel) and [Phinx](https://github.com/cakephp/phinx). Currently supports PostgreSQL, MySQL and SQLite.
 
 If you would like to see your DB flavor supported, take a look at how to make a client plugin with examples in the [clients folder](./clients) or in the section [How to make a client](#how-to-make-a-client).
 
-See documentation for the [query builder](https://doc.deno.land/https/deno.land/x/nessie/qb.ts).
+The query builder is no longer maintained. If you need the code, it has been moved to [its own repo](https://github.com/halvardssm/deno-query-builder). It can also be found in Nessie version 1.1.3 or older.
 
 See documentation for the [clients](https://doc.deno.land/https/deno.land/x/nessie/mod.ts).
 
