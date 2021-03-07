@@ -1,6 +1,6 @@
-import type { ConnectionOptions } from "https://deno.land/x/postgres@v0.8.0/connection_params.ts";
-import { Client } from "https://deno.land/x/postgres@v0.8.0/mod.ts";
-import type { QueryResult } from "https://deno.land/x/postgres@v0.8.0/query/query.ts";
+import type { ConnectionOptions } from "https://deno.land/x/postgres@v0.4.6/connection_params.ts";
+import { Client } from "https://deno.land/x/postgres@v0.4.6/mod.ts";
+import type { QueryResult } from "https://deno.land/x/postgres@v0.4.6/query.ts";
 import { AbstractClient } from "./AbstractClient.ts";
 import type {
   AmountMigrateT,
