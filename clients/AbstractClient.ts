@@ -152,7 +152,6 @@ export abstract class AbstractClient<Client> {
           const exposedObject: Info<any> = {
             dialect: this.dialect!,
             connection: queryHandler,
-            queryBuilder: undefined,
           };
 
           const SeedClass: new (
