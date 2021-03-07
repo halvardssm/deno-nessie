@@ -1,6 +1,10 @@
 import { State } from "./cli/state.ts";
-import { Denomander, DenomanderConfig, resolve } from "./deps.ts";
-import { URL_TEMPLATE_BASE, VERSION } from "./consts.ts";
+import { Denomander, format, resolve } from "./deps.ts";
+import {
+  REGEX_MIGRATION_FILE_NAME,
+  URL_TEMPLATE_BASE,
+  VERSION,
+} from "./consts.ts";
 
 /** Initializes Denomander */
 const initDenomander = () => {
@@ -30,6 +34,10 @@ const initDenomander = () => {
     .command(
       "rollback [amount?]",
       "Rolls back migrations. Optional number of rollbacks. If not provided, it will do one.",
+    )
+    .command(
+      "update_timestamps",
+      "Update the timestamp format from milliseconds to timestamp. This command should be run inside of the folder where you store your migrations.",
     );
 
   program.parse(Deno.args);
@@ -52,6 +60,26 @@ const initNessie = async () => {
   await Deno.create(resolve(Deno.cwd(), "db/seeds/.gitkeep"));
 };
 
+const updateTimestamps = () => {
+  const migrationFiles = [...Deno.readDirSync(Deno.cwd())];
+
+  migrationFiles
+    .filter((el) => el.isFile && REGEX_MIGRATION_FILE_NAME.test(el.name))
+    .map((el) => {
+      const milliseconds = el.name.split("-", 1)[0];
+      const timestamp = new Date(milliseconds);
+      const newName = format(timestamp, "yyyyMMddHHmmss");
+
+      return {
+        oldName: el.name,
+        newName,
+      };
+    })
+    .forEach(({ oldName, newName }) => {
+      Deno.renameSync(oldName, newName);
+    });
+};
+
 /** Main application */
 const run = async () => {
   try {
@@ -59,6 +87,8 @@ const run = async () => {
 
     if (prog.init) {
       await initNessie();
+    } else if (prog.update_timestamps) {
+      updateTimestamps();
     } else {
       const state = await new State(prog).init();
 
@@ -80,6 +110,7 @@ const run = async () => {
         await state.client!.close();
       }
     }
+
     Deno.exit();
   } catch (e) {
     console.error(e);
