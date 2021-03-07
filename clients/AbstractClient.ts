@@ -34,7 +34,6 @@ export abstract class AbstractClient<Client> {
   migrationFolder: string;
   seedFolder: string;
   experimental: boolean;
-  exposeQueryBuilder = false;
   dialect?: DBDialects;
 
   protected readonly QUERY_GET_LATEST =
@@ -195,13 +194,7 @@ export abstract class AbstractClient<Client> {
     const exposedObject: Info<any> = {
       dialect: this.dialect!,
       connection: queryHandler,
-      queryBuilder: undefined,
     };
-
-    if (this.exposeQueryBuilder) {
-      const { Schema } = await import("https://deno.land/x/nessie/qb.ts");
-      exposedObject.queryBuilder = new Schema(this.dialect);
-    }
 
     if (this.experimental) {
       const MigrationClass: new (

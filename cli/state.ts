@@ -52,10 +52,6 @@ export class State {
       this.client = this.config.client;
     }
 
-    if (this.config?.exposeQueryBuilder) {
-      this.client.exposeQueryBuilder = this.config.exposeQueryBuilder;
-    }
-
     this.client.setLogger(this.logger.bind(this));
 
     return this;

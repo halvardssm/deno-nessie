@@ -8,8 +8,6 @@ export type Info<T = undefined> = {
   dialect: DBDialects;
   /** @deprecated Will be removed as connection will be exposed in the wrapper class */
   connection: QueryHandler;
-  /** @deprecated Will be removed */
-  queryBuilder: T;
 };
 
 /**
@@ -57,8 +55,6 @@ export interface ClientI {
   migrationFiles: Deno.DirEntry[];
   /** Seed files read from the seed folder */
   seedFiles: Deno.DirEntry[];
-  /** Toggle for whether or not the qb should be exposed in migration methods */
-  exposeQueryBuilder: boolean;
   /** Prepares the db connection */
   prepare: () => Promise<void>;
   /** Closes the db connection */
@@ -78,7 +74,6 @@ export interface ClientI {
 /** Nessie config options. */
 export interface NessieConfig {
   client: ClientI;
-  exposeQueryBuilder?: boolean;
   experimental?: boolean;
 }
 
