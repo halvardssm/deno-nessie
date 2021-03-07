@@ -12,44 +12,8 @@ on:
       - master
 
 jobs:
-  info:
-    name: Get Info
-    runs-on: ubuntu-latest
-
-    outputs:
-      qb: ${{ steps.qb.outputs.diff }}
-      cli: ${{ steps.cli.outputs.diff }}
-
-    steps:
-      - name: Clone repo
-        uses: actions/checkout@master
-
-      - name: Check Query Builder
-        id: qb
-        uses: technote-space/get-diff-action@v4.0.5
-        with:
-          PREFIX_FILTER: |
-            query-builder/
-            tests/query-builder/
-            tests/query-builder-migrations/
-          SUFFIX_FILTER: .ts
-
-      - name: Check CLI
-        id: cli
-        uses: technote-space/get-diff-action@v4.0.5
-        with:
-          PREFIX_FILTER: |
-            cli.ts
-            deps.ts
-            mod.ts
-            cli/**
-            clients/**
-            tests/cli/**
-
   cli:
     name: Test CLI
-    needs: info
-    if: needs.info.outputs.cli || contains(github.ref, 'master')
     runs-on: ubuntu-latest
     
     steps:
@@ -75,8 +39,6 @@ jobs:
 
   cli-migrations:
     name: Test CLI Migrations
-    needs: info
-    if: needs.info.outputs.cli || contains(github.ref, 'master')
     runs-on: ubuntu-latest
 
     services:
@@ -125,7 +87,6 @@ jobs:
   cli-migrations-experimental:
     name: Test CLI Migrations Experimental
     needs: info
-    if: needs.info.outputs.cli || contains(github.ref, 'master')
     runs-on: ubuntu-latest
 
     services:
