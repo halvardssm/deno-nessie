@@ -4,41 +4,49 @@ DB_USER=root
 DB_PWD=pwd
 DB_NAME=nessie
 
-CONFIG_FILE=./tests/config/mysql.config.ts
-DB_URL=postgres://${DB_USER}:${DB_PWD@localhost:${DB_PG_PORT}/${DB_NAME}
+test-all: db-all-restart test-cli-migrations db-all-restart test-cli-migrations-experimental
 
-migration-%:
-	deno run --allow-write --allow-read --allow-net cli.ts make $* -c ${CONFIG_FILE}
-migrate:
-	deno run --allow-net --allow-read cli.ts migrate -c ${CONFIG_FILE}
-rollback:
-	deno run --allow-net --allow-read cli.ts rollback -c ${CONFIG_FILE}
-
-test-clean: db-all-restart sleeper
-test-all: test-qb test-clean test-qb-migrations test-clean test-cli-migrations test-clean test-cli-migrations-experimental
-
-test-qb:
-	deno test tests/query-builder
-test-qb-migrations:
-	deno test --allow-write --allow-run --allow-read tests/query-builder-migrations
 test-cli-migrations:
 	deno test --allow-write --allow-run --allow-read tests/cli
 test-cli-migrations-experimental:
 	deno test --allow-write --allow-run --allow-read tests/cli-experimental
-sleeper:
-	sleep 45s
 
 db-all-restart: db-all-stop db-all-start
-db-all-start: db-sqlite-start db-pg-start db-mysql-start
+db-all-start: db-pg-start db-mysql-start db-sqlite-start
 db-all-stop: db-pg-stop db-mysql-stop db-sqlite-stop
 db-pg-start:
-	docker run -d -p $(DB_PG_PORT):5432 -e POSTGRES_USER=$(DB_USER) -e POSTGRES_PASSWORD=$(DB_PWD) -e POSTGRES_DB=${DB_NAME} -v `pwd`/tests/data/pg:/var/lib/postgresql/data --rm --name $(DB_NAME)-pg postgres:latest
+	docker run -d --rm \
+	-p $(DB_PG_PORT):5432 \
+	-e POSTGRES_USER=$(DB_USER) \
+	-e POSTGRES_PASSWORD=$(DB_PWD) \
+	-e POSTGRES_DB=${DB_NAME} \
+	-v `pwd`/tests/data/pg:/var/lib/postgresql/data \
+	--name $(DB_NAME)-pg \
+	--health-cmd pg_isready \
+	--health-interval 10s \
+	--health-timeout 5s \
+	--health-retries 5 \
+	postgres:latest
+	while [ "`docker inspect -f {{.State.Health.Status}} $(DB_NAME)-pg`" != "healthy" ]; do sleep 10; done
+	sleep 5
 db-pg-stop:
 	docker kill ${DB_NAME}-pg | true
 	rm -rf tests/data/pg
 db-mysql-start:
 	# docker run -d -p $(DB_MYSQL_PORT):3306 -e MYSQL_ROOT_PASSWORD=$(DB_PWD) -e MYSQL_DATABASE=${DB_NAME} -v `pwd`/tests/data/mysql:/var/lib/mysql --rm --name $(DB_NAME)-mysql mysql:5
-	docker run -d -p $(DB_MYSQL_PORT):3306 -e MYSQL_ALLOW_EMPTY_PASSWORD=true -e MYSQL_DATABASE=${DB_NAME} -v `pwd`/tests/data/mysql:/var/lib/mysql --rm --name $(DB_NAME)-mysql mysql:latest
+	docker run -d --rm \
+	-p $(DB_MYSQL_PORT):3306 \
+	-e MYSQL_ALLOW_EMPTY_PASSWORD=true \
+	-e MYSQL_DATABASE=${DB_NAME} \
+	-v `pwd`/tests/data/mysql:/var/lib/mysql \
+	--name $(DB_NAME)-mysql \
+	--health-cmd "mysqladmin ping" \
+	--health-interval 10s \
+	--health-timeout 5s \
+	--health-retries 5 \
+	mysql:latest
+	while [ "`docker inspect -f {{.State.Health.Status}} $(DB_NAME)-mysql`" != "healthy" ]; do sleep 10; done
+	sleep 5
 db-mysql-stop:
 	docker kill ${DB_NAME}-mysql | true
 	rm -rf tests/data/mysql

@@ -34,8 +34,6 @@ const clientSqLite = new ClientSQLite(clientOptions, "./sqlite.db");
 /** This is the final config object */
 const config = {
   client: clientPg,
-  // Defaults to false, if you want the query builder exposed in migration files, set this to true.
-  exposeQueryBuilder: false,
 };
 
 export default config;

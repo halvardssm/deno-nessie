@@ -1,7 +1,7 @@
 name: CI
 
 env:
-  DENO_VERSION: 1.8.0
+  DENO_VERSION: 1.7.5
 
 on:
   push:
@@ -12,44 +12,8 @@ on:
       - master
 
 jobs:
-  info:
-    name: Get Info
-    runs-on: ubuntu-latest
-
-    outputs:
-      qb: ${{ steps.qb.outputs.diff }}
-      cli: ${{ steps.cli.outputs.diff }}
-
-    steps:
-      - name: Clone repo
-        uses: actions/checkout@master
-
-      - name: Check Query Builder
-        id: qb
-        uses: technote-space/get-diff-action@v4.0.5
-        with:
-          PREFIX_FILTER: |
-            query-builder/
-            tests/query-builder/
-            tests/query-builder-migrations/
-          SUFFIX_FILTER: .ts
-
-      - name: Check CLI
-        id: cli
-        uses: technote-space/get-diff-action@v4.0.5
-        with:
-          PREFIX_FILTER: |
-            cli.ts
-            deps.ts
-            mod.ts
-            cli/**
-            clients/**
-            tests/cli/**
-
   cli:
     name: Test CLI
-    needs: info
-    if: needs.info.outputs.cli || contains(github.ref, 'master')
     runs-on: ubuntu-latest
     
     steps:
@@ -75,8 +39,6 @@ jobs:
 
   cli-migrations:
     name: Test CLI Migrations
-    needs: info
-    if: needs.info.outputs.cli || contains(github.ref, 'master')
     runs-on: ubuntu-latest
 
     services:
@@ -125,7 +87,6 @@ jobs:
   cli-migrations-experimental:
     name: Test CLI Migrations Experimental
     needs: info
-    if: needs.info.outputs.cli || contains(github.ref, 'master')
     runs-on: ubuntu-latest
 
     services:
@@ -170,70 +131,3 @@ jobs:
 
       - name: Run tests
         run: make test-cli-migrations-experimental
-
-  query-builder:
-    name: Test Query Builder
-    needs: info
-    if: needs.info.outputs.qb || contains(github.ref, 'master')
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Clone repo
-        uses: actions/checkout@master
-
-      - name: Install deno
-        uses: denolib/setup-deno@master
-        with:
-          deno-version: ${{env.DENO_VERSION}}
-
-      - name: Test query builder
-        run: make test-qb
-
-  query-builder-migrations:
-    name: Test Query Builder Migration
-    needs: [info, query-builder]
-    if: needs.info.outputs.qb || contains(github.ref, 'master')
-    runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_USER: root
-          POSTGRES_PASSWORD: pwd
-          POSTGRES_DB: nessie
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5000:5432
-
-      mysql:
-        image: mysql
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: true
-          MYSQL_DATABASE: nessie
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-        ports:
-          - 5001:3306
-
-    steps:
-      - name: Clone repo
-        uses: actions/checkout@master
-
-      - name: Install deno
-        uses: denolib/setup-deno@master
-        with:
-          deno-version: ${{env.DENO_VERSION}}
-
-      - name: Create SQLite db
-        run: make db-sqlite-start
-
-      - name: Test query builder
-        run: make test-qb-migrations
