@@ -25,7 +25,7 @@ export const runner = async (dialect: string, type: any[]) => {
       "cli.ts",
       ...type,
       "-c",
-      `./tests/cli/config/${dialect}.config.ts`,
+      `./tests/cli-experimental/config/${dialect}.config.ts`,
       // "-d",
     ],
     stdout: "piped",

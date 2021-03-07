@@ -15,6 +15,7 @@ import type {
   AbstractMigration,
   AbstractMigrationProps,
 } from "../wrappers/AbstractMigration.ts";
+import { AbstractSeed, AbstractSeedProps } from "../wrappers/AbstractSeed.ts";
 
 /** The abstract client which handles most of the logic related to database communication. */
 export abstract class AbstractClient<Client> {
@@ -147,12 +148,31 @@ export abstract class AbstractClient<Client> {
       return;
     } else {
       for await (const file of files) {
-        const filePath = parsePath(this.seedFolder, file.name);
+        if (this.experimental) {
+          const exposedObject: Info<any> = {
+            dialect: this.dialect!,
+            connection: queryHandler,
+            queryBuilder: undefined,
+          };
 
-        const { run } = await import(filePath);
-        const sql = await run();
+          const SeedClass: new (
+            props: AbstractSeedProps<Client>,
+          ) => AbstractSeed<Client> = (await import(
+            parsePath(
+              this.seedFolder,
+              file.name,
+            )
+          )).default;
 
-        await queryHandler(sql);
+          const seed = new SeedClass({ client: this.client });
+          await seed.run(exposedObject);
+        } else {
+          const filePath = parsePath(this.seedFolder, file.name);
+          const { run } = await import(filePath);
+          const sql = await run();
+
+          await queryHandler(sql);
+        }
       }
 
       console.info("Seeding complete");
@@ -180,9 +200,9 @@ export abstract class AbstractClient<Client> {
       .sort((a, b) => parseInt(a?.name ?? "0") - parseInt(b?.name ?? "0"));
   }
 
-  /** 
-   * Handles migration files. 
-   * 
+  /**
+   * Handles migration files.
+   *
    * TODO on next major bump, remove non expreimental code
    */
   private async _migrationHandler(
@@ -210,8 +230,10 @@ export abstract class AbstractClient<Client> {
 
       if (isDown) {
         await migration.down(exposedObject);
+        await queryHandler(this.QUERY_MIGRATION_DELETE(fileName));
       } else {
         await migration.up(exposedObject);
+        await queryHandler(this.QUERY_MIGRATION_INSERT(fileName));
       }
     } else {
       const { up, down }: MigrationFile = await import(parsePath(
