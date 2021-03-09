@@ -1,4 +1,9 @@
-import { assertEquals, fromFileUrl, resolve } from "../../deps.ts";
+import {
+  assertArrayIncludes,
+  assertEquals,
+  fromFileUrl,
+  resolve,
+} from "../../deps.ts";
 
 Deno.test({
   name: "Update timestamps",
@@ -47,7 +52,8 @@ Deno.test({
     ];
 
     assertEquals(code, 0, result.join("\n"));
-    assertEquals(result.sort(), expected.sort());
+    assertEquals(result.length, expected.length, result.join("\n"));
+    assertArrayIncludes(result, expected);
 
     await Deno.remove(fileDir + "/22861120184639-test.ts");
     await Deno.remove(fileDir + "/20200426235022-test.ts");
