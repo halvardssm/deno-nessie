@@ -10,6 +10,12 @@ Deno.test({
   async fn() {
     const fileDir = resolve(fromFileUrl(import.meta.url), "..");
 
+    for await (const dirEntry of Deno.readDir(fileDir)) {
+      if (dirEntry.isFile && /.+-test\.ts/.test(dirEntry.name)) {
+        await Deno.remove(resolve(fileDir, dirEntry.name));
+      }
+    }
+
     await Deno.writeTextFile(fileDir + "/999999999999-test.ts", "");
     await Deno.writeTextFile(fileDir + "/1000000000000-test.ts", "");
     await Deno.writeTextFile(fileDir + "/1587937822648-test.ts", ""); //2020-04-26 23:50:22
