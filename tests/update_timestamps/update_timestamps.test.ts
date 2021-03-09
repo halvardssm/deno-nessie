@@ -47,7 +47,7 @@ Deno.test({
     ];
 
     assertEquals(code, 0, result.join("\n"));
-    assertEquals(result, expected);
+    assertEquals(result.sort(), expected.sort());
 
     await Deno.remove(fileDir + "/22861120184639-test.ts");
     await Deno.remove(fileDir + "/20200426235022-test.ts");
