@@ -130,3 +130,19 @@ jobs:
 
       - name: Run tests
         run: make test-cli-migrations-experimental
+  
+  cli-update-timestamps:
+    name: Test update timestamps
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@master
+
+      - name: Install deno
+        uses: denolib/setup-deno@master
+        with:
+          deno-version: ${{env.DENO_VERSION}}
+
+      - name: Run tests
+        run: make test-cli-update-timestamps
