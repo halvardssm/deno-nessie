@@ -18,7 +18,7 @@ Deno.test({
         "--allow-read",
         "--allow-write",
         "--unstable",
-        "../../cli_unstable.ts",
+        "../../cli.ts",
         "update_timestamps",
       ],
       cwd: "tests/update_timestamps",

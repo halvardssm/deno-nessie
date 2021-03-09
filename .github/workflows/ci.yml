@@ -132,7 +132,7 @@ jobs:
         run: make test-cli-migrations-experimental
   
   cli-update-timestamps:
-    name: Test update timestamps
+    name: Test CLI Update timestamps
     runs-on: ubuntu-latest
 
     steps:
