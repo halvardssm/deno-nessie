@@ -74,8 +74,17 @@ export interface ClientI {
 /** Nessie config options. */
 export interface NessieConfig {
   client: ClientI;
+  /** 
+   * Enables experimental options like migration classes, 
+   * features enabled in experimental mode are soon to be default 
+   * either in the next minor or major release 
+   */
   experimental?: boolean;
-  useTimestamps?: boolean;
+  /** 
+   * Defaults to false, only set to true if you are starting a new 
+   * project, or have run the upgrade_timestamps command (see readme)
+   */
+  useDateTime?: boolean;
 }
 
 /** Client config options. */

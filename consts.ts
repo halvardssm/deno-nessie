@@ -17,4 +17,4 @@ export const TABLE_MIGRATIONS = "nessie_migrations";
 export const COL_FILE_NAME = "file_name";
 export const COL_CREATED_AT = "created_at";
 export const REGEX_MIGRATION_FILE_NAME_LEGACY = /^\d{10,14}-.+.ts$/;
-export const REGEX_MIGRATION_FILE_NAME = /^\d{14}-.+.ts$/;
+export const REGEX_MIGRATION_FILE_NAME = /^\d{14}-.{0,235}.ts$/;
