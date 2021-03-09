@@ -86,7 +86,6 @@ jobs:
 
   cli-migrations-experimental:
     name: Test CLI Migrations Experimental
-    needs: info
     runs-on: ubuntu-latest
 
     services:
