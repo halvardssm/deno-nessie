@@ -4,7 +4,7 @@ ARG DENO_VERSION=1.7.5
 
 ENV DENO_INSTALL=/deno
 RUN mkdir -p /deno \
-    && curl -fsSL https://deno.land/x/install/install.sh | sh \
+    && curl -fsSL https://deno.land/x/install/install.sh | sh -s v${DENO_VERSION} \
     && chown -R vscode /deno
 
 ENV PATH=${DENO_INSTALL}/bin:${PATH} \
@@ -13,5 +13,3 @@ ENV PATH=${DENO_INSTALL}/bin:${PATH} \
 # [Optional] Uncomment this section to install additional OS packages.
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
    && apt-get -y install --no-install-recommends make
-
-RUN deno upgrade --version ${DENO_VERSION}
