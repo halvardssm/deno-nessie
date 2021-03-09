@@ -3,6 +3,7 @@ import {
   ClientOptions,
   ClientPostgreSQL,
   ClientSQLite,
+  NessieConfig,
 } from "https://deno.land/x/nessie/mod.ts";
 
 /** These are the default config options. */
@@ -32,8 +33,10 @@ const clientMySql = new ClientMySQL(clientOptions, {
 const clientSqLite = new ClientSQLite(clientOptions, "./sqlite.db");
 
 /** This is the final config object */
-const config = {
+const config: NessieConfig = {
   client: clientPg,
+  experimental: true,
+  useDateTime: true,
 };
 
 export default config;
