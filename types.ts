@@ -75,6 +75,7 @@ export interface ClientI {
 export interface NessieConfig {
   client: ClientI;
   experimental?: boolean;
+  useTimestamps?: boolean;
 }
 
 /** Client config options. */
