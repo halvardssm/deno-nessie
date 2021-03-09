@@ -99,13 +99,13 @@ const run = async () => {
 
     if (prog.init) {
       await initNessie();
+    } else if (prog.update_timestamps) {
+      updateTimestamps();
     } else {
       const state = await new State(prog).init();
 
       if (prog.make) {
         await state.makeMigration(prog.fileName);
-      } else if (prog.update_timestamps) {
-        updateTimestamps();
       } else if (prog["make:seed"]) {
         await state.makeSeed(prog.fileName);
       } else {
