@@ -1,5 +1,7 @@
 FROM mcr.microsoft.com/vscode/devcontainers/base:0-buster
 
+ARG DENO_VERSION=1.7.5
+
 ENV DENO_INSTALL=/deno
 RUN mkdir -p /deno \
     && curl -fsSL https://deno.land/x/install/install.sh | sh \
@@ -11,3 +13,5 @@ ENV PATH=${DENO_INSTALL}/bin:${PATH} \
 # [Optional] Uncomment this section to install additional OS packages.
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
    && apt-get -y install --no-install-recommends make
+
+RUN deno upgrade --version ${DENO_VERSION}
