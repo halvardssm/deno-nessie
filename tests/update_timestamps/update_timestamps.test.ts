@@ -58,13 +58,23 @@ Deno.test({
     ];
 
     assertEquals(code, 0, result.join("\n"));
-    // assertEquals(result.length, expected.length, result.join("\n"));
-    assertEquals(result.sort(), expected.sort());
 
-    await Deno.remove(fileDir + "/22861120184639-test.ts");
-    await Deno.remove(fileDir + "/20200426235022-test.ts");
-    await Deno.remove(fileDir + "/20010909034639-test.ts");
-    await Deno.remove(fileDir + "/20010909034640-test.ts");
-    await Deno.remove(fileDir + "/22861120184640-test.ts");
+    const missing: string[] = [];
+
+    result.forEach((el) => {
+      const exists = expected.some((ell) => ell === el);
+      if (!exists) {
+        missing.push(el);
+      }
+    });
+
+    assertEquals(result.length, expected.length, missing.join("\n"));
+    // assertEquals(result.sort(), expected.sort());
+
+    for await (const dirEntry of Deno.readDir(fileDir)) {
+      if (dirEntry.isFile && /.+-test\.ts/.test(dirEntry.name)) {
+        await Deno.remove(resolve(fileDir, dirEntry.name));
+      }
+    }
   },
 });
