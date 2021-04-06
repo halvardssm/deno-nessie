@@ -53,7 +53,7 @@ db-mysql-stop:
 	docker kill ${DB_NAME}-mysql | true
 	rm -rf tests/data/mysql
 db-sqlite-start:
-	mkdir -p tests/data && touch tests/data/sqlite.db
+	mkdir -p tests/data && sudo touch tests/data/sqlite.db
 db-sqlite-stop:
 	rm -rf tests/data/sqlite.db
 
