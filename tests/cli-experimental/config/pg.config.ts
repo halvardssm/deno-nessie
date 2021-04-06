@@ -9,7 +9,7 @@ export default {
     },
     {
       "database": "nessie",
-      "hostname": "localhost",
+      "hostname": "0.0.0.0",
       "port": 5000,
       "user": "root",
       "password": "pwd",
