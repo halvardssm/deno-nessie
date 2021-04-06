@@ -18,16 +18,13 @@ export const runner = async (dialect: string, type: any[]) => {
     cmd: [
       "deno",
       "run",
-      "--allow-net",
-      "--allow-read",
-      "--allow-write",
-      "--allow-env",
+      "-A",
       "--unstable",
       "cli.ts",
       ...type,
       "-c",
       `./tests/cli/config/${dialect}.config.ts`,
-      // "-d",
+      "-d",
     ],
     stdout: "piped",
   });
