@@ -1,7 +1,7 @@
 name: CI
 
 env:
-  DENO_VERSION: 1.8.3
+  DENO_VERSION: 1.7.5
 
 on:
   push:
@@ -15,7 +15,6 @@ jobs:
   cli:
     name: Test CLI
     runs-on: ubuntu-latest
-    container: node:10.18-jessie
 
     steps:
       - name: Install deno
