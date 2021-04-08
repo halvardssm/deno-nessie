@@ -78,8 +78,6 @@ jobs:
         with: 
           deno-version: ${{env.DENO_VERSION}}
 
-      - run: docker ps
-
       - name: Create databases
         run: make db-sqlite-start
 
@@ -126,8 +124,6 @@ jobs:
         uses: denolib/setup-deno@master
         with:
           deno-version: ${{env.DENO_VERSION}}
-
-      - run: docker ps
 
       - name: Create databases
         run: make db-sqlite-start
