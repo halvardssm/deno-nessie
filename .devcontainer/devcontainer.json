@@ -1,0 +1,23 @@
+{
+  "name": "Deno Nessie",
+  "dockerFile": "Dockerfile",
+  "runArgs": [
+    "--init",
+    "--privileged"
+  ],
+  "overrideCommand": false,
+  "settings": {
+    "terminal.integrated.shell.linux": "/bin/zsh",
+    "deno.enable": true,
+    "deno.unstable": true,
+    "deno.lint": true,
+    "deno.import_intellisense_origins": {
+      "https://deno.land": true
+    }
+  },
+  "extensions": [
+    "ms-azuretools.vscode-docker",
+    "denoland.vscode-deno"
+  ],
+  "remoteUser": "vscode"
+}

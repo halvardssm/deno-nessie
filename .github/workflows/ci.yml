@@ -1,21 +1,21 @@
 name: CI
 
 env:
-  DENO_VERSION: 1.7.5
+  DENO_VERSION: 1.8.3
 
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   cli:
     name: Test CLI
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Install deno
         uses: denolib/setup-deno@master
@@ -23,19 +23,19 @@ jobs:
           deno-version: ${{env.DENO_VERSION}}
           
       - name: Nessie Init
-        run: deno run --allow-read --allow-write --allow-net https://raw.githubusercontent.com/$URL_PATH/cli.ts init
+        run: deno run --allow-read --allow-write --allow-net --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init
         env:
-          URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'master'}}
+          URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
 
       - name: Create migration
-        run: deno run --allow-read --allow-write --allow-net https://raw.githubusercontent.com/$URL_PATH/cli.ts make test
+        run: deno run --allow-read --allow-write --allow-net --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make test
         env:
-          URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'master'}}
+          URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
 
       - name: Create seed
-        run: deno run --allow-read --allow-write --allow-net https://raw.githubusercontent.com/$URL_PATH/cli.ts make:seed test
+        run: deno run --allow-read --allow-write --allow-net --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make:seed test
         env:
-          URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'master'}}
+          URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
 
   cli-migrations:
     name: Test CLI Migrations
@@ -78,7 +78,9 @@ jobs:
         with: 
           deno-version: ${{env.DENO_VERSION}}
 
-      - name: Create SQLite db
+      - run: docker ps
+
+      - name: Create databases
         run: make db-sqlite-start
 
       - name: Run tests
@@ -86,7 +88,6 @@ jobs:
 
   cli-migrations-experimental:
     name: Test CLI Migrations Experimental
-    needs: info
     runs-on: ubuntu-latest
 
     services:
@@ -126,8 +127,26 @@ jobs:
         with:
           deno-version: ${{env.DENO_VERSION}}
 
-      - name: Create SQLite db
+      - run: docker ps
+
+      - name: Create databases
         run: make db-sqlite-start
 
       - name: Run tests
         run: make test-cli-migrations-experimental
+  
+  cli-update-timestamps:
+    name: Test CLI Update timestamps
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@master
+
+      - name: Install deno
+        uses: denolib/setup-deno@master
+        with:
+          deno-version: ${{env.DENO_VERSION}}
+
+      - name: Run tests
+        run: make test-cli-update-timestamps

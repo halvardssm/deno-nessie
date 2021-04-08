@@ -20,13 +20,15 @@ import {
   COL_FILE_NAME,
   DEFAULT_MIGRATION_FOLDER,
   DEFAULT_SEED_FOLDER,
-  REGEX_MIGRATION_FILE_NAME,
+  REGEX_MIGRATION_FILE_NAME_LEGACY,
   TABLE_MIGRATIONS,
 } from "../consts.ts";
 
 /** The abstract client which handles most of the logic related to database communication. */
 export abstract class AbstractClient<Client> {
-  protected readonly regexFileName = new RegExp(REGEX_MIGRATION_FILE_NAME);
+  protected readonly regexFileName = new RegExp(
+    REGEX_MIGRATION_FILE_NAME_LEGACY,
+  );
 
   protected logger: LoggerFn = () => undefined;
 

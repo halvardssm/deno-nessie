@@ -1,4 +1,4 @@
-import { Denomander, exists } from "../deps.ts";
+import { Denomander, exists, format } from "../deps.ts";
 import { isUrl, parsePath } from "./utils.ts";
 import type { ClientI, NessieConfig } from "../types.ts";
 import {
@@ -36,7 +36,9 @@ export class State {
       exists(parsePath(DEFAULT_CONFIG_FILE))
     ) {
       this.logger("Checking project root");
-      this.config = await import(parsePath(DEFAULT_CONFIG_FILE));
+
+      const configRaw = await import(parsePath(DEFAULT_CONFIG_FILE));
+      this.config = configRaw.default;
     } else {
       throw new Error("Config file is not found");
     }
@@ -50,17 +52,26 @@ export class State {
 
   /** Makes the migration */
   async makeMigration(migrationName = "migration") {
-    if (
-      migrationName.length > MAX_FILE_NAME_LENGTH - 13
-    ) {
-      throw new Error(
-        `Migration name can't be longer than ${MAX_FILE_NAME_LENGTH - 13}`,
-      );
+    if (migrationName.includes(" ")) {
+      throw new Error("Migration name cannot include spaces ` `");
     }
 
-    const fileName = `${Date.now()}-${migrationName}.ts`;
+    let prefix;
 
-    this.logger(fileName, "Migration file name");
+    if (this.config!.useDateTime) {
+      const timestamp = new Date();
+      prefix = format(timestamp, "yyyyMMddHHmmss");
+    } else {
+      prefix = Date.now();
+    }
+
+    const fileName = `${prefix}-${migrationName}.ts`;
+
+    if (fileName.length > MAX_FILE_NAME_LENGTH) {
+      throw new Error("Migration name can't be longer than 80 characters");
+    } else {
+      this.logger(fileName, "Migration file name");
+    }
 
     await Deno.mkdir(this.client!.migrationFolder, { recursive: true });
 

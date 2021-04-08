@@ -8,7 +8,7 @@ export default {
       experimental: true,
     },
     {
-      "hostname": "localhost",
+      "hostname": "0.0.0.0",
       "port": 5001,
       "username": "root",
       "db": "nessie",
