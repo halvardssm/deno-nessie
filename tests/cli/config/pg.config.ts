@@ -5,7 +5,7 @@ export default {
     { migrationFolder: "./tests/cli", seedFolder: "./tests/cli" },
     {
       "database": "nessie",
-      "hostname": "localhost",
+      "hostname": "0.0.0.0",
       "port": 5000,
       "user": "root",
       "password": "pwd",
