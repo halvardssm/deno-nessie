@@ -1,4 +1,4 @@
-export const VERSION = "1.1.3";
+export const VERSION = "1.2.0";
 export const URL_TEMPLATE_BASE =
   `https://deno.land/x/nessie@${VERSION}/cli/templates/`;
 
