@@ -99,8 +99,6 @@ const run = async () => {
 
     if (prog.init) {
       await initNessie();
-    } else if (prog.update_timestamps) {
-      updateTimestamps();
     } else {
       const state = await new State(prog).init();
 
@@ -117,6 +115,9 @@ const run = async () => {
           await state.client!.rollback(prog.amount);
         } else if (prog.seed) {
           await state.client!.seed(prog.matcher);
+        } else if (prog.update_timestamps) {
+          updateTimestamps();
+          await state.client!.updateTimestamps();
         }
 
         await state.client!.close();

@@ -24,11 +24,18 @@ export class ClientPostgreSQL extends AbstractClient<Client>
   implements ClientI {
   dialect: DBDialects = "pg";
 
+  private QUERY_TRANSACTION_START = `BEGIN TRANSACTION;`;
+  private QUERY_TRANSACTION_COMMIT = `COMMIT TRANSACTION;`;
+  private QUERY_TRANSACTION_ROLLBACK = `ROLLBACK TRANSACTION;`;
+
   private QUERY_MIGRATION_TABLE_EXISTS =
     `SELECT to_regclass('${TABLE_MIGRATIONS}');`;
 
   private QUERY_CREATE_MIGRATION_TABLE =
     `CREATE TABLE ${TABLE_MIGRATIONS} (id bigserial PRIMARY KEY, ${COL_FILE_NAME} varchar(${MAX_FILE_NAME_LENGTH}) UNIQUE, ${COL_CREATED_AT} timestamp (0) default current_timestamp);`;
+
+  private QUERY_UPDATE_TIMESTAMPS =
+    `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = to_char(to_timestamp(CAST(SPLIT_PART(${COL_FILE_NAME}, '-', 1) AS BIGINT) / 1000), 'yyyymmddHH24MISS') WHERE CAST(SPLIT_PART(${COL_FILE_NAME}, '-', 1) AS BIGINT) < 1672531200000;`;
 
   constructor(
     options: ClientOptions,
@@ -53,6 +60,28 @@ export class ClientPostgreSQL extends AbstractClient<Client>
     if (!migrationTableExists) {
       await this.client.query(this.QUERY_CREATE_MIGRATION_TABLE);
       console.info("Database setup complete");
+    }
+  }
+
+  async updateTimestamps() {
+    await this.client.connect();
+    const queryResult = await this.query(
+      this.QUERY_MIGRATION_TABLE_EXISTS,
+    ) as QueryResult;
+
+    const migrationTableExists =
+      queryResult.rows?.[0]?.[0] === TABLE_MIGRATIONS;
+
+    if (migrationTableExists) {
+      await this.query(this.QUERY_TRANSACTION_START);
+      try {
+        await this.query(this.QUERY_UPDATE_TIMESTAMPS);
+        await this.query(this.QUERY_TRANSACTION_COMMIT);
+        console.info("Updated timestamps");
+      } catch (e) {
+        await this.query(this.QUERY_TRANSACTION_ROLLBACK);
+        throw e;
+      }
     }
   }
 
