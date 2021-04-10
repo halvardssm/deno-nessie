@@ -3,8 +3,10 @@ import { Denomander, format, resolve } from "./deps.ts";
 import {
   REGEX_MIGRATION_FILE_NAME_LEGACY,
   URL_TEMPLATE_BASE,
+  URL_TEMPLATE_BASE_VERSIONED,
   VERSION,
 } from "./consts.ts";
+import { URL_BASE } from "./consts";
 
 /** Initializes Denomander */
 const initDenomander = () => {
@@ -47,11 +49,21 @@ const initDenomander = () => {
 
 /** Initializes Nessie */
 const initNessie = async () => {
-  const responseFile = await fetch(URL_TEMPLATE_BASE + "config.ts");
+  let response = await fetch(URL_TEMPLATE_BASE_VERSIONED + "config.ts");
+
+  //fetch unversioned in case versioned does not exists
+  if (!response.ok) {
+    response = await fetch(URL_TEMPLATE_BASE + "config.ts");
+  }
+
+  //throw if not successfull
+  if (!response.ok) {
+    throw response.statusText;
+  }
 
   await Deno.writeTextFile(
     resolve(Deno.cwd(), "nessie.config.ts"),
-    await responseFile.text(),
+    await response.text(),
   );
 
   await Deno.mkdir(resolve(Deno.cwd(), "db/migrations"), { recursive: true });
