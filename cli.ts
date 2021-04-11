@@ -2,7 +2,6 @@ import { State } from "./cli/state.ts";
 import { Denomander, format, resolve } from "./deps.ts";
 import {
   REGEX_MIGRATION_FILE_NAME_LEGACY,
-  URL_BASE,
   URL_TEMPLATE_BASE,
   URL_TEMPLATE_BASE_VERSIONED,
   VERSION,
