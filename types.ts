@@ -57,6 +57,8 @@ export interface ClientI {
   seedFiles: Deno.DirEntry[];
   /** Prepares the db connection */
   prepare: () => Promise<void>;
+  /** Updates timestamp format */
+  updateTimestamps: () => Promise<void>;
   /** Closes the db connection */
   close: () => Promise<void>;
   /** Handles the migration */
