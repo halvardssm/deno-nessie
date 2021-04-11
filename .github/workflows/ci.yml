@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Install deno
-        uses: denolib/setup-deno@master
+        uses: denoland/setup-deno@main
         with: 
           deno-version: ${{env.DENO_VERSION}}
           
@@ -74,7 +74,7 @@ jobs:
         uses: actions/checkout@master
 
       - name: Install deno
-        uses: denolib/setup-deno@master
+        uses: denoland/setup-deno@main
         with: 
           deno-version: ${{env.DENO_VERSION}}
 
@@ -121,7 +121,7 @@ jobs:
         uses: actions/checkout@master
 
       - name: Install deno
-        uses: denolib/setup-deno@master
+        uses: denoland/setup-deno@main
         with:
           deno-version: ${{env.DENO_VERSION}}
 
@@ -140,7 +140,7 @@ jobs:
         uses: actions/checkout@master
 
       - name: Install deno
-        uses: denolib/setup-deno@master
+        uses: denoland/setup-deno@main
         with:
           deno-version: ${{env.DENO_VERSION}}
 
