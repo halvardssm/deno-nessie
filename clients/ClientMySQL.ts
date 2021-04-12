@@ -31,7 +31,7 @@ export class ClientMySQL extends AbstractClient<Client> implements ClientI {
     `CREATE TABLE ${TABLE_MIGRATIONS} (id bigint UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, ${COL_FILE_NAME} varchar(${MAX_FILE_NAME_LENGTH}) NOT NULL UNIQUE, ${COL_CREATED_AT} datetime NOT NULL DEFAULT CURRENT_TIMESTAMP);`;
 
   private QUERY_UPDATE_TIMESTAMPS =
-    `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = FROM_UNIXTIME(CAST(substring_index(${COL_FILE_NAME}, '-', 1) AS SIGNED) / 1000, '%Y%m%d%H%i%S') WHERE CAST(substring_index(${COL_FILE_NAME}, '-', 1) AS SIGNED) / 1000 < 1672531200000;`;
+    `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = CONCAT(FROM_UNIXTIME(CAST(substring_index(${COL_FILE_NAME}, '-', 1) AS SIGNED) / 1000, '%Y%m%d%H%i%S'), substring(file_name, instr( file_name,'-'))) WHERE CAST(substring_index(${COL_FILE_NAME}, '-', 1) AS SIGNED) < 1672531200000;`;
 
   constructor(
     options: ClientOptions,

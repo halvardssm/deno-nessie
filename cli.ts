@@ -75,7 +75,11 @@ const updateTimestamps = () => {
   const migrationFiles = [...Deno.readDirSync(Deno.cwd())];
 
   const filteredMigrations = migrationFiles
-    .filter((el) => el.isFile && REGEX_MIGRATION_FILE_NAME_LEGACY.test(el.name))
+    .filter((el) =>
+      el.isFile &&
+      REGEX_MIGRATION_FILE_NAME_LEGACY.test(el.name) &&
+      parseInt(el.name.split("-")[0]) < 1672531200000
+    )
     .sort()
     .map((el) => {
       const filenameArray = el.name.split("-", 2);
