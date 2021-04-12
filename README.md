@@ -74,7 +74,7 @@ Nessie is available through:
   `deno run --allow-net --allow-read https://deno.land/x/nessie/cli.ts seed ".+.ts"`
 
 - `update_timestamps`: Update timestamps - will update timestamps to the new
-  format.
+  format. Will only update timestams where the value is less than 1672531200000 (2023-01-01) so that the timestamps wont be updated multiple times.
 
   `deno run --allow-read --allow-write https://deno.land/x/nessie/cli.ts update_timestamps`
 

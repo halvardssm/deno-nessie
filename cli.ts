@@ -38,7 +38,7 @@ const initDenomander = () => {
     )
     .command(
       "update_timestamps",
-      "Update the timestamp format from milliseconds to timestamp. This command should be run inside of the folder where you store your migrations.",
+      "Update the timestamp format from milliseconds to timestamp. This command should be run inside of the folder where you store your migrations. Will only update timestams where the value is less than 1672531200000 (2023-01-01) so that the timestamps wont be updated multiple times.",
     );
 
   program.parse(Deno.args);
