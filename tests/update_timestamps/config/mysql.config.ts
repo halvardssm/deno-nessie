@@ -1,6 +1,6 @@
-import { ClientMySQL, MySQLClientConfig } from "../../../mod.ts";
+import { ClientMySQL } from "../../../mod.ts";
 
-export const dbConnection: MySQLClientConfig = {
+export const dbConnection = {
   "hostname": "0.0.0.0",
   "port": 5001,
   "username": "root",

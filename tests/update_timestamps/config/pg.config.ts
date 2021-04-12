@@ -1,6 +1,6 @@
-import { ClientPostgreSQL, PGClientConfig } from "../../../mod.ts";
+import { ClientPostgreSQL } from "../../../mod.ts";
 
-export const dbConnection: PGClientConfig = {
+export const dbConnection = {
   "database": "nessie",
   "hostname": "0.0.0.0",
   "port": 5000,
