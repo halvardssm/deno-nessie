@@ -10,7 +10,6 @@
     "./cli/**/*",
     "./clients/**/*",
     "./wrappers/**/*",
-    "./query-builder/**/*",
     "./README.md"
   ],
   "check": false,
