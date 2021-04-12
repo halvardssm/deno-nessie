@@ -3,6 +3,7 @@ import { Denomander, format, resolve } from "./deps.ts";
 import {
   REGEX_MIGRATION_FILE_NAME_LEGACY,
   URL_TEMPLATE_BASE,
+  URL_TEMPLATE_BASE_VERSIONED,
   VERSION,
 } from "./consts.ts";
 
@@ -37,7 +38,7 @@ const initDenomander = () => {
     )
     .command(
       "update_timestamps",
-      "Update the timestamp format from milliseconds to timestamp. This command should be run inside of the folder where you store your migrations.",
+      "Update the timestamp format from milliseconds to timestamp. This command should be run inside of the folder where you store your migrations. Will only update timestams where the value is less than 1672531200000 (2023-01-01) so that the timestamps wont be updated multiple times.",
     );
 
   program.parse(Deno.args);
@@ -47,11 +48,21 @@ const initDenomander = () => {
 
 /** Initializes Nessie */
 const initNessie = async () => {
-  const responseFile = await fetch(URL_TEMPLATE_BASE + "config.ts");
+  let response = await fetch(URL_TEMPLATE_BASE_VERSIONED + "config.ts");
+
+  //fetch unversioned in case versioned does not exists
+  if (!response.ok) {
+    response = await fetch(URL_TEMPLATE_BASE + "config.ts");
+  }
+
+  //throw if not successfull
+  if (!response.ok) {
+    throw response.statusText;
+  }
 
   await Deno.writeTextFile(
     resolve(Deno.cwd(), "nessie.config.ts"),
-    await responseFile.text(),
+    await response.text(),
   );
 
   await Deno.mkdir(resolve(Deno.cwd(), "db/migrations"), { recursive: true });
@@ -64,7 +75,11 @@ const updateTimestamps = () => {
   const migrationFiles = [...Deno.readDirSync(Deno.cwd())];
 
   const filteredMigrations = migrationFiles
-    .filter((el) => el.isFile && REGEX_MIGRATION_FILE_NAME_LEGACY.test(el.name))
+    .filter((el) =>
+      el.isFile &&
+      REGEX_MIGRATION_FILE_NAME_LEGACY.test(el.name) &&
+      parseInt(el.name.split("-")[0]) < 1672531200000
+    )
     .sort()
     .map((el) => {
       const filenameArray = el.name.split("-", 2);
@@ -99,8 +114,6 @@ const run = async () => {
 
     if (prog.init) {
       await initNessie();
-    } else if (prog.update_timestamps) {
-      updateTimestamps();
     } else {
       const state = await new State(prog).init();
 
@@ -117,6 +130,9 @@ const run = async () => {
           await state.client!.rollback(prog.amount);
         } else if (prog.seed) {
           await state.client!.seed(prog.matcher);
+        } else if (prog.update_timestamps) {
+          updateTimestamps();
+          await state.client!.updateTimestamps();
         }
 
         await state.client!.close();
