@@ -29,7 +29,7 @@ Nessie is available through:
 
 - https://deno.land/x/nessie
 - https://raw.githubusercontent.com/halvardssm/deno-nessie
-- https://nest.land/package/nessie
+- https://nest.land/package/Nessie
 
 ## Usage
 
