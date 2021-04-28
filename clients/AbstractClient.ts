@@ -152,6 +152,7 @@ export abstract class AbstractClient<Client> {
     } else {
       for await (const file of files) {
         if (this.experimental) {
+          // deno-lint-ignore no-explicit-any
           const exposedObject: Info<any> = {
             dialect: this.dialect!,
             connection: queryHandler,

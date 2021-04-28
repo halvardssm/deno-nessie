@@ -17,20 +17,20 @@ import {
 
 /** MySQL client */
 export class ClientMySQL extends AbstractClient<Client> implements ClientI {
-  private clientOptions: ClientConfig;
+  #clientOptions: ClientConfig;
   dialect: DBDialects = "mysql";
 
-  private QUERY_TRANSACTION_START = `START TRANSACTION;`;
-  private QUERY_TRANSACTION_COMMIT = `COMMIT;`;
-  private QUERY_TRANSACTION_ROLLBACK = `ROLLBACK;`;
+  #QUERY_TRANSACTION_START = `START TRANSACTION;`;
+  #QUERY_TRANSACTION_COMMIT = `COMMIT;`;
+  #QUERY_TRANSACTION_ROLLBACK = `ROLLBACK;`;
 
-  private QUERY_MIGRATION_TABLE_EXISTS =
+  #QUERY_MIGRATION_TABLE_EXISTS =
     `SELECT * FROM information_schema.tables WHERE table_name = '${TABLE_MIGRATIONS}' LIMIT 1;`;
 
-  private QUERY_CREATE_MIGRATION_TABLE =
+  #QUERY_CREATE_MIGRATION_TABLE =
     `CREATE TABLE ${TABLE_MIGRATIONS} (id bigint UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, ${COL_FILE_NAME} varchar(${MAX_FILE_NAME_LENGTH}) NOT NULL UNIQUE, ${COL_CREATED_AT} datetime NOT NULL DEFAULT CURRENT_TIMESTAMP);`;
 
-  private QUERY_UPDATE_TIMESTAMPS =
+  #QUERY_UPDATE_TIMESTAMPS =
     `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = CONCAT(FROM_UNIXTIME(CAST(substring_index(${COL_FILE_NAME}, '-', 1) AS SIGNED) / 1000, '%Y%m%d%H%i%S'), substring(file_name, instr( file_name,'-'))) WHERE CAST(substring_index(${COL_FILE_NAME}, '-', 1) AS SIGNED) < 1672531200000;`;
 
   constructor(
@@ -41,35 +41,35 @@ export class ClientMySQL extends AbstractClient<Client> implements ClientI {
       ...options,
       client: new Client(),
     });
-    this.clientOptions = connectionOptions;
+    this.#clientOptions = connectionOptions;
   }
 
   async prepare() {
-    await this.client.connect(this.clientOptions);
-    const queryResult = await this.query(this.QUERY_MIGRATION_TABLE_EXISTS);
+    await this.client.connect(this.#clientOptions);
+    const queryResult = await this.query(this.#QUERY_MIGRATION_TABLE_EXISTS);
 
     const migrationTableExists = queryResult?.[0]?.length > 0;
 
     if (!migrationTableExists) {
-      await this.query(this.QUERY_CREATE_MIGRATION_TABLE);
+      await this.query(this.#QUERY_CREATE_MIGRATION_TABLE);
       console.info("Database setup complete");
     }
   }
 
   async updateTimestamps() {
-    await this.client.connect(this.clientOptions);
-    const queryResult = await this.query(this.QUERY_MIGRATION_TABLE_EXISTS);
+    await this.client.connect(this.#clientOptions);
+    const queryResult = await this.query(this.#QUERY_MIGRATION_TABLE_EXISTS);
 
     const migrationTableExists = queryResult?.[0]?.length > 0;
 
     if (migrationTableExists) {
-      await this.query(this.QUERY_TRANSACTION_START);
+      await this.query(this.#QUERY_TRANSACTION_START);
       try {
-        await this.query(this.QUERY_UPDATE_TIMESTAMPS);
-        await this.query(this.QUERY_TRANSACTION_COMMIT);
+        await this.query(this.#QUERY_UPDATE_TIMESTAMPS);
+        await this.query(this.#QUERY_TRANSACTION_COMMIT);
         console.info("Updated timestamps");
       } catch (e) {
-        await this.query(this.QUERY_TRANSACTION_ROLLBACK);
+        await this.query(this.#QUERY_TRANSACTION_ROLLBACK);
         throw e;
       }
     }
@@ -117,9 +117,9 @@ export class ClientMySQL extends AbstractClient<Client> implements ClientI {
   async rollback(amount: AmountRollbackT) {
     const allMigrations = await this.query(this.QUERY_GET_ALL);
 
-    const parsedMigrations: string[] = allMigrations?.[0].map((el: any) =>
-      el?.[COL_FILE_NAME]
-    );
+    const parsedMigrations: string[] = allMigrations?.[0].map((
+      el: Record<string, string>,
+    ) => el?.[COL_FILE_NAME]);
 
     await super.rollback(
       amount,

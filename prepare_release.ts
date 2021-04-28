@@ -34,6 +34,7 @@ if (!REG_EXP_VERSION.test(versionDeno)) {
 }
 
 const setEggConfig = async (version: string) => {
+  // deno-lint-ignore no-explicit-any
   const eggFile = JSON.parse(await Deno.readTextFile(FILE_JSON_EGG)) as any;
 
   eggFile.version = version;

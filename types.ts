@@ -21,6 +21,7 @@ export type Migration<T = undefined> = (
 /** `run` method in seed files. */
 export type Seed = () => string | string[] | Promise<string | string[]>;
 /** Logger function. */
+// deno-lint-ignore no-explicit-any
 export type LoggerFn = (output?: any, title?: string) => void;
 /** Handy type to cover printf. */
 export type QueryWithString = (string: string) => string;
@@ -31,6 +32,7 @@ export type AmountRollbackT = AmountMigrateT | "all";
 /** Query type. */
 export type QueryT = string | string[];
 /** Query handler function. */
+// deno-lint-ignore no-explicit-any
 export type QueryHandler = (query: QueryT) => Promise<any>;
 
 /**
@@ -94,6 +96,7 @@ export interface ClientOptions {
   migrationFolder?: string;
   seedFolder?: string;
   experimental?: boolean;
+  // deno-lint-ignore no-explicit-any
   [option: string]: any;
 }
 export interface AbstractClientOptions<Client> extends ClientOptions {

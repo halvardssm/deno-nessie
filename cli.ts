@@ -71,7 +71,7 @@ const initNessie = async () => {
   await Deno.create(resolve(Deno.cwd(), "db/seeds/.gitkeep"));
 };
 
-const updateTimestamps = () => {
+const updateTimestamps = async () => {
   const migrationFiles = [...Deno.readDirSync(Deno.cwd())];
 
   const filteredMigrations = migrationFiles
@@ -94,9 +94,9 @@ const updateTimestamps = () => {
       };
     });
 
-  filteredMigrations.forEach(({ oldName, newName }) => {
-    Deno.renameSync(oldName, newName);
-  });
+  for await (const { oldName, newName } of filteredMigrations) {
+    await Deno.rename(oldName, newName);
+  }
 
   const output = filteredMigrations
     .map(({ oldName, newName }) => `${oldName} => ${newName}`)
@@ -104,7 +104,7 @@ const updateTimestamps = () => {
 
   const encoder = new TextEncoder();
 
-  Deno.stdout.writeSync(encoder.encode(output));
+  await Deno.stdout.write(encoder.encode(output));
 };
 
 /** Main application */
@@ -131,7 +131,7 @@ const run = async () => {
         } else if (prog.seed) {
           await state.client!.seed(prog.matcher);
         } else if (prog.update_timestamps) {
-          updateTimestamps();
+          await updateTimestamps();
           await state.client!.updateTimestamps();
         }
 

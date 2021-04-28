@@ -4,6 +4,7 @@ export type AbstractMigrationProps<Client> = {
   client: Client;
 };
 
+// deno-lint-ignore no-explicit-any
 export abstract class AbstractMigration<Client = any> {
   protected client: Client;
 

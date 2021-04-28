@@ -1,4 +1,4 @@
-import { DB } from "https://deno.land/x/sqlite@v2.3.0/mod.ts";
+import { DB } from "https://deno.land/x/sqlite@v2.4.0/mod.ts";
 import { AbstractClient } from "./AbstractClient.ts";
 import { resolve } from "../deps.ts";
 import type {
@@ -20,17 +20,17 @@ import {
 export class ClientSQLite extends AbstractClient<DB> implements ClientI {
   dialect: DBDialects = "sqlite3";
 
-  private QUERY_TRANSACTION_START = `BEGIN TRANSACTION;`;
-  private QUERY_TRANSACTION_COMMIT = `COMMIT;`;
-  private QUERY_TRANSACTION_ROLLBACK = `ROLLBACK;`;
+  #QUERY_TRANSACTION_START = `BEGIN TRANSACTION;`;
+  #QUERY_TRANSACTION_COMMIT = `COMMIT;`;
+  #QUERY_TRANSACTION_ROLLBACK = `ROLLBACK;`;
 
-  private QUERY_MIGRATION_TABLE_EXISTS =
+  #QUERY_MIGRATION_TABLE_EXISTS =
     `SELECT name FROM sqlite_master WHERE type='table' AND name='${TABLE_MIGRATIONS}';`;
 
-  private QUERY_CREATE_MIGRATION_TABLE =
+  #QUERY_CREATE_MIGRATION_TABLE =
     `CREATE TABLE ${TABLE_MIGRATIONS} (id integer NOT NULL PRIMARY KEY autoincrement, ${COL_FILE_NAME} varchar(${MAX_FILE_NAME_LENGTH}) UNIQUE, ${COL_CREATED_AT} datetime NOT NULL DEFAULT CURRENT_TIMESTAMP);`;
 
-  private QUERY_UPDATE_TIMESTAMPS =
+  #QUERY_UPDATE_TIMESTAMPS =
     `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = strftime('%Y%m%d%H%M%S', CAST(substr(${COL_FILE_NAME}, 0, instr(${COL_FILE_NAME}, '-')) AS INTEGER) / 1000, 'unixepoch') || substr(${COL_FILE_NAME}, instr(${COL_FILE_NAME}, '-')) WHERE CAST(substr(${COL_FILE_NAME}, 0, instr(${COL_FILE_NAME}, '-')) AS INTEGER) < 1672531200000;`;
 
   constructor(options: ClientOptions, connectionOptions: string) {
@@ -41,31 +41,31 @@ export class ClientSQLite extends AbstractClient<DB> implements ClientI {
   }
 
   async prepare() {
-    const queryResult = await this.query(this.QUERY_MIGRATION_TABLE_EXISTS);
+    const queryResult = await this.query(this.#QUERY_MIGRATION_TABLE_EXISTS);
 
     const migrationTableExists =
       queryResult?.[0]?.[0]?.[0] === TABLE_MIGRATIONS;
 
     if (!migrationTableExists) {
-      await this.query(this.QUERY_CREATE_MIGRATION_TABLE);
+      await this.query(this.#QUERY_CREATE_MIGRATION_TABLE);
       console.info("Database setup complete");
     }
   }
 
   async updateTimestamps() {
-    const queryResult = await this.query(this.QUERY_MIGRATION_TABLE_EXISTS);
+    const queryResult = await this.query(this.#QUERY_MIGRATION_TABLE_EXISTS);
 
     const migrationTableExists =
       queryResult?.[0]?.[0]?.[0] === TABLE_MIGRATIONS;
 
     if (migrationTableExists) {
-      await this.query(this.QUERY_TRANSACTION_START);
+      await this.query(this.#QUERY_TRANSACTION_START);
       try {
-        await this.query(this.QUERY_UPDATE_TIMESTAMPS);
-        await this.query(this.QUERY_TRANSACTION_COMMIT);
+        await this.query(this.#QUERY_UPDATE_TIMESTAMPS);
+        await this.query(this.#QUERY_TRANSACTION_COMMIT);
         console.info("Updated timestamps");
       } catch (e) {
-        await this.query(this.QUERY_TRANSACTION_ROLLBACK);
+        await this.query(this.#QUERY_TRANSACTION_ROLLBACK);
         throw e;
       }
     }
@@ -90,6 +90,7 @@ export class ClientSQLite extends AbstractClient<DB> implements ClientI {
     return ra;
   }
 
+  // deno-lint-ignore require-await
   async close() {
     this.client?.close();
   }
