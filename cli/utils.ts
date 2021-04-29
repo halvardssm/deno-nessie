@@ -2,7 +2,7 @@ import { resolve } from "../deps.ts";
 
 /** Helper function for path parsing. 
  * 
- * If the first element starts with `http` or `https` it will return the first element. 
+ * If the first element starts with `http` or `https` or `file` it will return the first element. 
  * Else, the path will be prefixed by `file://` and resolved. 
  */
 export const parsePath = (...path: string[]): string => {
@@ -14,9 +14,7 @@ export const parsePath = (...path: string[]): string => {
 };
 
 export const isUrl = (path: string) => {
-  if (path?.startsWith("http://") || path?.startsWith("https://")) {
-    return true;
-  }
-
-  return false;
+  return path.startsWith("http://") 
+      || path.startsWith("https://") 
+      || path.startsWith("file://")
 };
