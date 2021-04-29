@@ -17,6 +17,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Clone repo
+        uses: actions/checkout@master
+
       - name: Install deno
         uses: denoland/setup-deno@main
         with: 
