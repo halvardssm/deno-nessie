@@ -1,7 +1,7 @@
 name: CI
 
 env:
-  DENO_VERSION: 1.8.3
+  DENO_VERSION: 1.9.2
 
 on:
   push:
@@ -12,6 +12,22 @@ on:
       - main
 
 jobs:
+  fmt:
+    name: Test format and lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@master
+
+      - name: Install deno
+        uses: denoland/setup-deno@main
+        with: 
+          deno-version: ${{env.DENO_VERSION}}
+
+      - name: Run test for format and lint
+        run: make test-fmt
+    
   cli:
     name: Test CLI
     runs-on: ubuntu-latest

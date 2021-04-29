@@ -111,6 +111,7 @@ export class State {
   }
 
   /** A logger to use throughout the application, outputs when the debugger is enabled */
+  // deno-lint-ignore no-explicit-any
   logger(output?: any, title?: string): void {
     try {
       if (this.enableDebug) {

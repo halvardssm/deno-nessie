@@ -14,7 +14,7 @@ export const parsePath = (...path: string[]): string => {
 };
 
 export const isUrl = (path: string) => {
-  return path.startsWith("http://") 
-      || path.startsWith("https://") 
-      || path.startsWith("file://")
+  return path.startsWith("http://") ||
+    path.startsWith("https://") ||
+    path.startsWith("file://");
 };

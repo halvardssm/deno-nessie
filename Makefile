@@ -4,7 +4,11 @@ DB_USER=root
 DB_PWD=pwd
 DB_NAME=nessie
 
-test-all: db-all-restart test-cli-migrations db-all-restart test-cli-migrations-experimental test-cli-update-timestamps
+test-all: test-fmt db-all-restart test-cli-migrations db-all-restart test-cli-migrations-experimental test-cli-update-timestamps
+
+test-fmt:
+	deno lint --unstable --ignore=tests,examples,cli/templates
+	deno fmt --check
 
 test-cli-migrations:
 	deno test -A --unstable tests/cli

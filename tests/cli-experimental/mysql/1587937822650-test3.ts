@@ -1,4 +1,4 @@
-import { AbstractMigration, Info } from "../../mod.ts";
+import { AbstractMigration, Info } from "../../../mod.ts";
 
 export default class extends AbstractMigration {
   async up({ dialect }: Info): Promise<void> {
