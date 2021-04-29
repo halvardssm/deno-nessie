@@ -1,7 +1,7 @@
 import {
   Client,
   ConnectionOptions,
-} from "https://deno.land/x/postgres@0.11.2/mod.ts";
+} from "https://deno.land/x/postgres@v0.11.2/mod.ts";
 import { AbstractClient } from "./AbstractClient.ts";
 import type {
   AmountMigrateT,
