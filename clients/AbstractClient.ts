@@ -160,7 +160,7 @@ export abstract class AbstractClient<Client> {
 
           const SeedClass: new (
             props: AbstractSeedProps<Client>,
-          ) => AbstractSeed<Client> = (await import(
+          ) => AbstractSeed<this> = (await import(
             parsePath(
               this.seedFolder,
               file.name,
@@ -222,7 +222,7 @@ export abstract class AbstractClient<Client> {
     if (this.experimental) {
       const MigrationClass: new (
         props: AbstractMigrationProps<Client>,
-      ) => AbstractMigration<Client> = (await import(
+      ) => AbstractMigration<this> = (await import(
         parsePath(
           this.migrationFolder,
           fileName,
