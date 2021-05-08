@@ -69,11 +69,20 @@ export interface NessieConfig {
 
 /** Client config options. */
 export interface ClientOptions {
+  /** @deprecated use `migrationFolders` instead */
   migrationFolder?: string;
+  migrationFolders?: string[];
+  /** @deprecated use `seedFolders` instead */
   seedFolder?: string;
+  seedFolders?: string[];
   // deno-lint-ignore no-explicit-any
   [option: string]: any;
 }
 export interface AbstractClientOptions<Client> extends ClientOptions {
   client: Client;
 }
+
+export type FileEntryT = {
+  name: string;
+  path: string;
+};

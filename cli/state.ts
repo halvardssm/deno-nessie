@@ -77,17 +77,19 @@ export class State {
       this.logger(fileName, "Migration file name");
     }
 
-    await Deno.mkdir(this.client!.migrationFolder, { recursive: true });
+    const selectedFolder = this._folderPrompt(this.client!.migrationFolders);
+
+    await Deno.mkdir(selectedFolder, { recursive: true });
 
     const responseFile = await fetch(URL_TEMPLATE_BASE + "/migration.ts");
 
     await Deno.writeTextFile(
-      `${this.client!.migrationFolder}/${fileName}`,
+      `${selectedFolder}/${fileName}`,
       await responseFile.text(),
     );
 
     console.info(
-      `Created migration ${fileName} at ${this.client!.migrationFolder}`,
+      `Created migration ${fileName} at ${selectedFolder}`,
     );
   }
 
@@ -100,17 +102,19 @@ export class State {
 
     this.logger(fileName, "Seed file name");
 
-    await Deno.mkdir(this.client!.seedFolder, { recursive: true });
+    const selectedFolder = this._folderPrompt(this.client!.seedFolders);
+
+    await Deno.mkdir(selectedFolder, { recursive: true });
 
     const responseFile = await fetch(URL_TEMPLATE_BASE + "seed.ts");
 
     await Deno.writeTextFile(
-      `${this.client!.seedFolder}/${fileName}`,
+      `${selectedFolder}/${fileName}`,
       await responseFile.text(),
     );
 
     console.info(
-      `Created seed ${fileName} at ${this.client!.seedFolder}`,
+      `Created seed ${fileName} at ${selectedFolder}`,
     );
   }
 
@@ -125,5 +129,34 @@ export class State {
     } catch {
       console.error("Error at: " + title);
     }
+  }
+
+  private _folderPrompt(folders: string[]) {
+    let promptSelection = 0;
+
+    if (folders.length > 1) {
+      let promptString =
+        `You have multiple folder sources, where do you want to create the new file?
+        (choose a number between 0 and ${folders.length})
+        `;
+
+      folders.forEach((folder, i) => promptString += `[${i}]: ${folder}\n`);
+
+      const promptRaw = prompt(promptString, "0") ?? "0";
+
+      this.logger(promptRaw, "Prompt input raw");
+
+      promptSelection = parseInt(promptRaw);
+
+      this.logger(promptSelection, "Prompt input parsed");
+
+      if (promptSelection > folders.length - 1) {
+        promptSelection = 0;
+      }
+    }
+
+    this.logger(promptSelection, "Prompt input final");
+
+    return folders[promptSelection];
   }
 }
