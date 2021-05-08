@@ -1,12 +1,13 @@
+import type { AbstractClient } from "./clients/AbstractClient.ts";
 /** Supported dialects */
-export type DBDialects = "pg" | "mysql" | "sqlite3";
+export type DBDialects = "pg" | "mysql" | "sqlite3" | string;
 
 /** Exposed object in migration files. available in `up`/`down` methods.
  * queryBuilder is available when passing `exposeQueryBuilder: true` to the config file.
  */
 export type Info<T = undefined> = {
   dialect: DBDialects;
-  /** @deprecated Will be removed as connection will be exposed in the wrapper class */
+  /** @deprecated Will be removed as the client will be exposed in the wrapper class */
   connection: QueryHandler;
 };
 
@@ -18,7 +19,11 @@ export type Info<T = undefined> = {
 export type Migration<T = undefined> = (
   info: Info<T>,
 ) => string | string[] | Promise<string | string[]>;
-/** `run` method in seed files. */
+/**
+ * @deprecated Please consider using the class seeds.
+ *  
+ * `run` method in seed files. 
+ */
 export type Seed = () => string | string[] | Promise<string | string[]>;
 /** Logger function. */
 // deno-lint-ignore no-explicit-any
@@ -45,39 +50,10 @@ export type MigrationFile = {
   down: Migration;
 };
 
-/** Client interface. Is to be implemented by every client. */
-export interface ClientI {
-  /** The current dialect, given by the Client e.g. pg, mysql, sqlite3 */
-  dialect: string;
-  /** Migration folder given from the config file */
-  migrationFolder: string;
-  /** Seed folder given from the config file */
-  seedFolder: string;
-  /** Migration files read from the migration folder */
-  migrationFiles: Deno.DirEntry[];
-  /** Seed files read from the seed folder */
-  seedFiles: Deno.DirEntry[];
-  /** Prepares the db connection */
-  prepare: () => Promise<void>;
-  /** Updates timestamp format */
-  updateTimestamps: () => Promise<void>;
-  /** Closes the db connection */
-  close: () => Promise<void>;
-  /** Handles the migration */
-  migrate: (amount: AmountMigrateT) => Promise<void>;
-  /** Handles the rollback */
-  rollback: (amount: AmountRollbackT) => Promise<void>;
-  /** Handles the seeding */
-  seed: (matcher?: string) => Promise<void>;
-  /** Universal wrapper for db query execution */
-  query: QueryHandler;
-  /** Sets the logger. Used by State */
-  setLogger: LoggerFn;
-}
-
 /** Nessie config options. */
 export interface NessieConfig {
-  client: ClientI;
+  // deno-lint-ignore no-explicit-any
+  client: AbstractClient<any>;
   /** 
    * Enables experimental options like migration classes, 
    * features enabled in experimental mode are soon to be default 
@@ -95,7 +71,6 @@ export interface NessieConfig {
 export interface ClientOptions {
   migrationFolder?: string;
   seedFolder?: string;
-  experimental?: boolean;
   // deno-lint-ignore no-explicit-any
   [option: string]: any;
 }
