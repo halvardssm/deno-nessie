@@ -46,9 +46,7 @@ const cli = async () => {
     )
     .action(async (options, matcher: string | undefined) => {
       const state = await new State(options).init();
-      await state.client!.prepare();
       await state.client!.seed(matcher);
-      await state.client!.close();
     })
     .command(
       "migrate [amount:number]",
@@ -149,11 +147,10 @@ const updateTimestamps = async () => {
 
   await Deno.stdout.write(encoder.encode(output));
 };
+
 const makeMigration = async (options: CommandOptions, fileName: string) => {
   const state = await new State(options).init();
-  await state.client!.prepare();
   await state.makeMigration(fileName);
-  await state.client!.close();
 };
 
 /** Main application */
