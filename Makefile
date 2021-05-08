@@ -63,3 +63,4 @@ db-sqlite-stop:
 
 bump-%: # version number and deno version separated by `:` e.g. 1.2.3:1.2.3
 	deno run --allow-read --allow-write prepare_release.ts $*
+	make 
