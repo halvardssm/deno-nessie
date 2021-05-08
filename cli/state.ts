@@ -1,6 +1,6 @@
-import { Denomander, exists, format } from "../deps.ts";
+import { CliffySelect, exists, format } from "../deps.ts";
 import { isUrl, parsePath } from "./utils.ts";
-import type { NessieConfig } from "../types.ts";
+import type { CommandOptions, NessieConfig } from "../types.ts";
 import {
   DEFAULT_CONFIG_FILE,
   MAX_FILE_NAME_LENGTH,
@@ -17,9 +17,9 @@ export class State {
   private config?: NessieConfig;
   client?: NessieConfig["client"];
 
-  constructor(args: Denomander) {
-    this.enableDebug = args.debug;
-    this.configFile = parsePath(args.config || DEFAULT_CONFIG_FILE);
+  constructor(options: CommandOptions) {
+    this.enableDebug = !!options.debug;
+    this.configFile = parsePath(options.config || DEFAULT_CONFIG_FILE);
 
     this.logger([this.enableDebug, this.configFile], "State");
   }
@@ -77,7 +77,9 @@ export class State {
       this.logger(fileName, "Migration file name");
     }
 
-    const selectedFolder = this._folderPrompt(this.client!.migrationFolders);
+    const selectedFolder = await this._folderPrompt(
+      this.client!.migrationFolders,
+    );
 
     await Deno.mkdir(selectedFolder, { recursive: true });
 
@@ -102,7 +104,7 @@ export class State {
 
     this.logger(fileName, "Seed file name");
 
-    const selectedFolder = this._folderPrompt(this.client!.seedFolders);
+    const selectedFolder = await this._folderPrompt(this.client!.seedFolders);
 
     await Deno.mkdir(selectedFolder, { recursive: true });
 
@@ -131,28 +133,20 @@ export class State {
     }
   }
 
-  private _folderPrompt(folders: string[]) {
+  private async _folderPrompt(folders: string[]) {
     let promptSelection = 0;
 
     if (folders.length > 1) {
-      let promptString =
-        `You have multiple folder sources, where do you want to create the new file?
-        (choose a number between 0 and ${folders.length})
-        `;
+      const promptResult = await CliffySelect.prompt({
+        message:
+          `You have multiple folder sources, where do you want to create the new file?`,
+        options: folders.map((folder, i) => ({
+          value: i.toString(),
+          name: folder,
+        })),
+      });
 
-      folders.forEach((folder, i) => promptString += `[${i}]: ${folder}\n`);
-
-      const promptRaw = prompt(promptString, "0") ?? "0";
-
-      this.logger(promptRaw, "Prompt input raw");
-
-      promptSelection = parseInt(promptRaw);
-
-      this.logger(promptSelection, "Prompt input parsed");
-
-      if (promptSelection > folders.length - 1) {
-        promptSelection = 0;
-      }
+      promptSelection = parseInt(promptResult);
     }
 
     this.logger(promptSelection, "Prompt input final");

@@ -86,3 +86,8 @@ export type FileEntryT = {
   name: string;
   path: string;
 };
+
+export type CommandOptions = {
+  debug: boolean;
+  config?: string;
+};

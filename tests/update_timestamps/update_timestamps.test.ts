@@ -1,7 +1,7 @@
 import { assert, assertEquals, fromFileUrl, resolve } from "../../deps.ts";
 import { TABLE_MIGRATIONS } from "../../consts.ts";
 import { Client as MySQL } from "https://deno.land/x/mysql@v2.8.0/mod.ts";
-import { Client as PostgreSQL } from "https://deno.land/x/postgres@v0.4.6/mod.ts";
+import { Client as PostgreSQL } from "https://deno.land/x/postgres@v0.11.2/mod.ts";
 import { DB as SQLite } from "https://deno.land/x/sqlite@v2.3.0/mod.ts";
 
 const emptyMigration = `import { AbstractMigration, Info } from "../../mod.ts";
@@ -147,13 +147,12 @@ for await (const dialect of DIALECTS) {
       if (dialect === DIALECT_PG) {
         client = new PostgreSQL(dbConnection);
         await client.connect();
-        const migrationFilesDbRaw = await client.query(
+        const { rows: migrationFilesDbRaw } = await client.queryObject(
           `SELECT * FROM ${TABLE_MIGRATIONS}`,
         );
         await client.end();
-        migrationFilesDb = migrationFilesDbRaw.rowsOfObjects().map((el) =>
-          el.file_name
-        );
+        migrationFilesDb = migrationFilesDbRaw
+          .map((el) => el.file_name as string);
       } else if (dialect === DIALECT_MYSQL) {
         client = new MySQL();
         await client.connect(dbConnection);
