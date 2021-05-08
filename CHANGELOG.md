@@ -33,7 +33,8 @@
 
 ## Version 1.2.1
 
-- Updated Nest CI script to use `denoland/setup-deno` instead of `denolib/setup-deno`
+- Updated Nest CI script to use `denoland/setup-deno` instead of
+  `denolib/setup-deno`
 - Fixed Nest Nessie link in readme
 - Removed query builder from `egg.json`
 - Fixed `isUrl` parsing
@@ -51,7 +52,8 @@
 - MD formatting now happens via Deno fmt
 - Added Codecoverage file (WIP)
 - Transferred QueryBuilder to its own repo
-- Added experimental migration names to use `yyyymmddHHMMss` instead of unix timestamp
+- Added experimental migration names to use `yyyymmddHHMMss` instead of unix
+  timestamp
 - Improved experimental class based migrations
 
 ## Version 1.1.0

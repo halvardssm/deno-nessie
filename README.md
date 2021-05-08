@@ -10,16 +10,16 @@
 
 A modular database migration tool for [Deno](https://deno.land) inspired by
 [Laravel](https://github.com/laravel/laravel) and
-[Phinx](https://github.com/cakephp/phinx). Currently supports PostgreSQL, MySQL (and MariaDB)
-and SQLite.
+[Phinx](https://github.com/cakephp/phinx). Currently supports PostgreSQL, MySQL
+(and MariaDB) and SQLite.
 
 If you would like to see your DB flavor supported, take a look at how to make a
 client plugin with examples in the [clients folder](./clients) or in the section
 [How to make a client](#how-to-make-a-client).
 
->The query builder is no longer maintained. If you need the code, it has been
-moved to [its own repo](https://github.com/halvardssm/deno-query-builder). It
-can also be found in Nessie version 1.1.3 or older.
+> The query builder is no longer maintained. If you need the code, it has been
+> moved to [its own repo](https://github.com/halvardssm/deno-query-builder). It
+> can also be found in Nessie version 1.1.3 or older.
 
 See documentation for the
 [clients](https://doc.deno.land/https/deno.land/x/nessie/mod.ts).
@@ -32,7 +32,8 @@ Nessie is available through:
 
 ## Usage
 
-- `init`: Generates a `nessie.config.ts` file and also the `db` folder where migration and seed files will be placed.
+- `init`: Generates a `nessie.config.ts` file and also the `db` folder where
+  migration and seed files will be placed.
 
   ```shell
   deno run -A --unstable https://deno.land/x/nessie/cli.ts init
@@ -42,7 +43,7 @@ Nessie is available through:
 
   ```shell
   deno run -A --unstable https://deno.land/x/nessie/cli.ts make:migration create_users
-  
+
   deno run -A --unstable https://deno.land/x/nessie/cli.ts make create_users
   ```
 
@@ -58,9 +59,9 @@ Nessie is available through:
 
   ```shell
   deno run -A --unstable https://deno.land/x/nessie/cli.ts migrate
-  
+
   deno run -A --unstable https://deno.land/x/nessie/cli.ts migrate 1
-  
+
   deno run -A --unstable https://deno.land/x/nessie/cli.ts migrate -c ./nessie.config.ts
   ```
 
@@ -69,9 +70,9 @@ Nessie is available through:
 
   ```shell
   deno run -A --unstable https://deno.land/x/nessie/cli.ts rollback
-  
+
   deno run -A --unstable https://deno.land/x/nessie/cli.ts rollback 2
-  
+
   deno run -A --unstable https://deno.land/x/nessie/cli.ts rollback all
   ```
 
@@ -80,9 +81,9 @@ Nessie is available through:
 
   ```shell
   deno run -A --unstable https://deno.land/x/nessie/cli.ts seed
-  
+
   deno run -A --unstable https://deno.land/x/nessie/cli.ts seed seed_file.js
-  
+
   deno run -A --unstable https://deno.land/x/nessie/cli.ts seed ".+.ts"
   ```
 
@@ -101,12 +102,18 @@ Nessie is available through:
 
 ### Deno flags and Permissions
 
-While the examples simply show `-A` as the permission flag, you can also limit the permissions according to your needs. Bellow you will see what Nessie actually needs.
+While the examples simply show `-A` as the permission flag, you can also limit
+the permissions according to your needs. Bellow you will see what Nessie
+actually needs.
 
-- `--unstable`: Needed by [std/fs/copy](https://deno.land/std@0.90.0/fs/copy.ts) as it uses `Deno.utimeSync` and `Deno.utime` which are still unstable
-- `--allow-read`: Nessie needs read access to be able to read the migration and seed folders, it also checks for the precense of the config file.
-- `--allow-write`: When creating a new migration or seed file, Nessie needs write access.
-- `--allow-net`: Nessie downloads the config, migration and seed files from `https://deno.land/x/nessie`, this is the only url needed.
+- `--unstable`: Needed by [std/fs/copy](https://deno.land/std@0.90.0/fs/copy.ts)
+  as it uses `Deno.utimeSync` and `Deno.utime` which are still unstable
+- `--allow-read`: Nessie needs read access to be able to read the migration and
+  seed folders, it also checks for the precense of the config file.
+- `--allow-write`: When creating a new migration or seed file, Nessie needs
+  write access.
+- `--allow-net`: Nessie downloads the config, migration and seed files from
+  `https://deno.land/x/nessie`, this is the only url needed.
 
 ## Contributing
 
