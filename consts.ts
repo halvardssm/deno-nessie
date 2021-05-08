@@ -10,12 +10,6 @@ export const DEFAULT_CONFIG_FILE = "nessie.config.ts";
 export const DEFAULT_MIGRATION_FOLDER = "./db/migrations";
 export const DEFAULT_SEED_FOLDER = "./db/seeds";
 
-export const STD_CLIENT_OPTIONS = {
-  migrationFolder: DEFAULT_MIGRATION_FOLDER,
-  seedFolder: DEFAULT_SEED_FOLDER,
-  experimental: true,
-};
-
 export const MAX_FILE_NAME_LENGTH = 100;
 export const TABLE_MIGRATIONS = "nessie_migrations";
 export const COL_FILE_NAME = "file_name";

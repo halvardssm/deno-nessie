@@ -5,7 +5,6 @@ export default {
     {
       migrationFolder: "./tests/cli-experimental/pg",
       seedFolder: "./tests/cli-experimental/pg",
-      experimental: true,
     },
     {
       "database": "nessie",
@@ -15,4 +14,6 @@ export default {
       "password": "pwd",
     },
   ),
+  experimental: true,
+  useDateTime: true,
 };

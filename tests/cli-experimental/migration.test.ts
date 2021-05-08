@@ -17,7 +17,7 @@ const strings = [
     name: "Migrate 1",
     string: [TYPE_MIGRATE, "1"],
     solution: [
-      "Migrated 1587937822648-test1.ts",
+      "Migrated 20210508115213-test1.ts",
       "Migration complete",
     ],
   },
@@ -25,8 +25,8 @@ const strings = [
     name: "Migrate all",
     string: [TYPE_MIGRATE],
     solution: [
-      "Migrated 1587937822649-test2.ts",
-      "Migrated 1587937822650-test3.ts",
+      "Migrated 20210508125213-test2.ts",
+      "Migrated 20210508135213-test3.ts",
       "Migration complete",
     ],
   },
@@ -46,16 +46,16 @@ const strings = [
     name: "Rollback test3 and test2",
     string: [TYPE_ROLLBACK, "2"],
     solution: [
-      "Rolled back 1587937822650-test3.ts",
-      "Rolled back 1587937822649-test2.ts",
+      "Rolled back 20210508135213-test3.ts",
+      "Rolled back 20210508125213-test2.ts",
     ],
   },
   {
     name: "Migrate test2 and test3",
     string: [TYPE_MIGRATE, "2"],
     solution: [
-      "Migrated 1587937822649-test2.ts",
-      "Migrated 1587937822650-test3.ts",
+      "Migrated 20210508125213-test2.ts",
+      "Migrated 20210508135213-test3.ts",
       "Migration complete",
     ],
   },
@@ -63,9 +63,9 @@ const strings = [
     name: "Rollback all",
     string: [TYPE_ROLLBACK, "all"],
     solution: [
-      "Rolled back 1587937822650-test3.ts",
-      "Rolled back 1587937822649-test2.ts",
-      "Rolled back 1587937822648-test1.ts",
+      "Rolled back 20210508135213-test3.ts",
+      "Rolled back 20210508125213-test2.ts",
+      "Rolled back 20210508115213-test1.ts",
     ],
   },
   {

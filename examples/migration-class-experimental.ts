@@ -1,9 +1,12 @@
-import type { Info } from "https://deno.land/x/nessie/mod.ts";
-import { AbstractMigration } from "https://deno.land/x/nessie/wrappers/AbstractMigration.ts";
-import type { Client } from "https://deno.land/x/postgres@v0.4.5/mod.ts";
+import {
+  AbstractMigration,
+  ClientPostgreSQL,
+  Info,
+} from "https://deno.land/x/nessie/mod.ts";
 import Dex from "https://deno.land/x/dex/mod.ts";
 
-export default class ExperimentalMigration extends AbstractMigration<Client> {
+export default class ExperimentalMigration
+  extends AbstractMigration<ClientPostgreSQL> {
   async up({ dialect }: Info): Promise<void> {
     const query = Dex({ client: dialect }).schema.createTable(
       "test",
@@ -14,16 +17,16 @@ export default class ExperimentalMigration extends AbstractMigration<Client> {
       },
     );
 
-    this.client.query(query);
+    this.client.queryArray(query);
 
-    this.client.query(
+    this.client.queryArray(
       'insert into test (file_name) values ("test1"), ("test2")',
     );
 
-    const res = await this.client.query("select * from test");
+    const res = await this.client.queryObject("select * from test");
 
-    for await (const row of res.rowsOfObjects()) {
-      this.client.query(
+    for await (const row of res) {
+      this.client.queryArray(
         `update test set file_name = ${row.file_name +
           "_some_suffix"} where id = ${row.id}`,
       );
@@ -33,6 +36,6 @@ export default class ExperimentalMigration extends AbstractMigration<Client> {
   async down({ dialect }: Info): Promise<void> {
     const query = Dex({ client: dialect }).schema.dropTable("test");
 
-    this.client.query(query);
+    await this.client.queryArray(query);
   }
 }

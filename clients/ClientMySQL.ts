@@ -3,7 +3,6 @@ import { AbstractClient } from "./AbstractClient.ts";
 import type {
   AmountMigrateT,
   AmountRollbackT,
-  ClientI,
   ClientOptions,
   DBDialects,
   QueryT,
@@ -16,7 +15,7 @@ import {
 } from "../consts.ts";
 
 /** MySQL client */
-export class ClientMySQL extends AbstractClient<Client> implements ClientI {
+export class ClientMySQL extends AbstractClient<Client> {
   #clientOptions: ClientConfig;
   dialect: DBDialects = "mysql";
 
@@ -107,7 +106,7 @@ export class ClientMySQL extends AbstractClient<Client> implements ClientI {
 
   async migrate(amount: AmountMigrateT) {
     const latestMigration = await this.query(this.QUERY_GET_LATEST);
-    await super.migrate(
+    await this._migrate(
       amount,
       latestMigration?.[0]?.[0]?.[COL_FILE_NAME],
       this.query.bind(this),
@@ -121,7 +120,7 @@ export class ClientMySQL extends AbstractClient<Client> implements ClientI {
       el: Record<string, string>,
     ) => el?.[COL_FILE_NAME]);
 
-    await super.rollback(
+    await this._rollback(
       amount,
       parsedMigrations,
       this.query.bind(this),
@@ -129,6 +128,6 @@ export class ClientMySQL extends AbstractClient<Client> implements ClientI {
   }
 
   async seed(matcher?: string) {
-    await super.seed(matcher, this.query.bind(this));
+    await this._seed(matcher, this.query.bind(this));
   }
 }

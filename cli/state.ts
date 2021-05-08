@@ -1,6 +1,6 @@
 import { Denomander, exists, format } from "../deps.ts";
 import { isUrl, parsePath } from "./utils.ts";
-import type { ClientI, NessieConfig } from "../types.ts";
+import type { NessieConfig } from "../types.ts";
 import {
   DEFAULT_CONFIG_FILE,
   MAX_FILE_NAME_LENGTH,
@@ -15,7 +15,7 @@ export class State {
   private readonly enableDebug: boolean;
   private readonly configFile: string;
   private config?: NessieConfig;
-  client?: ClientI;
+  client?: NessieConfig["client"];
 
   constructor(args: Denomander) {
     this.enableDebug = args.debug;
@@ -46,6 +46,10 @@ export class State {
     this.client = this.config!.client;
 
     this.client.setLogger(this.logger.bind(this));
+
+    if (this.config?.experimental) {
+      this.client?.isExperimental?.();
+    }
 
     return this;
   }

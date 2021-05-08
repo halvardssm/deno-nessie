@@ -6,7 +6,6 @@ import { AbstractClient } from "./AbstractClient.ts";
 import type {
   AmountMigrateT,
   AmountRollbackT,
-  ClientI,
   ClientOptions,
   DBDialects,
   QueryT,
@@ -21,8 +20,7 @@ import {
 export type { ConnectionOptions };
 
 /** PostgreSQL client */
-export class ClientPostgreSQL extends AbstractClient<Client>
-  implements ClientI {
+export class ClientPostgreSQL extends AbstractClient<Client> {
   dialect: DBDialects = "pg";
 
   #QUERY_TRANSACTION_START = `BEGIN TRANSACTION;`;
@@ -105,7 +103,7 @@ export class ClientPostgreSQL extends AbstractClient<Client>
 
   async migrate(amount: AmountMigrateT) {
     const latestMigration = await this.client.queryArray(this.QUERY_GET_LATEST);
-    await super.migrate(
+    await this._migrate(
       amount,
       latestMigration.rows?.[0]?.[0] as undefined,
       this.query.bind(this),
@@ -115,7 +113,7 @@ export class ClientPostgreSQL extends AbstractClient<Client>
   async rollback(amount: AmountRollbackT) {
     const allMigrations = await this.client.queryArray(this.QUERY_GET_ALL);
 
-    await super.rollback(
+    await this._rollback(
       amount,
       allMigrations.rows?.map((el) => el?.[0]) as string[],
       this.query.bind(this),
@@ -123,6 +121,6 @@ export class ClientPostgreSQL extends AbstractClient<Client>
   }
 
   async seed(matcher?: string) {
-    await super.seed(matcher, this.query.bind(this));
+    await this._seed(matcher, this.query.bind(this));
   }
 }

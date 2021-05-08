@@ -10,7 +10,6 @@ import {
 const clientOptions: ClientOptions = {
   migrationFolder: "./db/migrations",
   seedFolder: "./db/seeds",
-  experimental: true,
 };
 
 /** Select one of the supported clients */
