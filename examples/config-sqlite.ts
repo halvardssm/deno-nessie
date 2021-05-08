@@ -5,8 +5,8 @@ import {
 } from "https://deno.land/x/nessie/mod.ts";
 
 const clientConfig: ClientOptions = {
-  migrationFolder: "./db/migrations",
-  seedFolder: "./db/seeds",
+  migrationFolders: ["./db/migrations"],
+  seedFolders: ["./db/seeds"],
 };
 
 const dbFile = "./sqlite.db";
