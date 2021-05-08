@@ -1,4 +1,4 @@
-export const VERSION = "1.2.4";
+export const VERSION = "1.3.0";
 
 export const URL_BASE = `https://deno.land/x/nessie`;
 
