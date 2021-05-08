@@ -22,8 +22,12 @@ const initDenomander = () => {
       "Path to config file, will default to ./nessie.config.ts",
     )
     .command("init", "Generates the config file")
-    .command("make [fileName]", "Creates a migration file with the name")
+    .command(
+      "make:migration [fileName]",
+      "Creates a migration file with the name",
+    )
     .command("make:seed [fileName]", "Creates a seed file with the name")
+    .command("make [fileName]", "Alias of make:migration")
     .command(
       "seed [matcher?]",
       "Seeds the database with the files found with the matcher in the seed folder specified in the config file. Matcher is optional, and accepts string literals and RegExp",
@@ -117,7 +121,7 @@ const run = async () => {
     } else {
       const state = await new State(prog).init();
 
-      if (prog.make) {
+      if (prog["make:migration"] || prog.make) {
         await state.makeMigration(prog.fileName);
       } else if (prog["make:seed"]) {
         await state.makeSeed(prog.fileName);
