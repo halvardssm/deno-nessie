@@ -4,7 +4,6 @@ import { resolve } from "../deps.ts";
 import type {
   AmountMigrateT,
   AmountRollbackT,
-  ClientI,
   ClientOptions,
   DBDialects,
   QueryT,
@@ -17,7 +16,7 @@ import {
 } from "../consts.ts";
 
 /** SQLite client */
-export class ClientSQLite extends AbstractClient<DB> implements ClientI {
+export class ClientSQLite extends AbstractClient<DB> {
   dialect: DBDialects = "sqlite3";
 
   #QUERY_TRANSACTION_START = `BEGIN TRANSACTION;`;
@@ -97,7 +96,7 @@ export class ClientSQLite extends AbstractClient<DB> implements ClientI {
 
   async migrate(amount: AmountMigrateT) {
     const latestMigration = await this.query(this.QUERY_GET_LATEST);
-    await super.migrate(
+    await this._migrate(
       amount,
       latestMigration?.[0]?.[0]?.[0],
       this.query.bind(this),
@@ -107,7 +106,7 @@ export class ClientSQLite extends AbstractClient<DB> implements ClientI {
   async rollback(amount: AmountRollbackT) {
     const allMigrations = await this.query(this.QUERY_GET_ALL);
 
-    await super.rollback(
+    await this._rollback(
       amount,
       allMigrations?.[0]?.flatMap((el) => el?.[0]),
       this.query.bind(this),
@@ -115,6 +114,6 @@ export class ClientSQLite extends AbstractClient<DB> implements ClientI {
   }
 
   async seed(matcher?: string) {
-    await super.seed(matcher, this.query.bind(this));
+    await this._seed(matcher, this.query.bind(this));
   }
 }

@@ -1,13 +1,13 @@
 import {
   ClientOptions,
   ClientPostgreSQL,
+  NessieConfig,
 } from "https://deno.land/x/nessie/mod.ts";
-import type { ConnectionOptions } from "https://deno.land/x/postgres@v0.4.5/connection_params.ts";
+import type { ConnectionOptions } from "https://deno.land/x/postgres@v0.11.2/mod.ts";
 
 const clientConfig: ClientOptions = {
   migrationFolder: "./db/migrations",
   seedFolder: "./db/seeds",
-  experimental: true,
 };
 
 const connectionConfig: ConnectionOptions = {
@@ -18,6 +18,10 @@ const connectionConfig: ConnectionOptions = {
   password: "pwd",
 };
 
-export default {
+const config: NessieConfig = {
   client: new ClientPostgreSQL(clientConfig, connectionConfig),
+  experimental: true,
+  useDateTime: true,
 };
+
+export default config;

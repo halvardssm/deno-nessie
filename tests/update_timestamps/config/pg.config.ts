@@ -13,8 +13,8 @@ export default {
     {
       migrationFolder: "./tests/update_timestamps",
       seedFolder: "./tests/update_timestamps",
-      experimental: true,
     },
     dbConnection,
   ),
+  experimental: true,
 };

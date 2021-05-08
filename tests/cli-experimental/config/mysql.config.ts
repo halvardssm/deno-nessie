@@ -5,7 +5,6 @@ export default {
     {
       migrationFolder: "./tests/cli-experimental/mysql",
       seedFolder: "./tests/cli-experimental/mysql",
-      experimental: true,
     },
     {
       "hostname": "0.0.0.0",
@@ -14,4 +13,6 @@ export default {
       "db": "nessie",
     },
   ),
+  experimental: true,
+  useDateTime: true,
 };

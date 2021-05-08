@@ -9,6 +9,7 @@ import type {
   LoggerFn,
   MigrationFile,
   QueryHandler,
+  QueryT,
   QueryWithString,
 } from "../types.ts";
 import type {
@@ -33,12 +34,17 @@ export abstract class AbstractClient<Client> {
   protected logger: LoggerFn = () => undefined;
 
   client: Client;
+  /** Migration files read from the migration folder */
   migrationFiles: Deno.DirEntry[];
+  /** Seed files read from the seed folder */
   seedFiles: Deno.DirEntry[];
+  /** Migration folder given from the config file */
   migrationFolder: string;
+  /** Seed folder given from the config file */
   seedFolder: string;
-  experimental: boolean;
-  dialect?: DBDialects;
+  experimental = false;
+  /** The current dialect, given by the Client e.g. pg, mysql, sqlite3 */
+  dialect?: DBDialects | string;
 
   protected readonly QUERY_GET_LATEST =
     `SELECT ${COL_FILE_NAME} FROM ${TABLE_MIGRATIONS} ORDER BY ${COL_FILE_NAME} DESC LIMIT 1;`;
@@ -56,7 +62,6 @@ export abstract class AbstractClient<Client> {
     );
     this.seedFolder = resolve(options.seedFolder || DEFAULT_SEED_FOLDER);
     this.client = options.client;
-    this.experimental = options.experimental || false;
 
     try {
       this.migrationFiles = Array.from(Deno.readDirSync(this.migrationFolder));
@@ -73,8 +78,12 @@ export abstract class AbstractClient<Client> {
     }
   }
 
+  isExperimental() {
+    this.experimental = true;
+  }
+
   /** Runs the `up` method on all available migrations after filtering and sorting. */
-  protected async migrate(
+  protected async _migrate(
     amount: AmountMigrateT,
     latestMigration: string | undefined,
     queryHandler: QueryHandler,
@@ -108,7 +117,7 @@ export abstract class AbstractClient<Client> {
   }
 
   /** Runs the `down` method on defined number of migrations after retrieving them from the DB. */
-  async rollback(
+  async _rollback(
     amount: AmountRollbackT,
     allMigrations: string[] | undefined,
     queryHandler: QueryHandler,
@@ -139,7 +148,7 @@ export abstract class AbstractClient<Client> {
   }
 
   /** Runs the `run` method on seed files. Filters on the matcher. */
-  async seed(matcher = ".+.ts", queryHandler: QueryHandler) {
+  async _seed(matcher = ".+.ts", queryHandler: QueryHandler) {
     const files = this.seedFiles.filter((el) =>
       el.isFile && (el.name === matcher || new RegExp(matcher).test(el.name))
     );
@@ -264,4 +273,20 @@ export abstract class AbstractClient<Client> {
       await queryHandler(query);
     }
   }
+
+  /** Prepares the db connection */
+  abstract prepare(): Promise<void>;
+  /** Updates timestamp format */
+  abstract updateTimestamps(): Promise<void>;
+  /** Closes the db connection */
+  abstract close(): Promise<void>;
+  /** Handles the migration */
+  abstract migrate(amount: AmountMigrateT): Promise<void>;
+  /** Handles the rollback */
+  abstract rollback(amount: AmountRollbackT): Promise<void>;
+  /** Handles the seeding */
+  abstract seed(matcher?: string): Promise<void>;
+  /** Universal wrapper for db query execution */
+  // deno-lint-ignore no-explicit-any
+  abstract query(query: QueryT): Promise<any>;
 }

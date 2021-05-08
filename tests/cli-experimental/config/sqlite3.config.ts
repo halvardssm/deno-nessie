@@ -5,8 +5,9 @@ export default {
     {
       migrationFolder: "./tests/cli-experimental/sqlite3",
       seedFolder: "./tests/cli-experimental/sqlite3",
-      experimental: true,
     },
     "./tests/data/sqlite.db",
   ),
+  experimental: true,
+  useDateTime: true,
 };
