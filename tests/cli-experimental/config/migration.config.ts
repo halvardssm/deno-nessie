@@ -33,7 +33,7 @@ export const runner = async (dialect: string, type: any[]) => {
 
   const rawOutput = await r.output();
   r.close();
-  let result = decoder.decode(rawOutput).split("\n");
+  const result = decoder.decode(rawOutput).split("\n");
 
   if (code !== 0) {
     result.push(`Code was ${code}`);

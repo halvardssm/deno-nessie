@@ -3,8 +3,14 @@ import { ClientMySQL } from "../../../mod.ts";
 export default {
   client: new ClientMySQL(
     {
-      migrationFolder: "./tests/cli-experimental/mysql",
-      seedFolder: "./tests/cli-experimental/mysql",
+      migrationFolders: [
+        "./tests/cli-experimental/mysql1",
+        "./tests/cli-experimental/mysql2",
+      ],
+      seedFolders: [
+        "./tests/cli-experimental/mysql1",
+        "./tests/cli-experimental/mysql2",
+      ],
     },
     {
       "hostname": "0.0.0.0",

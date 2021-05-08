@@ -6,8 +6,8 @@ import {
 import type { ConnectionOptions } from "https://deno.land/x/postgres@v0.11.2/mod.ts";
 
 const clientConfig: ClientOptions = {
-  migrationFolder: "./db/migrations",
-  seedFolder: "./db/seeds",
+  migrationFolders: ["./db/migrations"],
+  seedFolders: ["./db/seeds"],
 };
 
 const connectionConfig: ConnectionOptions = {

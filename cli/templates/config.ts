@@ -8,8 +8,8 @@ import {
 
 /** These are the default config options. */
 const clientOptions: ClientOptions = {
-  migrationFolder: "./db/migrations",
-  seedFolder: "./db/seeds",
+  migrationFolders: ["./db/migrations"],
+  seedFolders: ["./db/seeds"],
 };
 
 /** Select one of the supported clients */

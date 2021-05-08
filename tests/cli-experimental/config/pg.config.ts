@@ -3,8 +3,14 @@ import { ClientPostgreSQL } from "../../../mod.ts";
 export default {
   client: new ClientPostgreSQL(
     {
-      migrationFolder: "./tests/cli-experimental/pg",
-      seedFolder: "./tests/cli-experimental/pg",
+      migrationFolders: [
+        "./tests/cli-experimental/pg1",
+        "./tests/cli-experimental/pg2",
+      ],
+      seedFolders: [
+        "./tests/cli-experimental/pg1",
+        "./tests/cli-experimental/pg2",
+      ],
     },
     {
       "database": "nessie",

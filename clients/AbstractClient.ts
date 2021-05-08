@@ -1,10 +1,10 @@
-import { parsePath } from "../cli/utils.ts";
 import { resolve } from "../deps.ts";
 import type {
   AbstractClientOptions,
   AmountMigrateT,
   AmountRollbackT,
   DBDialects,
+  FileEntryT,
   Info,
   LoggerFn,
   MigrationFile,
@@ -21,27 +21,24 @@ import {
   COL_FILE_NAME,
   DEFAULT_MIGRATION_FOLDER,
   DEFAULT_SEED_FOLDER,
+  REGEX_MIGRATION_FILE_NAME,
   REGEX_MIGRATION_FILE_NAME_LEGACY,
   TABLE_MIGRATIONS,
 } from "../consts.ts";
 
 /** The abstract client which handles most of the logic related to database communication. */
 export abstract class AbstractClient<Client> {
-  protected readonly regexFileName = new RegExp(
-    REGEX_MIGRATION_FILE_NAME_LEGACY,
-  );
-
   protected logger: LoggerFn = () => undefined;
 
   client: Client;
-  /** Migration files read from the migration folder */
-  migrationFiles: Deno.DirEntry[];
-  /** Seed files read from the seed folder */
-  seedFiles: Deno.DirEntry[];
-  /** Migration folder given from the config file */
-  migrationFolder: string;
-  /** Seed folder given from the config file */
-  seedFolder: string;
+  /** Migration files read from the migration folders */
+  migrationFiles: FileEntryT[] = [];
+  /** Seed files read from the seed folders */
+  seedFiles: FileEntryT[] = [];
+  /** Migration folders given from the config file */
+  migrationFolders: string[] = [];
+  /** Seed folders given from the config file */
+  seedFolders: string[] = [];
   experimental = false;
   /** The current dialect, given by the Client e.g. pg, mysql, sqlite3 */
   dialect?: DBDialects | string;
@@ -57,29 +54,20 @@ export abstract class AbstractClient<Client> {
     `DELETE FROM ${TABLE_MIGRATIONS} WHERE ${COL_FILE_NAME} = '${fileName}';`;
 
   constructor(options: AbstractClientOptions<Client>) {
-    this.migrationFolder = resolve(
-      options.migrationFolder || DEFAULT_MIGRATION_FOLDER,
-    );
-    this.seedFolder = resolve(options.seedFolder || DEFAULT_SEED_FOLDER);
     this.client = options.client;
 
-    try {
-      this.migrationFiles = Array.from(Deno.readDirSync(this.migrationFolder));
-    } catch {
-      this.logger(`Migration folder not found at '${this.migrationFolder}'`);
-      this.migrationFiles = [];
-    }
-
-    try {
-      this.seedFiles = Array.from(Deno.readDirSync(this.seedFolder));
-    } catch {
-      this.logger(`Seed folder not found at '${this.seedFolder}'`);
-      this.seedFiles = [];
-    }
+    this._parseMigrationAndSeedFolders(options);
+    this._parseMigrationAndSeedFiles();
   }
 
   isExperimental() {
     this.experimental = true;
+  }
+
+  private _isMigrationFile(name: string): boolean {
+    return this.experimental
+      ? REGEX_MIGRATION_FILE_NAME.test(name)
+      : REGEX_MIGRATION_FILE_NAME_LEGACY.test(name);
   }
 
   /** Runs the `up` method on all available migrations after filtering and sorting. */
@@ -90,23 +78,23 @@ export abstract class AbstractClient<Client> {
   ) {
     this.logger(amount, "Amount pre");
 
-    this._filterAndSortFiles(latestMigration);
+    this._sliceMigrationFiles(latestMigration);
     amount = typeof amount === "number" ? amount : this.migrationFiles.length;
 
     this.logger(latestMigration, "Latest migrations");
 
     if (this.migrationFiles.length > 0) {
       this.logger(
-        this.migrationFiles.map((el) => el.name),
+        this.migrationFiles.map((files) => files.name),
         "Filtered and sorted migration files",
       );
 
       amount = Math.min(this.migrationFiles.length, amount);
 
-      for (let i = 0; i < amount; i++) {
-        const file = this.migrationFiles[i];
+      for (const [i, file] of this.migrationFiles.entries()) {
+        if (i >= amount) break;
 
-        await this._migrationHandler(file.name, queryHandler);
+        await this._migrationHandler(file, queryHandler);
 
         console.info(`Migrated ${file.name}`);
       }
@@ -135,12 +123,19 @@ export abstract class AbstractClient<Client> {
     if (allMigrations && allMigrations.length > 0) {
       amount = Math.min(allMigrations.length, amount);
 
-      for (let i = 0; i < amount; i++) {
-        const fileName = allMigrations[i];
+      for (const [i, fileName] of allMigrations.entries()) {
+        if (i >= amount) break;
 
-        await this._migrationHandler(fileName, queryHandler, true);
+        const file = this.migrationFiles
+          .find((migrationFile) => migrationFile.name === fileName);
 
-        console.info(`Rolled back ${fileName}`);
+        if (!file) {
+          throw new Error(`Migration file '${fileName}' is not found`);
+        }
+
+        await this._migrationHandler(file, queryHandler, true);
+
+        console.info(`Rolled back ${file.name}`);
       }
     } else {
       console.info("Nothing to rollback");
@@ -150,13 +145,11 @@ export abstract class AbstractClient<Client> {
   /** Runs the `run` method on seed files. Filters on the matcher. */
   async _seed(matcher = ".+.ts", queryHandler: QueryHandler) {
     const files = this.seedFiles.filter((el) =>
-      el.isFile && (el.name === matcher || new RegExp(matcher).test(el.name))
+      el.name === matcher || new RegExp(matcher).test(el.name)
     );
 
-    if (!files) {
-      console.info(
-        `No seed file found at '${this.seedFolder}' with matcher '${matcher}'`,
-      );
+    if (files.length < 1) {
+      console.info(`No seed file found with matcher '${matcher}'`);
       return;
     } else {
       for await (const file of files) {
@@ -169,18 +162,12 @@ export abstract class AbstractClient<Client> {
 
           const SeedClass: new (
             props: AbstractSeedProps<Client>,
-          ) => AbstractSeed<this> = (await import(
-            parsePath(
-              this.seedFolder,
-              file.name,
-            )
-          )).default;
+          ) => AbstractSeed<this> = (await import(file.path)).default;
 
           const seed = new SeedClass({ client: this.client });
           await seed.run(exposedObject);
         } else {
-          const filePath = parsePath(this.seedFolder, file.name);
-          const { run } = await import(filePath);
+          const { run } = await import(file.path);
           const sql = await run();
 
           await queryHandler(sql);
@@ -202,14 +189,15 @@ export abstract class AbstractClient<Client> {
   }
 
   /** Filters and sort files in ascending order. */
-  private _filterAndSortFiles(queryResult: string | undefined): void {
-    this.migrationFiles = this.migrationFiles
-      .filter((file: Deno.DirEntry): boolean => {
-        if (!this.regexFileName.test(file.name)) return false;
-        if (queryResult === undefined) return true;
-        return file.name > queryResult;
-      })
-      .sort((a, b) => parseInt(a?.name ?? "0") - parseInt(b?.name ?? "0"));
+  private _sliceMigrationFiles(queryResult: string | undefined): void {
+    if (!queryResult) return;
+
+    const sliceIndex = this.migrationFiles
+      .findIndex((file) => file.name >= queryResult);
+
+    if (sliceIndex !== undefined) {
+      this.migrationFiles = this.migrationFiles.slice(sliceIndex + 1);
+    }
   }
 
   /**
@@ -218,7 +206,7 @@ export abstract class AbstractClient<Client> {
    * TODO on next major bump, remove non expreimental code
    */
   private async _migrationHandler(
-    fileName: string,
+    file: FileEntryT,
     queryHandler: QueryHandler,
     isDown = false,
   ) {
@@ -231,27 +219,19 @@ export abstract class AbstractClient<Client> {
     if (this.experimental) {
       const MigrationClass: new (
         props: AbstractMigrationProps<Client>,
-      ) => AbstractMigration<this> = (await import(
-        parsePath(
-          this.migrationFolder,
-          fileName,
-        )
-      )).default;
+      ) => AbstractMigration<this> = (await import(file.path)).default;
 
       const migration = new MigrationClass({ client: this.client });
 
       if (isDown) {
         await migration.down(exposedObject);
-        await queryHandler(this.QUERY_MIGRATION_DELETE(fileName));
+        await queryHandler(this.QUERY_MIGRATION_DELETE(file.name));
       } else {
         await migration.up(exposedObject);
-        await queryHandler(this.QUERY_MIGRATION_INSERT(fileName));
+        await queryHandler(this.QUERY_MIGRATION_INSERT(file.name));
       }
     } else {
-      const { up, down }: MigrationFile = await import(parsePath(
-        this.migrationFolder,
-        fileName,
-      ));
+      const { up, down }: MigrationFile = await import(file.path);
 
       let query: string | string[];
 
@@ -265,13 +245,106 @@ export abstract class AbstractClient<Client> {
       else if (typeof query === "string") query = [query];
 
       if (isDown) {
-        query.push(this.QUERY_MIGRATION_DELETE(fileName));
+        query.push(this.QUERY_MIGRATION_DELETE(file.name));
       } else {
-        query.push(this.QUERY_MIGRATION_INSERT(fileName));
+        query.push(this.QUERY_MIGRATION_INSERT(file.name));
       }
 
       await queryHandler(query);
     }
+  }
+
+  /** Checks if an array only contains unique values */
+  private _arrayIsUnique(array: unknown[]): boolean {
+    return array.length === new Set(array).size;
+  }
+
+  /** Parses and sets the migrationFolders and seedFolders */
+  private _parseMigrationAndSeedFolders(
+    options: AbstractClientOptions<Client>,
+  ): void {
+    if (
+      options.migrationFolders && !this._arrayIsUnique(options.migrationFolders)
+    ) {
+      throw new Error("Entries for the migration folders has to be unique");
+    }
+
+    if (options.seedFolders && !this._arrayIsUnique(options.seedFolders)) {
+      throw new Error("Entries for the seed folders has to be unique");
+    }
+
+    options.migrationFolders?.forEach((folder) => {
+      this.migrationFolders.push(resolve(folder));
+    });
+
+    if (this.migrationFolders.length < 1) {
+      this.migrationFolders.push(resolve(
+        options.migrationFolder || DEFAULT_MIGRATION_FOLDER,
+      ));
+    }
+
+    if (!this._arrayIsUnique(this.migrationFolders)) {
+      throw new Error(
+        "Entries for the resolved migration folders has to be unique",
+      );
+    }
+
+    options.seedFolders?.forEach((folder) => {
+      this.seedFolders.push(resolve(folder));
+    });
+
+    if (this.seedFolders.length < 1) {
+      this.seedFolders.push(resolve(
+        options.seedFolder || DEFAULT_SEED_FOLDER,
+      ));
+    }
+
+    if (!this._arrayIsUnique(this.seedFolders)) {
+      throw new Error(
+        "Entries for the resolved seed folders has to be unique",
+      );
+    }
+  }
+
+  /** Parses and sets the migrationFiles and seedFiles */
+  private _parseMigrationAndSeedFiles(): void {
+    this.migrationFolders.forEach((folder) => {
+      const filesRaw: FileEntryT[] = Array.from(Deno.readDirSync(folder))
+        .filter((file) => file.isFile && this._isMigrationFile(file.name))
+        .map((file) => ({
+          name: file.name,
+          path: resolve(folder, file.name),
+        }));
+
+      this.migrationFiles.push(...filesRaw);
+    });
+
+    if (!this._arrayIsUnique(this.migrationFiles.map((file) => file.name))) {
+      throw new Error(
+        "Entries for the migration files has to be unique",
+      );
+    }
+
+    this.migrationFiles.sort((a, b) => parseInt(a.name) - parseInt(b.name));
+
+    this.seedFolders.forEach((folder) => {
+      const filesRaw = Array.from(Deno.readDirSync(folder))
+        .filter((file) => file.isFile)
+        .map((file) => ({
+          name: file.name,
+          path: resolve(folder, file.name),
+        }));
+
+      this.seedFiles.push(...filesRaw);
+    });
+
+    if (!this._arrayIsUnique(this.seedFiles.map((file) => file.name))) {
+      throw new Error(
+        "Entries for the resolved seed files has to be unique",
+      );
+    }
+
+    this.seedFiles.sort((a, b) => a.name.localeCompare(b.name));
   }
 
   /** Prepares the db connection */

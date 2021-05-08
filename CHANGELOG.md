@@ -1,5 +1,11 @@
 # Nessie Change Log
 
+## Version 1.3.1
+
+- Cliffy v0.18.2
+- Replaced Denomander with Cliffy
+- Added support for multiple migration and seed folders
+
 ## Version 1.3.0
 
 - Added `CHANGELOG.md` file

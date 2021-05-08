@@ -1,53 +1,92 @@
 import { State } from "./cli/state.ts";
-import { Denomander, format, resolve } from "./deps.ts";
+import { CliffyCommand, CompletionsCommand, format, resolve } from "./deps.ts";
 import {
   REGEX_MIGRATION_FILE_NAME_LEGACY,
   URL_TEMPLATE_BASE,
   URL_TEMPLATE_BASE_VERSIONED,
   VERSION,
 } from "./consts.ts";
+import { AmountMigrateT, AmountRollbackT, CommandOptions } from "./types.ts";
 
-/** Initializes Denomander */
-const initDenomander = () => {
-  const program = new Denomander({
-    app_name: "Nessie Migrations",
-    app_description: "A database migration tool for Deno.",
-    app_version: VERSION,
-  });
-
-  program
-    .globalOption("-d --debug", "Enables verbose output")
-    .globalOption(
-      "-c --config",
+/** Initializes CliffyCommand */
+const cli = async () => {
+  await new CliffyCommand<void, [], CommandOptions>()
+    .name("Nessie Migrations")
+    .version(VERSION)
+    .description("A database migration tool for Deno.")
+    .option("-d, --debug [debug:boolean]", "Enables verbose output", {
+      global: true,
+      default: false,
+    })
+    .option(
+      "-c, --config <config:string>",
       "Path to config file, will default to ./nessie.config.ts",
+      { global: true, default: "./nessie.config.ts" },
     )
-    .command("init", "Generates the config file")
+    .command("init", "Generates the config file.")
+    .action(async () => await initNessie())
     .command(
-      "make:migration [fileName]",
-      "Creates a migration file with the name",
+      "make:migration <fileName:string>",
+      "Creates a migration file with the name.",
     )
-    .command("make:seed [fileName]", "Creates a seed file with the name")
-    .command("make [fileName]", "Alias of make:migration")
+    .action(makeMigration)
     .command(
-      "seed [matcher?]",
-      "Seeds the database with the files found with the matcher in the seed folder specified in the config file. Matcher is optional, and accepts string literals and RegExp",
+      "make:seed <fileName:string>",
+      "Creates a seed file with the name.",
     )
+    .action(async (options, fileName: string) => {
+      const state = await new State(options).init();
+      await state.makeSeed(fileName);
+    })
+    .command("make <fileName:string>", "Alias of make:migration.")
+    .action(makeMigration)
     .command(
-      "migrate [amount?]",
+      "seed [matcher:string]",
+      "Seeds the database with the files found with the matcher in the seed folder specified in the config file. Matcher is optional, and accepts string literals and RegExp.",
+    )
+    .action(async (options, matcher: string | undefined) => {
+      const state = await new State(options).init();
+      await state.client!.prepare();
+      await state.client!.seed(matcher);
+      await state.client!.close();
+    })
+    .command(
+      "migrate [amount:number]",
       "Migrates migrations. Optional number of migrations. If not provided, it will do all available.",
     )
+    .action(async (options, amount: AmountMigrateT) => {
+      const state = await new State(options).init();
+      await state.client!.prepare();
+      await state.client!.migrate(amount);
+      await state.client!.close();
+    })
     .command(
-      "rollback [amount?]",
+      "rollback [amount:string]",
       "Rolls back migrations. Optional number of rollbacks. If not provided, it will do one.",
     )
+    .action(async (options, amount: AmountRollbackT) => {
+      amount = amount === "all"
+        ? amount
+        : parseInt(amount as unknown as string);
+
+      const state = await new State(options).init();
+      await state.client!.prepare();
+      await state.client!.rollback(amount);
+      await state.client!.close();
+    })
     .command(
       "update_timestamps",
-      "Update the timestamp format from milliseconds to timestamp. This command should be run inside of the folder where you store your migrations. Will only update timestams where the value is less than 1672531200000 (2023-01-01) so that the timestamps wont be updated multiple times.",
-    );
-
-  program.parse(Deno.args);
-
-  return program;
+      "Update the timestamp format from milliseconds to timestamp. This command should be run inside of the folder where you store your migrations. Will only update timestams where the value is less than 1672531200000 (2023-01-01) so that the timestamps won't be updated multiple times.",
+    )
+    .action(async (options) => {
+      const state = await new State(options).init();
+      await state.client!.prepare();
+      await updateTimestamps();
+      await state.client!.updateTimestamps();
+      await state.client!.close();
+    })
+    .command("completions", new CompletionsCommand())
+    .parse(Deno.args);
 };
 
 /** Initializes Nessie */
@@ -111,37 +150,15 @@ const updateTimestamps = async () => {
   await Deno.stdout.write(encoder.encode(output));
 };
 
+const makeMigration = async (options: CommandOptions, fileName: string) => {
+  const state = await new State(options).init();
+  await state.makeMigration(fileName);
+};
+
 /** Main application */
 const run = async () => {
   try {
-    const prog = initDenomander();
-
-    if (prog.init) {
-      await initNessie();
-    } else {
-      const state = await new State(prog).init();
-
-      if (prog["make:migration"] || prog.make) {
-        await state.makeMigration(prog.fileName);
-      } else if (prog["make:seed"]) {
-        await state.makeSeed(prog.fileName);
-      } else {
-        await state.client!.prepare();
-
-        if (prog.migrate) {
-          await state.client!.migrate(prog.amount);
-        } else if (prog.rollback) {
-          await state.client!.rollback(prog.amount);
-        } else if (prog.seed) {
-          await state.client!.seed(prog.matcher);
-        } else if (prog.update_timestamps) {
-          await updateTimestamps();
-          await state.client!.updateTimestamps();
-        }
-
-        await state.client!.close();
-      }
-    }
+    await cli();
 
     Deno.exit();
   } catch (e) {

@@ -6,8 +6,8 @@ import {
 import type { ClientConfig } from "https://deno.land/x/mysql@v2.8.0/mod.ts";
 
 const clientConfig: ClientOptions = {
-  migrationFolder: "./db/migrations",
-  seedFolder: "./db/seeds",
+  migrationFolders: ["./db/migrations"],
+  seedFolders: ["./db/seeds"],
 };
 
 const connectionConfig: ClientConfig = {

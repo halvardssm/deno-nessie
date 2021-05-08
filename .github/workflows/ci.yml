@@ -39,17 +39,17 @@ jobs:
           deno-version: ${{env.DENO_VERSION}}
           
       - name: Nessie Init
-        run: deno run --allow-read --allow-write --allow-net --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init
+        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init
         env:
           URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
 
       - name: Create migration
-        run: deno run --allow-read --allow-write --allow-net --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make test
+        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make test
         env:
           URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
 
       - name: Create seed
-        run: deno run --allow-read --allow-write --allow-net --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make:seed test
+        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make:seed test
         env:
           URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
 

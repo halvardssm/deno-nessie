@@ -122,7 +122,7 @@ All contributions are welcome, make sure to read the
 
 ## Uses
 
-- [Denomander](https://deno.land/x/denomander/)
+- [Cliffy](https://deno.land/x/cliffy/)
 - [Deno Postgres](https://deno.land/x/postgres/)
 - [Deno MySQL](https://deno.land/x/mysql/) - Currently it works with password
   for 5.*, but for >=8 you have to send a blank password, see
@@ -152,8 +152,8 @@ import {
 } from "https://deno.land/x/nessie/mod.ts";
 
 const clientOptions: ClientOptions = {
-  migrationFolder: "./db/migrations",
-  seedFolder: "./db/seeds",
+  migrationFolders: ["./db/migrations"],
+  seedFolders: ["./db/seeds"],
 };
 
 const clientPg = new ClientPostgreSQL(clientOptions, {
