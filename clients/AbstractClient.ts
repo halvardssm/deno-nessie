@@ -21,6 +21,7 @@ import {
   COL_FILE_NAME,
   DEFAULT_MIGRATION_FOLDER,
   DEFAULT_SEED_FOLDER,
+  MAX_FILE_NAME_LENGTH,
   REGEX_MIGRATION_FILE_NAME,
   REGEX_MIGRATION_FILE_NAME_LEGACY,
   TABLE_MIGRATIONS,
@@ -66,7 +67,8 @@ export abstract class AbstractClient<Client> {
 
   private _isMigrationFile(name: string): boolean {
     return this.experimental
-      ? REGEX_MIGRATION_FILE_NAME.test(name)
+      ? (REGEX_MIGRATION_FILE_NAME.test(name) &&
+        name.length < MAX_FILE_NAME_LENGTH)
       : REGEX_MIGRATION_FILE_NAME_LEGACY.test(name);
   }
 

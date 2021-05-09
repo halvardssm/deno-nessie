@@ -1,6 +1,7 @@
 import { State } from "./cli/state.ts";
 import { CliffyCommand, CompletionsCommand, format, resolve } from "./deps.ts";
 import {
+  DEFAULT_CONFIG_FILE,
   REGEX_MIGRATION_FILE_NAME_LEGACY,
   URL_TEMPLATE_BASE,
   URL_TEMPLATE_BASE_VERSIONED,
@@ -14,25 +15,26 @@ const cli = async () => {
     .name("Nessie Migrations")
     .version(VERSION)
     .description("A database migration tool for Deno.")
-    .option("-d, --debug [debug:boolean]", "Enables verbose output", {
+    .option("-d, --debug", "Enables verbose output", {
       global: true,
       default: false,
     })
     .option(
       "-c, --config <config:string>",
-      "Path to config file, will default to ./nessie.config.ts",
-      { global: true, default: "./nessie.config.ts" },
+      "Path to config file.",
+      { global: true, default: `./${DEFAULT_CONFIG_FILE}` },
     )
     .command("init", "Generates the config file.")
     .action(async () => await initNessie())
     .command(
       "make:migration <fileName:string>",
-      "Creates a migration file with the name.",
+      "Creates a migration file with the name. Allows lower snake case and digits e.g. `some_migration_1`.",
     )
+    .example("test", "tester")
     .action(makeMigration)
     .command(
       "make:seed <fileName:string>",
-      "Creates a seed file with the name.",
+      "Creates a seed file with the name. Allows lower snake case and digits e.g. `some_seed_1`.",
     )
     .action(async (options, fileName: string) => {
       const state = await new State(options).init();

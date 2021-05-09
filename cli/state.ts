@@ -4,6 +4,7 @@ import type { CommandOptions, NessieConfig } from "../types.ts";
 import {
   DEFAULT_CONFIG_FILE,
   MAX_FILE_NAME_LENGTH,
+  REGEX_FILE_NAME,
   URL_TEMPLATE_BASE,
 } from "../consts.ts";
 
@@ -18,7 +19,7 @@ export class State {
   client?: NessieConfig["client"];
 
   constructor(options: CommandOptions) {
-    this.enableDebug = !!options.debug;
+    this.enableDebug = options.debug;
     this.configFile = parsePath(options.config || DEFAULT_CONFIG_FILE);
 
     this.logger([this.enableDebug, this.configFile], "State");
@@ -56,8 +57,10 @@ export class State {
 
   /** Makes the migration */
   async makeMigration(migrationName = "migration") {
-    if (migrationName.includes(" ")) {
-      throw new Error("Migration name cannot include spaces ` `");
+    if (REGEX_FILE_NAME.test(migrationName) && migrationName.length < 80) {
+      throw new Error(
+        "Migration name has to be snakecase and only include a-z (all lowercase) and 1-9",
+      );
     }
 
     let prefix;
@@ -97,6 +100,12 @@ export class State {
 
   /** Makes the seed */
   async makeSeed(seedName = "seed") {
+    if (REGEX_FILE_NAME.test(seedName)) {
+      throw new Error(
+        "Seed name has to be snakecase and only include a-z (all lowercase) and 1-9",
+      );
+    }
+
     const fileName = `${seedName}.ts`;
     if (this.client?.seedFiles.find((el) => el.name === seedName)) {
       console.info(`Seed with name '${seedName}' already exists.`);
