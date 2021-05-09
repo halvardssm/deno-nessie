@@ -1,5 +1,9 @@
 # Nessie Change Log
 
+## Version 1.3.2
+
+- Added Coverage reporting
+
 ## Version 1.3.1
 
 - Cliffy v0.18.2
