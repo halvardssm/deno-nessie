@@ -57,7 +57,7 @@ export class State {
 
   /** Makes the migration */
   async makeMigration(migrationName = "migration") {
-    if (REGEX_FILE_NAME.test(migrationName) && migrationName.length < 80) {
+    if (!REGEX_FILE_NAME.test(migrationName) || migrationName.length >= 80) {
       throw new Error(
         "Migration name has to be snakecase and only include a-z (all lowercase) and 1-9",
       );
@@ -100,7 +100,7 @@ export class State {
 
   /** Makes the seed */
   async makeSeed(seedName = "seed") {
-    if (REGEX_FILE_NAME.test(seedName)) {
+    if (!REGEX_FILE_NAME.test(seedName)) {
       throw new Error(
         "Seed name has to be snakecase and only include a-z (all lowercase) and 1-9",
       );

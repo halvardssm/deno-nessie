@@ -1,5 +1,9 @@
 # Nessie Change Log
 
+## Version 1.3.2
+
+- Limit filenames to only be lowercase, snake case and digits
+
 ## Version 1.3.1
 
 - Cliffy v0.18.2
