@@ -53,16 +53,6 @@ jobs:
         env:
           URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
 
-      - name: Generate lcov
-        run: deno coverage --unstable --lcov ./coverage > coverage.lcov
-
-      - name: Upload coverage
-        if: matrix.os == 'ubuntu-latest'
-        uses: codecov/codecov-action@v1
-        with:
-          files: coverage.lcov
-          flags: cli
-
   cli-migrations:
     name: Test CLI Migrations
     runs-on: ubuntu-latest
@@ -109,6 +99,17 @@ jobs:
 
       - name: Run tests
         run: make test-cli-migrations
+
+      - name: Generate lcov
+        run: deno coverage --unstable --lcov ./coverage > coverage.lcov
+
+      - name: Upload coverage
+        if: matrix.os == 'ubuntu-latest'
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage.lcov
+          flags: cli
 
   cli-migrations-experimental:
     name: Test CLI Migrations Experimental
@@ -164,6 +165,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         uses: codecov/codecov-action@v1
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.lcov
           flags: cli-experimental
   
@@ -221,5 +223,6 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         uses: codecov/codecov-action@v1
         with:
+          token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.lcov
           flags: update-timestamps
