@@ -104,7 +104,6 @@ jobs:
         run: deno coverage --unstable --lcov ./coverage > coverage.lcov
 
       - name: Upload coverage
-        if: matrix.os == 'ubuntu-latest'
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -162,7 +161,6 @@ jobs:
         run: deno coverage --unstable --lcov ./coverage > coverage.lcov
 
       - name: Upload coverage
-        if: matrix.os == 'ubuntu-latest'
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -220,7 +218,6 @@ jobs:
         run: deno coverage --unstable --lcov ./coverage > coverage.lcov
 
       - name: Upload coverage
-        if: matrix.os == 'ubuntu-latest'
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
