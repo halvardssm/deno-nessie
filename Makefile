@@ -11,11 +11,11 @@ test-fmt:
 	deno fmt --check
 
 test-cli-migrations:
-	deno test -A --unstable tests/cli
+	deno test -A --unstable --coverage=coverage tests/cli
 test-cli-migrations-experimental:
-	deno test -A --unstable tests/cli-experimental
+	deno test -A --unstable --coverage=coverage tests/cli-experimental
 test-cli-update-timestamps:
-	deno test -A --unstable tests/update_timestamps
+	deno test -A --unstable --coverage=coverage tests/update_timestamps
 
 db-all-restart: db-all-stop db-all-start
 db-all-start: db-pg-start db-mysql-start db-sqlite-start

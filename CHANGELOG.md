@@ -3,6 +3,7 @@
 ## Version 1.3.2
 
 - Limit filenames to only be lowercase, snake case and digits
+- Added Coverage reporting
 
 ## Version 1.3.1
 
