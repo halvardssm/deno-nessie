@@ -85,7 +85,7 @@ export abstract class AbstractClient<Client> {
 
     if (this.migrationFiles.length > 0) {
       this.logger(
-        this.migrationFiles.map((files) => files.name),
+        this.migrationFiles,
         "Filtered and sorted migration files",
       );
 
