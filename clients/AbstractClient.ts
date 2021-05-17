@@ -274,11 +274,12 @@ export abstract class AbstractClient<Client> {
     }
 
     options.migrationFolders?.forEach((folder) => {
-      this.migrationFolders.push(resolve(folder));
+      this.migrationFolders.push(resolve(Deno.cwd(),folder));
     });
 
     if (this.migrationFolders.length < 1) {
       this.migrationFolders.push(resolve(
+        Deno.cwd(),
         options.migrationFolder || DEFAULT_MIGRATION_FOLDER,
       ));
     }
@@ -290,11 +291,12 @@ export abstract class AbstractClient<Client> {
     }
 
     options.seedFolders?.forEach((folder) => {
-      this.seedFolders.push(resolve(folder));
+      this.seedFolders.push(resolve(Deno.cwd(),folder));
     });
 
     if (this.seedFolders.length < 1) {
       this.seedFolders.push(resolve(
+        Deno.cwd(),
         options.seedFolder || DEFAULT_SEED_FOLDER,
       ));
     }
