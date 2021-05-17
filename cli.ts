@@ -8,6 +8,7 @@ import {
   resolve,
 } from "./deps.ts";
 import {
+  DB_CLIENTS,
   DB_DIALECTS,
   DEFAULT_CONFIG_FILE,
   DEFAULT_MIGRATION_FOLDER,
@@ -53,7 +54,7 @@ const cli = async () => {
       "Select the mode for what to create, can be one of 'config' or 'folders'. If not sumbitted, it will create both the config file and folders.",
       {
         value: (value: string): string[] => {
-          if (!(value in DB_DIALECTS)) {
+          if (!["config", "folders"].includes(value)) {
             throw new Error(
               `Mode must be one of 'config' or 'folders', but got "${value}".`,
             );
@@ -67,7 +68,7 @@ const cli = async () => {
       `Set the database dialect for the config file, can be one of '${DB_DIALECTS.PGSQL}', '${DB_DIALECTS.MYSQL}' or '${DB_DIALECTS.SQLITE}'. If not submitted, a general config file will be generated.`,
       {
         value: (value: string): string => {
-          if (!(value in DB_DIALECTS)) {
+          if (!(value in DB_CLIENTS)) {
             throw new Error(
               `Mode must be one of '${DB_DIALECTS.PGSQL}', '${DB_DIALECTS.MYSQL}' or '${DB_DIALECTS.SQLITE}', but got '${value}'.`,
             );
