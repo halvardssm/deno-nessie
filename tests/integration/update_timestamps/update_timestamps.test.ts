@@ -139,7 +139,9 @@ for await (const dialect of DIALECTS) {
 
       assertEquals(missing.length, 0, missing.join("\n"));
 
-      const configFile = await import(`./config/${dialect}.config.ts`);
+      const configFile = await import(
+        "file://" + resolve(`./config/${dialect}.config.ts`)
+      );
       const { dbConnection } = configFile;
 
       let client;

@@ -68,14 +68,16 @@ export class State {
     if (options.config) {
       const path = isRemoteUrl(options.config)
         ? options.config
-        : resolve(Deno.cwd(), options.config);
+        : "file://" + resolve(Deno.cwd(), options.config);
 
       const configRaw = await import(path);
       config = configRaw.default;
     } else if (exists(DEFAULT_CONFIG_FILE)) {
       if (options.debug) console.log("Checking project root");
 
-      const configRaw = await import(resolve(Deno.cwd(), DEFAULT_CONFIG_FILE));
+      const path = "file://" + resolve(Deno.cwd(), DEFAULT_CONFIG_FILE);
+
+      const configRaw = await import(path);
       config = configRaw.default;
     } else {
       throw new Error("Config file is not found");
