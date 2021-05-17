@@ -4,18 +4,18 @@ DB_USER=root
 DB_PWD=pwd
 DB_NAME=nessie
 
-test-all: test-fmt db-all-restart test-cli-migrations db-all-restart test-cli-migrations-experimental test-cli-update-timestamps
+test-all: test-fmt test-unit db-all-restart test-integration-cli test-integration-update-timestamps
 
 test-fmt:
 	deno lint --unstable --ignore=tests,examples,cli/templates
 	deno fmt --check
 
-test-cli-migrations:
-	deno test -A --unstable --coverage=coverage tests/cli
-test-cli-migrations-experimental:
-	deno test -A --unstable --coverage=coverage tests/cli-experimental
-test-cli-update-timestamps:
-	deno test -A --unstable --coverage=coverage tests/update_timestamps
+test-unit:
+	deno test -A --unstable --coverage=coverage tests/unit
+test-integration-cli:
+	deno test -A --unstable --coverage=coverage tests/integration/cli
+test-integration-update-timestamps:
+	deno test -A --unstable --coverage=coverage tests/integration/update_timestamps
 
 db-all-restart: db-all-stop db-all-start
 db-all-start: db-pg-start db-mysql-start db-sqlite-start

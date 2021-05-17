@@ -1,58 +1,222 @@
-import { CliffySelect, exists, format } from "../deps.ts";
-import { isUrl, parsePath } from "./utils.ts";
-import type { CommandOptions, NessieConfig } from "../types.ts";
+import {
+  basename,
+  CliffySelect,
+  CliffyToggle,
+  exists,
+  format,
+  resolve,
+} from "../deps.ts";
+import {
+  arrayIsUnique,
+  getLogger,
+  isMigrationFile,
+  isRemoteUrl,
+} from "./utils.ts";
+import type {
+  CommandOptions,
+  FileEntryT,
+  LoggerFn,
+  NessieConfig,
+  StateOptions,
+} from "../types.ts";
 import {
   DEFAULT_CONFIG_FILE,
-  MAX_FILE_NAME_LENGTH,
+  DEFAULT_MIGRATION_FOLDER,
+  DEFAULT_SEED_FOLDER,
   REGEX_FILE_NAME,
-  URL_TEMPLATE_BASE,
 } from "../consts.ts";
+import { AbstractClient } from "../clients/AbstractClient.ts";
+import { getMigrationTemplate, getSeedTemplate } from "./templates.ts";
 
 /** The main state for the application.
  *
  * Contains the client, and handles the communication to the database.
  */
 export class State {
-  private readonly enableDebug: boolean;
-  private readonly configFile: string;
-  private config?: NessieConfig;
-  client?: NessieConfig["client"];
+  readonly #config: NessieConfig;
+  readonly #migrationFolders: string[];
+  readonly #seedFolders: string[];
+  readonly #migrationFiles: FileEntryT[];
+  readonly #seedFiles: FileEntryT[];
+  client: NessieConfig["client"];
 
-  constructor(options: CommandOptions) {
-    this.enableDebug = options.debug;
-    this.configFile = parsePath(options.config || DEFAULT_CONFIG_FILE);
+  logger: LoggerFn = () => {};
 
-    this.logger([this.enableDebug, this.configFile], "State");
+  constructor(options: StateOptions) {
+    this.#config = options.config;
+    this.#migrationFolders = options.migrationFolders;
+    this.#seedFolders = options.seedFolders;
+    this.#migrationFiles = options.migrationFiles;
+    this.#seedFiles = options.seedFiles;
+
+    if (options.debug || this.#config.debug) {
+      this.logger = getLogger();
+    }
+
+    this.client = options.config.client;
+    this.client.setLogger(this.logger);
+
+    this.client;
   }
 
   /** Initializes the state with a client */
-  async init() {
-    this.logger("Checking config path");
+  static async init(options: CommandOptions) {
+    if (options.debug) console.log("Checking config path");
 
-    if (isUrl(this.configFile) || exists(this.configFile)) {
-      const configRaw = await import(this.configFile);
-      this.config = configRaw.default;
-    } else if (
-      isUrl(parsePath(DEFAULT_CONFIG_FILE)) ||
-      exists(parsePath(DEFAULT_CONFIG_FILE))
-    ) {
-      this.logger("Checking project root");
+    let config: NessieConfig;
 
-      const configRaw = await import(parsePath(DEFAULT_CONFIG_FILE));
-      this.config = configRaw.default;
+    if (options.config) {
+      const path = isRemoteUrl(options.config)
+        ? options.config
+        : resolve(Deno.cwd(), options.config);
+
+      const configRaw = await import(path);
+      config = configRaw.default;
+    } else if (exists(DEFAULT_CONFIG_FILE)) {
+      if (options.debug) console.log("Checking project root");
+
+      const configRaw = await import(resolve(Deno.cwd(), DEFAULT_CONFIG_FILE));
+      config = configRaw.default;
     } else {
       throw new Error("Config file is not found");
     }
 
-    this.client = this.config!.client;
-
-    this.client.setLogger(this.logger.bind(this));
-
-    if (this.config?.experimental) {
-      this.client?.isExperimental?.();
+    if (!(config.client instanceof AbstractClient)) {
+      throw new Error("Client is not valid");
     }
 
-    return this;
+    const { migrationFolders, seedFolders } = this
+      ._parseMigrationAndSeedFolders(config);
+    const { migrationFiles, seedFiles } = this._parseMigrationAndSeedFiles(
+      config,
+      migrationFolders,
+      seedFolders,
+    );
+
+    config.client.migrationFiles = migrationFiles;
+    config.client.seedFiles = seedFiles;
+
+    return new State({
+      config,
+      debug: options.debug,
+      migrationFolders,
+      migrationFiles,
+      seedFolders,
+      seedFiles,
+    });
+  }
+
+  /** Parses and sets the migrationFolders and seedFolders */
+  private static _parseMigrationAndSeedFolders(options: NessieConfig) {
+    const migrationFolders: string[] = [];
+    const seedFolders: string[] = [];
+
+    if (
+      options.migrationFolders && !arrayIsUnique(options.migrationFolders)
+    ) {
+      throw new Error("Entries for the migration folders has to be unique");
+    }
+
+    if (options.seedFolders && !arrayIsUnique(options.seedFolders)) {
+      throw new Error("Entries for the seed folders has to be unique");
+    }
+
+    options.migrationFolders?.forEach((folder) => {
+      migrationFolders.push(resolve(Deno.cwd(), folder));
+    });
+
+    if (migrationFolders.length < 1 && !options.additionalMigrationFiles) {
+      migrationFolders.push(resolve(Deno.cwd(), DEFAULT_MIGRATION_FOLDER));
+    }
+
+    if (!arrayIsUnique(migrationFolders)) {
+      throw new Error(
+        "Entries for the resolved migration folders has to be unique",
+      );
+    }
+
+    options.seedFolders?.forEach((folder) => {
+      seedFolders.push(resolve(Deno.cwd(), folder));
+    });
+
+    if (seedFolders.length < 1 && !options.additionalSeedFiles) {
+      seedFolders.push(resolve(Deno.cwd(), DEFAULT_SEED_FOLDER));
+    }
+
+    if (!arrayIsUnique(seedFolders)) {
+      throw new Error(
+        "Entries for the resolved seed folders has to be unique",
+      );
+    }
+    return { migrationFolders, seedFolders };
+  }
+
+  /** Parses and sets the migrationFiles and seedFiles */
+  private static _parseMigrationAndSeedFiles(
+    options: NessieConfig,
+    migrationFolders: string[],
+    seedFolders: string[],
+  ) {
+    const migrationFiles: FileEntryT[] = [];
+    const seedFiles: FileEntryT[] = [];
+
+    migrationFolders.forEach((folder) => {
+      const filesRaw: FileEntryT[] = Array.from(Deno.readDirSync(folder))
+        .filter((file) => file.isFile && isMigrationFile(file.name))
+        .map((file) => ({
+          name: file.name,
+          path: resolve(folder, file.name),
+        }));
+
+      migrationFiles.push(...filesRaw);
+    });
+
+    options.additionalMigrationFiles?.forEach((file) => {
+      const path = isRemoteUrl(file) ? file : resolve(Deno.cwd(), file);
+
+      migrationFiles.push({
+        name: basename(path),
+        path,
+      });
+    });
+
+    if (!arrayIsUnique(migrationFiles.map((file) => file.name))) {
+      throw new Error(
+        "Entries for the migration files has to be unique",
+      );
+    }
+
+    migrationFiles.sort((a, b) => parseInt(a.name) - parseInt(b.name));
+
+    seedFolders.forEach((folder) => {
+      const filesRaw = Array.from(Deno.readDirSync(folder))
+        .filter((file) => file.isFile)
+        .map((file) => ({
+          name: file.name,
+          path: resolve(folder, file.name),
+        }));
+
+      seedFiles.push(...filesRaw);
+    });
+
+    options.additionalSeedFiles?.forEach((file) => {
+      const path = isRemoteUrl(file) ? file : resolve(Deno.cwd(), file);
+
+      seedFiles.push({
+        name: basename(path),
+        path,
+      });
+    });
+
+    if (!arrayIsUnique(seedFiles.map((file) => file.name))) {
+      throw new Error(
+        "Entries for the resolved seed files has to be unique",
+      );
+    }
+
+    seedFiles.sort((a, b) => a.name.localeCompare(b.name));
+
+    return { migrationFiles, seedFiles };
   }
 
   /** Makes the migration */
@@ -63,39 +227,32 @@ export class State {
       );
     }
 
-    let prefix;
-
-    if (this.config!.useDateTime) {
-      const timestamp = new Date();
-      prefix = format(timestamp, "yyyyMMddHHmmss");
-    } else {
-      prefix = Date.now();
-    }
+    const prefix = format(new Date(), "yyyyMMddHHmmss");
 
     const fileName = `${prefix}-${migrationName}.ts`;
 
-    if (fileName.length > MAX_FILE_NAME_LENGTH) {
-      throw new Error("Migration name can't be longer than 80 characters");
-    } else {
-      this.logger(fileName, "Migration file name");
+    this.logger(fileName, "Migration file name");
+
+    if (!isMigrationFile(fileName)) {
+      throw new Error(`Migration name '${fileName}' is not valid`);
     }
 
     const selectedFolder = await this._folderPrompt(
-      this.client!.migrationFolders,
+      this.#migrationFolders.filter((folder) => !isRemoteUrl(folder)),
     );
 
-    await Deno.mkdir(selectedFolder, { recursive: true });
+    const template = getMigrationTemplate(this.client.dialect);
 
-    const responseFile = await fetch(URL_TEMPLATE_BASE + "/migration.ts");
+    const filePath = resolve(selectedFolder, fileName);
 
-    await Deno.writeTextFile(
-      `${selectedFolder}/${fileName}`,
-      await responseFile.text(),
-    );
+    if (exists(filePath)) {
+      const overwrite = await this._fileExistsPrompt(filePath);
+      if (!overwrite) return;
+    }
 
-    console.info(
-      `Created migration ${fileName} at ${selectedFolder}`,
-    );
+    await Deno.writeTextFile(filePath, template);
+
+    console.info(`Created migration ${filePath}`);
   }
 
   /** Makes the seed */
@@ -107,39 +264,25 @@ export class State {
     }
 
     const fileName = `${seedName}.ts`;
-    if (this.client?.seedFiles.find((el) => el.name === seedName)) {
-      console.info(`Seed with name '${seedName}' already exists.`);
-    }
 
     this.logger(fileName, "Seed file name");
 
-    const selectedFolder = await this._folderPrompt(this.client!.seedFolders);
-
-    await Deno.mkdir(selectedFolder, { recursive: true });
-
-    const responseFile = await fetch(URL_TEMPLATE_BASE + "seed.ts");
-
-    await Deno.writeTextFile(
-      `${selectedFolder}/${fileName}`,
-      await responseFile.text(),
+    const selectedFolder = await this._folderPrompt(
+      this.#seedFolders.filter((folder) => !isRemoteUrl(folder)),
     );
 
-    console.info(
-      `Created seed ${fileName} at ${selectedFolder}`,
-    );
-  }
+    const template = getSeedTemplate(this.client.dialect);
 
-  /** A logger to use throughout the application, outputs when the debugger is enabled */
-  // deno-lint-ignore no-explicit-any
-  logger(output?: any, title?: string): void {
-    try {
-      if (this.enableDebug) {
-        title ? console.log(title + ": ") : null;
-        console.log(output);
-      }
-    } catch {
-      console.error("Error at: " + title);
+    const filePath = resolve(selectedFolder, fileName);
+
+    if (exists(filePath)) {
+      const overwrite = await this._fileExistsPrompt(filePath);
+      if (!overwrite) return;
     }
+
+    await Deno.writeTextFile(filePath, template);
+
+    console.info(`Created seed ${fileName} at ${selectedFolder}`);
   }
 
   private async _folderPrompt(folders: string[]) {
@@ -161,5 +304,15 @@ export class State {
     this.logger(promptSelection, "Prompt input final");
 
     return folders[promptSelection];
+  }
+
+  private async _fileExistsPrompt(file: string): Promise<boolean> {
+    const result: boolean = await CliffyToggle.prompt(
+      `The file ${file} already exists, do you want to overwrite the existing file?`,
+    );
+
+    this.logger(result, "Toggle selection");
+
+    return result;
   }
 }

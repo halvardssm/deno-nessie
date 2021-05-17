@@ -1,14 +1,5 @@
-import {
-  ClientMySQL,
-  ClientOptions,
-  NessieConfig,
-} from "https://deno.land/x/nessie/mod.ts";
+import { ClientMySQL, NessieConfig } from "https://deno.land/x/nessie/mod.ts";
 import type { ClientConfig } from "https://deno.land/x/mysql@v2.8.0/mod.ts";
-
-const clientConfig: ClientOptions = {
-  migrationFolders: ["./db/migrations"],
-  seedFolders: ["./db/seeds"],
-};
 
 const connectionConfig: ClientConfig = {
   hostname: "localhost",
@@ -18,9 +9,9 @@ const connectionConfig: ClientConfig = {
 };
 
 const config: NessieConfig = {
-  client: new ClientMySQL(clientConfig, connectionConfig),
-  experimental: true,
-  useDateTime: true,
+  client: new ClientMySQL(connectionConfig),
+  migrationFolders: ["./db/migrations"],
+  seedFolders: ["./db/seeds"],
 };
 
 export default config;

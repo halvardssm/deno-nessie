@@ -1,9 +1,11 @@
-import { Client, ClientConfig } from "https://deno.land/x/mysql@v2.8.0/mod.ts";
+import {
+  Client,
+  ClientConfig as MySQLClientOptions,
+} from "https://deno.land/x/mysql@v2.8.0/mod.ts";
 import { AbstractClient } from "./AbstractClient.ts";
 import type {
   AmountMigrateT,
   AmountRollbackT,
-  ClientOptions,
   DBDialects,
   QueryT,
 } from "../types.ts";
@@ -14,9 +16,11 @@ import {
   TABLE_MIGRATIONS,
 } from "../consts.ts";
 
+export type { MySQLClientOptions };
+
 /** MySQL client */
 export class ClientMySQL extends AbstractClient<Client> {
-  #clientOptions: ClientConfig;
+  #clientOptions: MySQLClientOptions;
   dialect: DBDialects = "mysql";
 
   #QUERY_TRANSACTION_START = `START TRANSACTION;`;
@@ -32,14 +36,8 @@ export class ClientMySQL extends AbstractClient<Client> {
   #QUERY_UPDATE_TIMESTAMPS =
     `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = CONCAT(FROM_UNIXTIME(CAST(substring_index(${COL_FILE_NAME}, '-', 1) AS SIGNED) / 1000, '%Y%m%d%H%i%S'), substring(file_name, instr( file_name,'-'))) WHERE CAST(substring_index(${COL_FILE_NAME}, '-', 1) AS SIGNED) < 1672531200000;`;
 
-  constructor(
-    options: ClientOptions,
-    connectionOptions: ClientConfig,
-  ) {
-    super({
-      ...options,
-      client: new Client(),
-    });
+  constructor(connectionOptions: MySQLClientOptions) {
+    super({ client: new Client() });
     this.#clientOptions = connectionOptions;
   }
 
@@ -128,6 +126,6 @@ export class ClientMySQL extends AbstractClient<Client> {
   }
 
   async seed(matcher?: string) {
-    await this._seed(matcher, this.query.bind(this));
+    await this._seed(matcher);
   }
 }

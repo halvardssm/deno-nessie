@@ -4,7 +4,6 @@ import { resolve } from "../deps.ts";
 import type {
   AmountMigrateT,
   AmountRollbackT,
-  ClientOptions,
   DBDialects,
   QueryT,
 } from "../types.ts";
@@ -14,6 +13,9 @@ import {
   MAX_FILE_NAME_LENGTH,
   TABLE_MIGRATIONS,
 } from "../consts.ts";
+import { isRemoteUrl } from "../cli/utils.ts";
+
+export type SQLiteClientOptions = string | undefined;
 
 /** SQLite client */
 export class ClientSQLite extends AbstractClient<DB> {
@@ -32,11 +34,16 @@ export class ClientSQLite extends AbstractClient<DB> {
   #QUERY_UPDATE_TIMESTAMPS =
     `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = strftime('%Y%m%d%H%M%S', CAST(substr(${COL_FILE_NAME}, 0, instr(${COL_FILE_NAME}, '-')) AS INTEGER) / 1000, 'unixepoch') || substr(${COL_FILE_NAME}, instr(${COL_FILE_NAME}, '-')) WHERE CAST(substr(${COL_FILE_NAME}, 0, instr(${COL_FILE_NAME}, '-')) AS INTEGER) < 1672531200000;`;
 
-  constructor(options: ClientOptions, connectionOptions: string) {
-    super({
-      ...options,
-      client: new DB(resolve(connectionOptions)),
-    });
+  constructor(connectionOptions?: string) {
+    let path;
+
+    if (connectionOptions) {
+      path = isRemoteUrl(connectionOptions)
+        ? connectionOptions
+        : resolve(connectionOptions);
+    }
+
+    super({ client: new DB(path) });
   }
 
   async prepare() {
@@ -114,6 +121,6 @@ export class ClientSQLite extends AbstractClient<DB> {
   }
 
   async seed(matcher?: string) {
-    await this._seed(matcher, this.query.bind(this));
+    await this._seed(matcher);
   }
 }

@@ -27,6 +27,22 @@ jobs:
 
       - name: Run test for format and lint
         run: make test-fmt
+  
+  unit:
+    name: Test unit
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@master
+
+      - name: Install deno
+        uses: denoland/setup-deno@main
+        with: 
+          deno-version: ${{env.DENO_VERSION}}
+
+      - name: Run unit tests
+        run: make test-unit
     
   cli:
     name: Test CLI
@@ -47,9 +63,37 @@ jobs:
         run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make test
         env:
           URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
+      
+      - name: Create migration
+        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make:migration test2
+        env:
+          URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
 
       - name: Create seed
         run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make:seed test
+        env:
+          URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
+      
+      - name: Clean files and folders
+        run: rm -rf db && rm -rf nessie.config.ts
+
+      - name: Init with mode and pg
+        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --mode config --dialect pg
+        env:
+          URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
+      
+      - name: Init with mode and mysql
+        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --mode config --dialect mysql
+        env:
+          URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
+      
+      - name: Init with mode and sqlite3
+        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --mode config --dialect sqlite3
+        env:
+          URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
+      
+      - name: Init with folders only
+        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --mode folders
         env:
           URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
 
@@ -91,14 +135,14 @@ jobs:
 
       - name: Install deno
         uses: denoland/setup-deno@main
-        with: 
+        with:
           deno-version: ${{env.DENO_VERSION}}
 
       - name: Create databases
         run: make db-sqlite-start
 
       - name: Run tests
-        run: make test-cli-migrations
+        run: make test-integration-cli
 
       - name: Generate lcov
         run: deno coverage --unstable --lcov ./coverage > coverage.lcov
@@ -109,63 +153,6 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.lcov
           flags: cli
-
-  cli-migrations-experimental:
-    name: Test CLI Migrations Experimental
-    runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_USER: root
-          POSTGRES_PASSWORD: pwd
-          POSTGRES_DB: nessie
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5000:5432
-
-      mysql:
-        image: mysql
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: true
-          MYSQL_DATABASE: nessie
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-        ports:
-          - 5001:3306
-
-    steps:
-      - name: Clone repo
-        uses: actions/checkout@master
-
-      - name: Install deno
-        uses: denoland/setup-deno@main
-        with:
-          deno-version: ${{env.DENO_VERSION}}
-
-      - name: Create databases
-        run: make db-sqlite-start
-
-      - name: Run tests
-        run: make test-cli-migrations-experimental
-
-      - name: Generate lcov
-        run: deno coverage --unstable --lcov ./coverage > coverage.lcov
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          files: coverage.lcov
-          flags: cli-experimental
   
   cli-update-timestamps:
     name: Test CLI Update timestamps
@@ -212,7 +199,7 @@ jobs:
         run: make db-sqlite-start
 
       - name: Run tests
-        run: make test-cli-update-timestamps
+        run: make test-integration-update-timestamps
 
       - name: Generate lcov
         run: deno coverage --unstable --lcov ./coverage > coverage.lcov

@@ -1,12 +1,11 @@
 import {
   Client,
-  ConnectionOptions,
+  ConnectionOptions as PostgreSQLClientOptions,
 } from "https://deno.land/x/postgres@v0.11.2/mod.ts";
 import { AbstractClient } from "./AbstractClient.ts";
 import type {
   AmountMigrateT,
   AmountRollbackT,
-  ClientOptions,
   DBDialects,
   QueryT,
 } from "../types.ts";
@@ -17,7 +16,7 @@ import {
   TABLE_MIGRATIONS,
 } from "../consts.ts";
 
-export type { ConnectionOptions };
+export type { PostgreSQLClientOptions };
 
 /** PostgreSQL client */
 export class ClientPostgreSQL extends AbstractClient<Client> {
@@ -35,14 +34,8 @@ export class ClientPostgreSQL extends AbstractClient<Client> {
   #QUERY_UPDATE_TIMESTAMPS =
     `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = to_char(to_timestamp(CAST(SPLIT_PART(${COL_FILE_NAME}, '-', 1) AS BIGINT) / 1000), 'yyyymmddHH24MISS') || '-' || SPLIT_PART(${COL_FILE_NAME}, '-', 2) WHERE CAST(SPLIT_PART(${COL_FILE_NAME}, '-', 1) AS BIGINT) < 1672531200000;`;
 
-  constructor(
-    options: ClientOptions,
-    connectionOptions: ConnectionOptions,
-  ) {
-    super({
-      ...options,
-      client: new Client(connectionOptions),
-    });
+  constructor(connectionOptions: PostgreSQLClientOptions) {
+    super({ client: new Client(connectionOptions) });
   }
 
   async prepare() {
@@ -121,6 +114,6 @@ export class ClientPostgreSQL extends AbstractClient<Client> {
   }
 
   async seed(matcher?: string) {
-    await this._seed(matcher, this.query.bind(this));
+    await this._seed(matcher);
   }
 }

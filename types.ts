@@ -1,30 +1,15 @@
 import type { AbstractClient } from "./clients/AbstractClient.ts";
+import { DB_DIALECTS } from "./consts.ts";
 /** Supported dialects */
-export type DBDialects = "pg" | "mysql" | "sqlite3" | string;
+export type DBDialects = DB_DIALECTS | string;
 
 /** Exposed object in migration files. available in `up`/`down` methods.
  * queryBuilder is available when passing `exposeQueryBuilder: true` to the config file.
  */
 export type Info<T = undefined> = {
   dialect: DBDialects;
-  /** @deprecated Will be removed as the client will be exposed in the wrapper class */
-  connection: QueryHandler;
 };
 
-/**
- * @deprecated Please consider using the class migrations.
- *
- * `up`/`down` methods in migration files.
- */
-export type Migration<T = undefined> = (
-  info: Info<T>,
-) => string | string[] | Promise<string | string[]>;
-/**
- * @deprecated Please consider using the class seeds.
- *  
- * `run` method in seed files. 
- */
-export type Seed = () => string | string[] | Promise<string | string[]>;
 /** Logger function. */
 // deno-lint-ignore no-explicit-any
 export type LoggerFn = (output?: any, title?: string) => void;
@@ -40,45 +25,38 @@ export type QueryT = string | string[];
 // deno-lint-ignore no-explicit-any
 export type QueryHandler = (query: QueryT) => Promise<any>;
 
-/**
- * @deprecated Consider using migration classes.
- *
- * Type for migration files.
- */
-export type MigrationFile = {
-  up: Migration;
-  down: Migration;
-};
-
 /** Nessie config options. */
 export interface NessieConfig {
   // deno-lint-ignore no-explicit-any
   client: AbstractClient<any>;
-  /** 
-   * Enables experimental options like migration classes, 
-   * features enabled in experimental mode are soon to be default 
-   * either in the next minor or major release 
+  /**
+   * The folders where migration files are located.
+   * Can be a relative path or an absolute path.
+   * Defaults to ['./db/seeds/'] if additionalMigrationFiles is not populated
    */
-  experimental?: boolean;
-  /** 
-   * Defaults to false, only set to true if you are starting a new 
-   * project, or have run the upgrade_timestamps command (see readme)
-   */
-  useDateTime?: boolean;
+  migrationFolders?: string[];
+  /**
+  * The folders where seed files are located.
+  * Can be a relative path or an absolute path.
+  * Defaults to ['./db/seeds/'] if additionalSeedFiles is not populated
+  */
+  seedFolders?: string[];
+  /**
+  * Additional seed files which will be added to the list to
+  * match against when running the seed command.
+  */
+  additionalSeedFiles?: string[];
+  /**
+  * Additional migration files which will be added to the
+  * list to parse when running the migrate or rollback command.
+  * Can be any format supported by `import()` e.g. url or path
+  */
+  additionalMigrationFiles?: string[];
+  /** Enables verbose output for debugging */
+  debug?: boolean;
 }
 
-/** Client config options. */
-export interface ClientOptions {
-  /** @deprecated use `migrationFolders` instead */
-  migrationFolder?: string;
-  migrationFolders?: string[];
-  /** @deprecated use `seedFolders` instead */
-  seedFolder?: string;
-  seedFolders?: string[];
-  // deno-lint-ignore no-explicit-any
-  [option: string]: any;
-}
-export interface AbstractClientOptions<Client> extends ClientOptions {
+export interface AbstractClientOptions<Client> {
   client: Client;
 }
 
@@ -91,3 +69,17 @@ export type CommandOptions = {
   debug: boolean;
   config?: string;
 };
+
+export interface CommandOptionsInit extends CommandOptions {
+  mode?: "config" | "folders";
+  dialect?: DB_DIALECTS;
+}
+
+export interface StateOptions {
+  debug: boolean;
+  config: NessieConfig;
+  migrationFolders: string[];
+  seedFolders: string[];
+  migrationFiles: FileEntryT[];
+  seedFiles: FileEntryT[];
+}

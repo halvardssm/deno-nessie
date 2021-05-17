@@ -1,5 +1,9 @@
 # Nessie Change Log
 
+## Version 2.0.0
+
+-
+
 ## Version 1.3.2
 
 - Limit filenames to only be lowercase, snake case and digits
