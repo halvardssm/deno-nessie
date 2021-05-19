@@ -106,7 +106,6 @@ jobs:
       - name: Upload coverage
         uses: codecov/codecov-action@v1
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.lcov
           flags: cli
 
@@ -163,7 +162,6 @@ jobs:
       - name: Upload coverage
         uses: codecov/codecov-action@v1
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.lcov
           flags: cli-experimental
   
@@ -220,6 +218,5 @@ jobs:
       - name: Upload coverage
         uses: codecov/codecov-action@v1
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.lcov
           flags: update-timestamps
