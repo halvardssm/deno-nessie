@@ -100,6 +100,15 @@ jobs:
       - name: Run tests
         run: make test-cli-migrations
 
+      - name: Generate lcov
+        run: deno coverage --unstable --lcov ./coverage > coverage.lcov
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1
+        with:
+          files: coverage.lcov
+          flags: cli
+
   cli-migrations-experimental:
     name: Test CLI Migrations Experimental
     runs-on: ubuntu-latest
@@ -146,6 +155,15 @@ jobs:
 
       - name: Run tests
         run: make test-cli-migrations-experimental
+
+      - name: Generate lcov
+        run: deno coverage --unstable --lcov ./coverage > coverage.lcov
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1
+        with:
+          files: coverage.lcov
+          flags: cli-experimental
   
   cli-update-timestamps:
     name: Test CLI Update timestamps
@@ -193,3 +211,12 @@ jobs:
 
       - name: Run tests
         run: make test-cli-update-timestamps
+
+      - name: Generate lcov
+        run: deno coverage --unstable --lcov ./coverage > coverage.lcov
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1
+        with:
+          files: coverage.lcov
+          flags: update-timestamps
