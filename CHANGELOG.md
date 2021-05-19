@@ -1,8 +1,13 @@
 # Nessie Change Log
 
-## Version 1.3.2
+## Version Next
 
 - Added Coverage reporting
+
+## Version 1.3.1
+
+- Deno v1.10.1
+- Fixed bug where path for async import was not a file url
 
 ## Version 1.3.1
 
