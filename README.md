@@ -246,7 +246,7 @@ See the [example folder](./examples) for more
 A client needs to extend [AbstractClient](./clients/AbstractClient.ts).
 
 `query`: Takes a query string or array of query strings and sends them of to the
-batabase for execution. Should return whatever the database responds.
+database for execution. Should return whatever the database responds.
 
 `prepare`: Will be run when the migration or rollback commands are executed.
 This should create the connection, set up the `nessie_migrations` table and
