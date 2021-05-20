@@ -2,14 +2,13 @@
 
 ## Version 2.0.0
 
--
+- Added Coverage reporting
+- Limit filenames to only be lowercase, underscore and digits
 
 ## Version 1.3.2
 
 - Deno v1.10.1
 - Fixed bug where path for async import was not a file url
-- Limit filenames to only be lowercase, underscore and digits
-- Added Coverage reporting
 
 ## Version 1.3.1
 
