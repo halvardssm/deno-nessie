@@ -15,7 +15,7 @@ const cli = async () => {
     .name("Nessie Migrations")
     .version(VERSION)
     .description("A database migration tool for Deno.")
-    .option("-d, --debug", "Enables verbose output", {
+    .option("-d, --debug [debug:boolean]", "Enables verbose output", {
       global: true,
       default: false,
     })
