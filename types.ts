@@ -21,8 +21,8 @@ export type Migration<T = undefined> = (
 ) => string | string[] | Promise<string | string[]>;
 /**
  * @deprecated Please consider using the class seeds.
- *  
- * `run` method in seed files. 
+ *
+ * `run` method in seed files.
  */
 export type Seed = () => string | string[] | Promise<string | string[]>;
 /** Logger function. */
@@ -54,14 +54,14 @@ export type MigrationFile = {
 export interface NessieConfig {
   // deno-lint-ignore no-explicit-any
   client: AbstractClient<any>;
-  /** 
-   * Enables experimental options like migration classes, 
-   * features enabled in experimental mode are soon to be default 
-   * either in the next minor or major release 
+  /**
+   * Enables experimental options like migration classes,
+   * features enabled in experimental mode are soon to be default
+   * either in the next minor or major release
    */
   experimental?: boolean;
-  /** 
-   * Defaults to false, only set to true if you are starting a new 
+  /**
+   * Defaults to false, only set to true if you are starting a new
    * project, or have run the upgrade_timestamps command (see readme)
    */
   useDateTime?: boolean;

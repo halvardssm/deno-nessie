@@ -26,6 +26,7 @@ import {
   REGEX_MIGRATION_FILE_NAME_LEGACY,
   TABLE_MIGRATIONS,
 } from "../consts.ts";
+import { parsePath } from "../cli/utils.ts";
 
 /** The abstract client which handles most of the logic related to database communication. */
 export abstract class AbstractClient<Client> {
@@ -87,7 +88,7 @@ export abstract class AbstractClient<Client> {
 
     if (this.migrationFiles.length > 0) {
       this.logger(
-        this.migrationFiles.map((files) => files.name),
+        this.migrationFiles,
         "Filtered and sorted migration files",
       );
 
@@ -276,11 +277,12 @@ export abstract class AbstractClient<Client> {
     }
 
     options.migrationFolders?.forEach((folder) => {
-      this.migrationFolders.push(resolve(folder));
+      this.migrationFolders.push(resolve(Deno.cwd(), folder));
     });
 
     if (this.migrationFolders.length < 1) {
       this.migrationFolders.push(resolve(
+        Deno.cwd(),
         options.migrationFolder || DEFAULT_MIGRATION_FOLDER,
       ));
     }
@@ -292,11 +294,12 @@ export abstract class AbstractClient<Client> {
     }
 
     options.seedFolders?.forEach((folder) => {
-      this.seedFolders.push(resolve(folder));
+      this.seedFolders.push(resolve(Deno.cwd(), folder));
     });
 
     if (this.seedFolders.length < 1) {
       this.seedFolders.push(resolve(
+        Deno.cwd(),
         options.seedFolder || DEFAULT_SEED_FOLDER,
       ));
     }
@@ -315,7 +318,7 @@ export abstract class AbstractClient<Client> {
         .filter((file) => file.isFile && this._isMigrationFile(file.name))
         .map((file) => ({
           name: file.name,
-          path: resolve(folder, file.name),
+          path: parsePath(folder, file.name),
         }));
 
       this.migrationFiles.push(...filesRaw);
@@ -334,7 +337,7 @@ export abstract class AbstractClient<Client> {
         .filter((file) => file.isFile)
         .map((file) => ({
           name: file.name,
-          path: resolve(folder, file.name),
+          path: parsePath(folder, file.name),
         }));
 
       this.seedFiles.push(...filesRaw);
