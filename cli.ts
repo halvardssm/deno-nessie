@@ -53,13 +53,13 @@ const cli = async () => {
       "--mode <mode:string>",
       "Select the mode for what to create, can be one of 'config' or 'folders'. If not sumbitted, it will create both the config file and folders.",
       {
-        value: (value: string): string[] => {
+        value: (value: string): string => {
           if (!["config", "folders"].includes(value)) {
             throw new Error(
-              `Mode must be one of 'config' or 'folders', but got "${value}".`,
+              `Mode must be one of 'config' or 'folders', but got '${value}'.`,
             );
           }
-          return [value];
+          return value;
         },
       },
     )
