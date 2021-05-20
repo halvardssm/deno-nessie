@@ -44,6 +44,15 @@ jobs:
       - name: Run unit tests
         run: make test-unit
 
+      - name: Generate lcov
+        run: deno coverage --unstable --lcov ./coverage > coverage.lcov
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1
+        with:
+          files: coverage.lcov
+          flags: unit
+
   cli:
     name: Test CLI
     runs-on: ubuntu-latest
@@ -151,7 +160,7 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           files: coverage.lcov
-          flags: cli
+          flags: integration-cli
   
   cli-update-timestamps:
     name: Test CLI Update timestamps
@@ -207,4 +216,4 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           files: coverage.lcov
-          flags: update-timestamps
+          flags: integration-update-timestamps
