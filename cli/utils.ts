@@ -1,4 +1,10 @@
 import { resolve } from "../deps.ts";
+import {
+  MAX_FILE_NAME_LENGTH,
+  REGEX_FILE_NAME,
+  REGEX_MIGRATION_FILE_NAME,
+  REGEX_MIGRATION_FILE_NAME_LEGACY,
+} from "../consts.ts";
 
 /** Helper function for path parsing.
  *
@@ -17,4 +23,23 @@ export const isUrl = (path: string) => {
   return path.startsWith("http://") ||
     path.startsWith("https://") ||
     path.startsWith("file://");
+};
+
+export const isValidMigrationName = (
+  name: string,
+  isFilename = false,
+  isLegacy = false,
+): boolean => {
+  if (name.length < 1) return false;
+
+  if (isLegacy) {
+    return REGEX_MIGRATION_FILE_NAME_LEGACY.test(name);
+  }
+
+  if (isFilename) {
+    return REGEX_MIGRATION_FILE_NAME.test(name) &&
+      name.length < MAX_FILE_NAME_LENGTH;
+  }
+
+  return REGEX_FILE_NAME.test(name) || name.length >= 80;
 };

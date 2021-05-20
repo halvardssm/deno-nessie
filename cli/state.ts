@@ -1,10 +1,9 @@
 import { CliffySelect, exists, format } from "../deps.ts";
-import { isUrl, parsePath } from "./utils.ts";
+import { isUrl, isValidMigrationName, parsePath } from "./utils.ts";
 import type { CommandOptions, NessieConfig } from "../types.ts";
 import {
   DEFAULT_CONFIG_FILE,
   MAX_FILE_NAME_LENGTH,
-  REGEX_FILE_NAME,
   URL_TEMPLATE_BASE,
 } from "../consts.ts";
 
@@ -57,7 +56,7 @@ export class State {
 
   /** Makes the migration */
   async makeMigration(migrationName = "migration") {
-    if (!REGEX_FILE_NAME.test(migrationName) || migrationName.length >= 80) {
+    if (!isValidMigrationName(migrationName)) {
       throw new Error(
         "Migration name has to be snakecase and only include a-z (all lowercase) and 1-9",
       );
@@ -72,7 +71,7 @@ export class State {
       prefix = Date.now();
     }
 
-    const fileName = `${prefix}-${migrationName}.ts`;
+    const fileName = `${prefix}_${migrationName}.ts`;
 
     if (fileName.length > MAX_FILE_NAME_LENGTH) {
       throw new Error("Migration name can't be longer than 80 characters");
@@ -100,7 +99,7 @@ export class State {
 
   /** Makes the seed */
   async makeSeed(seedName = "seed") {
-    if (!REGEX_FILE_NAME.test(seedName)) {
+    if (!isValidMigrationName(seedName)) {
       throw new Error(
         "Seed name has to be snakecase and only include a-z (all lowercase) and 1-9",
       );

@@ -2,12 +2,12 @@ import { State } from "./cli/state.ts";
 import { CliffyCommand, CompletionsCommand, format, resolve } from "./deps.ts";
 import {
   DEFAULT_CONFIG_FILE,
-  REGEX_MIGRATION_FILE_NAME_LEGACY,
   URL_TEMPLATE_BASE,
   URL_TEMPLATE_BASE_VERSIONED,
   VERSION,
 } from "./consts.ts";
 import { AmountMigrateT, AmountRollbackT, CommandOptions } from "./types.ts";
+import { isValidMigrationName } from "./cli/utils.ts";
 
 /** Initializes CliffyCommand */
 const cli = async () => {
@@ -122,7 +122,7 @@ const updateTimestamps = async () => {
   const filteredMigrations = migrationFiles
     .filter((el) =>
       el.isFile &&
-      REGEX_MIGRATION_FILE_NAME_LEGACY.test(el.name) &&
+      isValidMigrationName(el.name, true, true) &&
       parseInt(el.name.split("-")[0]) < 1672531200000
     )
     .sort()

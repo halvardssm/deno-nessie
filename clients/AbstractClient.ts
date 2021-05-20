@@ -21,12 +21,9 @@ import {
   COL_FILE_NAME,
   DEFAULT_MIGRATION_FOLDER,
   DEFAULT_SEED_FOLDER,
-  MAX_FILE_NAME_LENGTH,
-  REGEX_MIGRATION_FILE_NAME,
-  REGEX_MIGRATION_FILE_NAME_LEGACY,
   TABLE_MIGRATIONS,
 } from "../consts.ts";
-import { parsePath } from "../cli/utils.ts";
+import { isValidMigrationName, parsePath } from "../cli/utils.ts";
 
 /** The abstract client which handles most of the logic related to database communication. */
 export abstract class AbstractClient<Client> {
@@ -64,13 +61,6 @@ export abstract class AbstractClient<Client> {
 
   isExperimental() {
     this.experimental = true;
-  }
-
-  private _isMigrationFile(name: string): boolean {
-    return this.experimental
-      ? (REGEX_MIGRATION_FILE_NAME.test(name) &&
-        name.length < MAX_FILE_NAME_LENGTH)
-      : REGEX_MIGRATION_FILE_NAME_LEGACY.test(name);
   }
 
   /** Runs the `up` method on all available migrations after filtering and sorting. */
@@ -315,7 +305,10 @@ export abstract class AbstractClient<Client> {
   private _parseMigrationAndSeedFiles(): void {
     this.migrationFolders.forEach((folder) => {
       const filesRaw: FileEntryT[] = Array.from(Deno.readDirSync(folder))
-        .filter((file) => file.isFile && this._isMigrationFile(file.name))
+        .filter((file) =>
+          file.isFile &&
+          isValidMigrationName(file.name, true, this.experimental)
+        )
         .map((file) => ({
           name: file.name,
           path: parsePath(folder, file.name),
