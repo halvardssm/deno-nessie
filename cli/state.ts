@@ -55,8 +55,6 @@ export class State {
 
     this.client = options.config.client;
     this.client.setLogger(this.logger);
-
-    this.client;
   }
 
   /** Initializes the state with a client */

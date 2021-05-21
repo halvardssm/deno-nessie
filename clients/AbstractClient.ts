@@ -133,7 +133,7 @@ export abstract class AbstractClient<Client> {
 
         const SeedClass: new (
           props: AbstractSeedProps<Client>,
-        ) => AbstractSeed<this> = (await import(file.path)).default;
+        ) => AbstractSeed<this> = (await import("file://" + file.path)).default;
 
         const seed = new SeedClass({ client: this.client });
         await seed.run(exposedObject);
@@ -178,7 +178,8 @@ export abstract class AbstractClient<Client> {
 
     const MigrationClass: new (
       props: AbstractMigrationProps<Client>,
-    ) => AbstractMigration<this> = (await import(file.path)).default;
+    ) => AbstractMigration<this> =
+      (await import("file://" + file.path)).default;
 
     const migration = new MigrationClass({ client: this.client });
 
