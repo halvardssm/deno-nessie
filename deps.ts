@@ -1,10 +1,10 @@
 export {
   basename,
+  dirname,
   fromFileUrl,
   relative,
   resolve,
   toFileUrl,
-  dirname
 } from "https://deno.land/std@0.96.0/path/mod.ts";
 export {
   assert,
