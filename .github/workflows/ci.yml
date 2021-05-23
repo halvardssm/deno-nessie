@@ -68,6 +68,10 @@ jobs:
         env:
           URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
 
+      - run: sed -i 's/from ".*"/from "https:\/\/raw\.githubusercontent\.com\/\$URL_PATH\/mod\.ts"/'
+        env:
+          URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
+
       - name: Create migration
         run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make test
         env:
