@@ -4,11 +4,11 @@ DB_USER=root
 DB_PWD=pwd
 DB_NAME=nessie
 
-test-all: test-fmt test-unit db-all-restart test-integration-cli test-integration-update-timestamps
+test-all: test-fmt test-unit db-all-restart test-integration-cli db-all-restart test-integration-update-timestamps
 
 test-fmt:
 	deno lint --unstable --ignore=tests,examples,cli/templates
-	deno fmt --check
+	deno fmt --check --ignore=coverage
 
 test-unit:
 	deno test -A --unstable --coverage=coverage tests/unit

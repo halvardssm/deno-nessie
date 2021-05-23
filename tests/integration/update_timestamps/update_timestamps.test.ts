@@ -119,9 +119,9 @@ for await (const dialect of DIALECTS) {
 
       const expected = [
         "Updated timestamps",
-        "1587937822648-test.ts => 20200426235022-test.ts",
-        "999999999999-test.ts => 20010909034639-test.ts",
-        "1000000000000-test.ts => 20010909034640-test.ts",
+        "1587937822648-test.ts => 20200426235022_test.ts",
+        "999999999999-test.ts => 20010909034639_test.ts",
+        "1000000000000-test.ts => 20010909034640_test.ts",
       ];
 
       assertEquals(code, 0, result.join("\n"));
@@ -140,7 +140,7 @@ for await (const dialect of DIALECTS) {
       assertEquals(missing.length, 0, missing.join("\n"));
 
       const configFile = await import(
-        "file://" + resolve(`./config/${dialect}.config.ts`)
+        "file://" + resolve(`./tests/integration/update_timestamps/config/${dialect}.config.ts`)
       );
       const { dbConnection } = configFile;
 
