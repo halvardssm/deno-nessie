@@ -1,7 +1,4 @@
-import {
-  Client,
-  ConnectionOptions as PostgreSQLClientOptions,
-} from "https://deno.land/x/postgres@v0.11.2/mod.ts";
+import { PostgreSQLClient, PostgreSQLClientOptions } from "../deps.ts";
 import { AbstractClient } from "./AbstractClient.ts";
 import type {
   AmountMigrateT,
@@ -19,7 +16,7 @@ import {
 export type { PostgreSQLClientOptions };
 
 /** PostgreSQL client */
-export class ClientPostgreSQL extends AbstractClient<Client> {
+export class ClientPostgreSQL extends AbstractClient<PostgreSQLClient> {
   dialect: DBDialects = "pg";
 
   #QUERY_TRANSACTION_START = `BEGIN TRANSACTION;`;
@@ -35,7 +32,7 @@ export class ClientPostgreSQL extends AbstractClient<Client> {
     `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = to_char(to_timestamp(CAST(SPLIT_PART(${COL_FILE_NAME}, '-', 1) AS BIGINT) / 1000), 'yyyymmddHH24MISS') || '-' || SPLIT_PART(${COL_FILE_NAME}, '-', 2) WHERE CAST(SPLIT_PART(${COL_FILE_NAME}, '-', 1) AS BIGINT) < 1672531200000;`;
 
   constructor(connectionOptions: PostgreSQLClientOptions) {
-    super({ client: new Client(connectionOptions) });
+    super({ client: new PostgreSQLClient(connectionOptions) });
   }
 
   async prepare() {

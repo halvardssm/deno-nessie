@@ -1,4 +1,4 @@
-import { DB } from "https://deno.land/x/sqlite@v2.4.0/mod.ts";
+import { SQLiteClient } from "../deps.ts";
 import { AbstractClient } from "./AbstractClient.ts";
 import type {
   AmountMigrateT,
@@ -16,7 +16,7 @@ import {
 export type SQLiteClientOptions = string | undefined;
 
 /** SQLite client */
-export class ClientSQLite extends AbstractClient<DB> {
+export class ClientSQLite extends AbstractClient<SQLiteClient> {
   dialect: DBDialects = "sqlite";
 
   #QUERY_TRANSACTION_START = `BEGIN TRANSACTION;`;
@@ -33,7 +33,7 @@ export class ClientSQLite extends AbstractClient<DB> {
     `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = strftime('%Y%m%d%H%M%S', CAST(substr(${COL_FILE_NAME}, 0, instr(${COL_FILE_NAME}, '-')) AS INTEGER) / 1000, 'unixepoch') || substr(${COL_FILE_NAME}, instr(${COL_FILE_NAME}, '-')) WHERE CAST(substr(${COL_FILE_NAME}, 0, instr(${COL_FILE_NAME}, '-')) AS INTEGER) < 1672531200000;`;
 
   constructor(connectionOptions?: string) {
-    super({ client: new DB(connectionOptions) });
+    super({ client: new SQLiteClient(connectionOptions) });
   }
 
   async prepare() {

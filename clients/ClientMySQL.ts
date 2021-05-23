@@ -1,7 +1,4 @@
-import {
-  Client,
-  ClientConfig as MySQLClientOptions,
-} from "https://deno.land/x/mysql@v2.8.0/mod.ts";
+import { MySQLClient, MySQLClientOptions } from "../deps.ts";
 import { AbstractClient } from "./AbstractClient.ts";
 import type {
   AmountMigrateT,
@@ -19,7 +16,7 @@ import {
 export type { MySQLClientOptions };
 
 /** MySQL client */
-export class ClientMySQL extends AbstractClient<Client> {
+export class ClientMySQL extends AbstractClient<MySQLClient> {
   #clientOptions: MySQLClientOptions;
   dialect: DBDialects = "mysql";
 
@@ -37,7 +34,7 @@ export class ClientMySQL extends AbstractClient<Client> {
     `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = CONCAT(FROM_UNIXTIME(CAST(substring_index(${COL_FILE_NAME}, '-', 1) AS SIGNED) / 1000, '%Y%m%d%H%i%S'), substring(file_name, instr( file_name,'-'))) WHERE CAST(substring_index(${COL_FILE_NAME}, '-', 1) AS SIGNED) < 1672531200000;`;
 
   constructor(connectionOptions: MySQLClientOptions) {
-    super({ client: new Client() });
+    super({ client: new MySQLClient() });
     this.#clientOptions = connectionOptions;
   }
 
