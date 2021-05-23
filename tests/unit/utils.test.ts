@@ -104,16 +104,16 @@ Deno.test("arrayIsUnique", () => {
 
 Deno.test("isMigrationFile", () => {
   const paths = [
-    { original: "20210508125213-test2.ts", expected: true },
-    { original: "202105081252133-test2.ts", expected: false },
-    { original: "2021050812521-test2.ts", expected: false },
-    { original: "2021050812521a-test2.ts", expected: false },
-    { original: "20210508125213_test2.ts", expected: false },
-    { original: "20210508125213-test2_.ts", expected: false },
-    { original: "20210508125213-test2.", expected: false },
-    { original: "20210508125213-test2", expected: false },
-    { original: ".20210508125213-test2.ts", expected: false },
-    { original: "20210508125213-test2_a.ts", expected: true },
+    { original: "20210508125213_test2.ts", expected: true },
+    { original: "202105081252133_test2.ts", expected: false },
+    { original: "2021050812521_test2.ts", expected: false },
+    { original: "2021050812521a_test2.ts", expected: false },
+    { original: "20210508125213-test2.ts", expected: false },
+    { original: "20210508125213_test2_.ts", expected: false },
+    { original: "20210508125213_test2.", expected: false },
+    { original: "20210508125213_test2", expected: false },
+    { original: ".20210508125213_test2.ts", expected: false },
+    { original: "20210508125213_test2_a.ts", expected: true },
   ];
 
   paths.forEach(({ original, expected }) => {

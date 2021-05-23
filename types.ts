@@ -27,12 +27,13 @@ export type QueryHandler = (query: QueryT) => Promise<any>;
 
 /** Nessie config options. */
 export interface NessieConfig {
+  /** Can be any class which extends `AbstractClient`. */
   // deno-lint-ignore no-explicit-any
   client: AbstractClient<any>;
   /**
    * The folders where migration files are located.
    * Can be a relative path or an absolute path.
-   * Defaults to ['./db/seeds/'] if additionalMigrationFiles is not populated
+   * Defaults to ['./db/migrations/'] if additionalMigrationFiles is not populated
    */
   migrationFolders?: string[];
   /**
@@ -42,16 +43,17 @@ export interface NessieConfig {
   */
   seedFolders?: string[];
   /**
-  * Additional seed files which will be added to the list to
-  * match against when running the seed command.
-  */
-  additionalSeedFiles?: string[];
-  /**
   * Additional migration files which will be added to the
   * list to parse when running the migrate or rollback command.
   * Can be any format supported by `import()` e.g. url or path
   */
   additionalMigrationFiles?: string[];
+  /**
+  * Additional seed files which will be added to the list to
+  * match against when running the seed command.
+  * Can be any format supported by `import()` e.g. url or path
+  */
+  additionalSeedFiles?: string[];
   /** Enables verbose output for debugging */
   debug?: boolean;
 }

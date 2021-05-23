@@ -14,7 +14,7 @@ Deno.test("getConfigTemplate standard", () => {
     NessieConfig,
 } from "${URL_BASE_VERSIONED}/mod.ts";
 
-const client = /** Select one of the supported clients */
+/** Select one of the supported clients */
 // const client = new ClientPostgreSQL(clientOptions, {
 //     database: "nessie",
 //     hostname: "localhost",

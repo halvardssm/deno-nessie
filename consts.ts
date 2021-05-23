@@ -15,9 +15,10 @@ export const MAX_FILE_NAME_LENGTH = 100;
 export const TABLE_MIGRATIONS = "nessie_migrations";
 export const COL_FILE_NAME = "file_name";
 export const COL_CREATED_AT = "created_at";
-export const REGEX_MIGRATION_FILE_NAME_LEGACY = /^\d{10,14}-.+.ts$/;
-export const REGEX_MIGRATION_FILE_NAME = /^\d{14}-[a-z\d]+(_[a-z\d]+)*.ts$/;
-export const REGEX_FILE_NAME = /^[a-z\d]+(_[a-z\d]+)*$/;
+export const REGEXP_MIGRATION_FILE_NAME_LEGACY = /^\d{10,14}-.+.ts$/;
+/** RegExp to validate the file name */
+export const REGEXP_MIGRATION_FILE_NAME = /^\d{14}_[a-z\d]+(_[a-z\d]+)*.ts$/;
+export const REGEXP_FILE_NAME = /^[a-z\d]+(_[a-z\d]+)*$/;
 
 export enum DB_DIALECTS {
   PGSQL = "pg",

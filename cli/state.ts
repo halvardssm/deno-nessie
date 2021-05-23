@@ -6,12 +6,7 @@ import {
   format,
   resolve,
 } from "../deps.ts";
-import {
-  arrayIsUnique,
-  getLogger,
-  isMigrationFile,
-  isRemoteUrl,
-} from "./utils.ts";
+import { arrayIsUnique, getLogger, isMigrationFile, isUrl } from "./utils.ts";
 import type {
   CommandOptions,
   FileEntryT,
@@ -23,7 +18,7 @@ import {
   DEFAULT_CONFIG_FILE,
   DEFAULT_MIGRATION_FOLDER,
   DEFAULT_SEED_FOLDER,
-  REGEX_FILE_NAME,
+  REGEXP_FILE_NAME,
 } from "../consts.ts";
 import { AbstractClient } from "../clients/AbstractClient.ts";
 import { getMigrationTemplate, getSeedTemplate } from "./templates.ts";
@@ -55,6 +50,13 @@ export class State {
 
     this.client = options.config.client;
     this.client.setLogger(this.logger);
+
+    this.logger({
+      migrationFolders: this.#migrationFolders,
+      seedFolders: this.#seedFolders,
+      migrationFiles: this.#migrationFiles,
+      seedFiles: this.#seedFiles,
+    }, "State");
   }
 
   /** Initializes the state with a client */
@@ -64,7 +66,7 @@ export class State {
     let config: NessieConfig;
 
     if (options.config) {
-      const path = isRemoteUrl(options.config)
+      const path = isUrl(options.config)
         ? options.config
         : "file://" + resolve(Deno.cwd(), options.config);
 
@@ -125,7 +127,10 @@ export class State {
       migrationFolders.push(resolve(Deno.cwd(), folder));
     });
 
-    if (migrationFolders.length < 1 && !options.additionalMigrationFiles) {
+    if (
+      migrationFolders.length < 1 &&
+      options.additionalMigrationFiles === undefined
+    ) {
       migrationFolders.push(resolve(Deno.cwd(), DEFAULT_MIGRATION_FOLDER));
     }
 
@@ -139,7 +144,7 @@ export class State {
       seedFolders.push(resolve(Deno.cwd(), folder));
     });
 
-    if (seedFolders.length < 1 && !options.additionalSeedFiles) {
+    if (seedFolders.length < 1 && options.additionalSeedFiles === undefined) {
       seedFolders.push(resolve(Deno.cwd(), DEFAULT_SEED_FOLDER));
     }
 
@@ -165,19 +170,23 @@ export class State {
         .filter((file) => file.isFile && isMigrationFile(file.name))
         .map((file) => ({
           name: file.name,
-          path: resolve(folder, file.name),
+          path: "file://" + resolve(folder, file.name),
         }));
 
       migrationFiles.push(...filesRaw);
     });
 
     options.additionalMigrationFiles?.forEach((file) => {
-      const path = isRemoteUrl(file) ? file : resolve(Deno.cwd(), file);
+      const path = isUrl(file) ? file : "file://" + resolve(Deno.cwd(), file);
 
-      migrationFiles.push({
-        name: basename(path),
-        path,
-      });
+      const fileName = basename(path);
+
+      if (isMigrationFile(fileName)) {
+        migrationFiles.push({
+          name: fileName,
+          path,
+        });
+      }
     });
 
     if (!arrayIsUnique(migrationFiles.map((file) => file.name))) {
@@ -193,17 +202,19 @@ export class State {
         .filter((file) => file.isFile)
         .map((file) => ({
           name: file.name,
-          path: resolve(folder, file.name),
+          path: "file://" + resolve(folder, file.name),
         }));
 
       seedFiles.push(...filesRaw);
     });
 
     options.additionalSeedFiles?.forEach((file) => {
-      const path = isRemoteUrl(file) ? file : resolve(Deno.cwd(), file);
+      const path = isUrl(file) ? file : "file://" + resolve(Deno.cwd(), file);
+
+      const fileName = basename(path);
 
       seedFiles.push({
-        name: basename(path),
+        name: fileName,
         path,
       });
     });
@@ -221,7 +232,7 @@ export class State {
 
   /** Makes the migration */
   async makeMigration(migrationName = "migration") {
-    if (!REGEX_FILE_NAME.test(migrationName) || migrationName.length >= 80) {
+    if (!REGEXP_FILE_NAME.test(migrationName) || migrationName.length >= 80) {
       throw new Error(
         "Migration name has to be snakecase and only include a-z (all lowercase) and 1-9",
       );
@@ -229,7 +240,7 @@ export class State {
 
     const prefix = format(new Date(), "yyyyMMddHHmmss");
 
-    const fileName = `${prefix}-${migrationName}.ts`;
+    const fileName = `${prefix}_${migrationName}.ts`;
 
     this.logger(fileName, "Migration file name");
 
@@ -238,7 +249,7 @@ export class State {
     }
 
     const selectedFolder = await this._folderPrompt(
-      this.#migrationFolders.filter((folder) => !isRemoteUrl(folder)),
+      this.#migrationFolders.filter((folder) => !isUrl(folder)),
     );
 
     const template = getMigrationTemplate(this.client.dialect);
@@ -257,7 +268,7 @@ export class State {
 
   /** Makes the seed */
   async makeSeed(seedName = "seed") {
-    if (!REGEX_FILE_NAME.test(seedName)) {
+    if (!REGEXP_FILE_NAME.test(seedName)) {
       throw new Error(
         "Seed name has to be snakecase and only include a-z (all lowercase) and 1-9",
       );
@@ -268,7 +279,7 @@ export class State {
     this.logger(fileName, "Seed file name");
 
     const selectedFolder = await this._folderPrompt(
-      this.#seedFolders.filter((folder) => !isRemoteUrl(folder)),
+      this.#seedFolders.filter((folder) => !isUrl(folder)),
     );
 
     const template = getSeedTemplate(this.client.dialect);

@@ -4,6 +4,7 @@ import {
   CliffyCompletionsCommand,
   CliffyHelpCommand,
   CliffyIAction,
+  dirname,
   format,
   resolve,
 } from "./deps.ts";
@@ -13,7 +14,7 @@ import {
   DEFAULT_CONFIG_FILE,
   DEFAULT_MIGRATION_FOLDER,
   DEFAULT_SEED_FOLDER,
-  REGEX_MIGRATION_FILE_NAME_LEGACY,
+  REGEXP_MIGRATION_FILE_NAME_LEGACY,
   VERSION,
 } from "./consts.ts";
 import {
@@ -23,6 +24,7 @@ import {
   CommandOptionsInit,
 } from "./types.ts";
 import { getConfigTemplate } from "./cli/templates.ts";
+import { isFileUrl, isMigrationFile } from "./cli/utils.ts";
 
 // deno-lint-ignore no-explicit-any
 type TCliffyAction<T extends unknown[] = any[]> = CliffyIAction<
@@ -195,34 +197,38 @@ const updateTimestamps: TCliffyAction = async (
   await state.client.prepare();
   await state.client.updateTimestamps();
   await state.client.close();
-  const migrationFiles = [...Deno.readDirSync(Deno.cwd())];
-
-  const filteredMigrations = migrationFiles
+  const migrationFiles = state.client.migrationFiles
     .filter((el) =>
-      el.isFile &&
-      REGEX_MIGRATION_FILE_NAME_LEGACY.test(el.name) &&
+      isFileUrl(el.path) &&
+      REGEXP_MIGRATION_FILE_NAME_LEGACY.test(el.name) &&
       parseInt(el.name.split("-")[0]) < 1672531200000
     )
-    .sort()
     .map((el) => {
       const filenameArray = el.name.split("-", 2);
       const milliseconds = filenameArray[0];
       const filename = filenameArray[1];
       const timestamp = new Date(parseInt(milliseconds));
       const newDateTime = format(timestamp, "yyyyMMddHHmmss");
+      const newName = newDateTime + "_" + filename;
+
+      if (!isMigrationFile(newName)) {
+        console.warn(
+          `Migration ${el.name} has been updated to ${newName}, but this is not a valid filename. Please change this filename manually. See the method 'isMigrationFile' from 'mod.ts' for filename validation`,
+        );
+      }
 
       return {
-        oldName: el.name,
-        newName: newDateTime + "-" + filename,
+        oldPath: el.path,
+        newPath: resolve(dirname(el.path), newName),
       };
     });
 
-  for await (const { oldName, newName } of filteredMigrations) {
-    await Deno.rename(oldName, newName);
+  for await (const { oldPath, newPath } of migrationFiles) {
+    await Deno.rename(oldPath, newPath);
   }
 
-  const output = filteredMigrations
-    .map(({ oldName, newName }) => `${oldName} => ${newName}`)
+  const output = migrationFiles
+    .map(({ oldPath, newPath }) => `${oldPath} => ${newPath}`)
     .join("\n");
 
   const encoder = new TextEncoder();

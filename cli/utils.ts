@@ -1,4 +1,4 @@
-import { MAX_FILE_NAME_LENGTH, REGEX_MIGRATION_FILE_NAME } from "../consts.ts";
+import { MAX_FILE_NAME_LENGTH, REGEXP_MIGRATION_FILE_NAME } from "../consts.ts";
 import { LoggerFn } from "../types.ts";
 
 export const isUrl = (path: string) => {
@@ -32,7 +32,11 @@ export function arrayIsUnique(array: unknown[]): boolean {
   return array.length === new Set(array).size;
 }
 
+/**
+ * Helper method to validate if a filename is a valid migration filename.
+ * Checks both the filename syntax and length.
+ */
 export function isMigrationFile(name: string): boolean {
-  return REGEX_MIGRATION_FILE_NAME.test(name) &&
+  return REGEXP_MIGRATION_FILE_NAME.test(name) &&
     name.length < MAX_FILE_NAME_LENGTH;
 }

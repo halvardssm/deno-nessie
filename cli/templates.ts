@@ -6,7 +6,7 @@ export function getConfigTemplate(dialect?: DBDialects) {
   let importString: string;
 
   if (dialect === DB_DIALECTS.PGSQL) {
-    client = `new ClientPostgreSQL({
+    client = `const client = new ClientPostgreSQL({
     database: "nessie",
     hostname: "localhost",
     port: 5432,
@@ -18,7 +18,7 @@ export function getConfigTemplate(dialect?: DBDialects) {
     NessieConfig,
 } from "${URL_BASE_VERSIONED}/mod.ts";`;
   } else if (dialect === DB_DIALECTS.MYSQL) {
-    client = `new ClientMySQL(clientOptions, {
+    client = `const client = new ClientMySQL(clientOptions, {
     hostname: "localhost",
     port: 3306,
     username: "root",
@@ -30,7 +30,7 @@ export function getConfigTemplate(dialect?: DBDialects) {
     NessieConfig,
 } from "${URL_BASE_VERSIONED}/mod.ts";`;
   } else if (dialect === DB_DIALECTS.SQLITE) {
-    client = `new ClientSQLite(clientOptions, "./sqlite.db");`;
+    client = `const client = new ClientSQLite(clientOptions, "./sqlite.db");`;
     importString = `import {
     ClientSQLite,
     NessieConfig,
@@ -64,7 +64,7 @@ export function getConfigTemplate(dialect?: DBDialects) {
 
   const template = `${importString}
 
-const client = ${client}
+${client}
 
 /** This is the final config object */
 const config: NessieConfig = {
