@@ -15,6 +15,8 @@ A modular database migration tool for [Deno](https://deno.land) inspired by
 [Phinx](https://github.com/cakephp/phinx). Currently supports PostgreSQL, MySQL
 (and MariaDB) and SQLite.
 
+🚨 **Version 2.0.0 is soon to be released**: Follow the release candidates to try out the new features, assist with finding bugs, and give feedback! V2.0.0 is available on the branch [v2](https://github.com/halvardssm/deno-nessie/tree/v2) until release.
+
 If you would like to see your DB flavor supported, take a look at how to make a
 client plugin with examples in the [clients folder](./clients) or in the section
 [How to make a client](#how-to-make-a-client).
