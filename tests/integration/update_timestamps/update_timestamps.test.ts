@@ -140,7 +140,10 @@ for await (const dialect of DIALECTS) {
       assertEquals(missing.length, 0, missing.join("\n"));
 
       const configFile = await import(
-        "file://" + resolve(`./tests/integration/update_timestamps/config/${dialect}.config.ts`)
+        "file://" +
+          resolve(
+            `./tests/integration/update_timestamps/config/${dialect}.config.ts`,
+          )
       );
       const { dbConnection } = configFile;
 
