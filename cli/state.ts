@@ -72,7 +72,7 @@ export class State {
 
       const configRaw = await import(path);
       config = configRaw.default;
-    } else if (exists(DEFAULT_CONFIG_FILE)) {
+    } else if (await exists(DEFAULT_CONFIG_FILE)) {
       if (options.debug) console.log("Checking project root");
 
       const path = "file://" + resolve(Deno.cwd(), DEFAULT_CONFIG_FILE);
@@ -256,7 +256,7 @@ export class State {
 
     const filePath = resolve(selectedFolder, fileName);
 
-    if (exists(filePath)) {
+    if (await exists(filePath)) {
       const overwrite = await this._fileExistsPrompt(filePath);
       if (!overwrite) return;
     }
@@ -286,7 +286,7 @@ export class State {
 
     const filePath = resolve(selectedFolder, fileName);
 
-    if (exists(filePath)) {
+    if (await exists(filePath)) {
       const overwrite = await this._fileExistsPrompt(filePath);
       if (!overwrite) return;
     }
