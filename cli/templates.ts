@@ -18,7 +18,7 @@ export function getConfigTemplate(dialect?: DBDialects) {
     NessieConfig,
 } from "${URL_BASE_VERSIONED}/mod.ts";`;
   } else if (dialect === DB_DIALECTS.MYSQL) {
-    client = `const client = new ClientMySQL(clientOptions, {
+    client = `const client = new ClientMySQL({
     hostname: "localhost",
     port: 3306,
     username: "root",
@@ -30,14 +30,14 @@ export function getConfigTemplate(dialect?: DBDialects) {
     NessieConfig,
 } from "${URL_BASE_VERSIONED}/mod.ts";`;
   } else if (dialect === DB_DIALECTS.SQLITE) {
-    client = `const client = new ClientSQLite(clientOptions, "./sqlite.db");`;
+    client = `const client = new ClientSQLite("./sqlite.db");`;
     importString = `import {
     ClientSQLite,
     NessieConfig,
 } from "${URL_BASE_VERSIONED}/mod.ts";`;
   } else {
     client = `/** Select one of the supported clients */
-// const client = new ClientPostgreSQL(clientOptions, {
+// const client = new ClientPostgreSQL({
 //     database: "nessie",
 //     hostname: "localhost",
 //     port: 5432,
@@ -45,7 +45,7 @@ export function getConfigTemplate(dialect?: DBDialects) {
 //     password: "pwd",
 // });
 
-// const client = new ClientMySQL(clientOptions, {
+// const client = new ClientMySQL({
 //     hostname: "localhost",
 //     port: 3306,
 //     username: "root",
@@ -53,7 +53,7 @@ export function getConfigTemplate(dialect?: DBDialects) {
 //     db: "nessie",
 // });
 
-// const client = new ClientSQLite(clientOptions, "./sqlite.db");`;
+// const client = new ClientSQLite("./sqlite.db");`;
     importString = `import {
     ClientMySQL,
     ClientPostgreSQL,
