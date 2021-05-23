@@ -16,15 +16,15 @@ export default class extends AbstractMigration<ClientPostgreSQL> {
       },
     );
 
-    this.client.queryArray(query);
+    await this.client.queryArray(query);
 
-    this.client.queryArray(
+    await this.client.queryArray(
       'insert into test (file_name) values ("test1"), ("test2")',
     );
 
     const res = await this.client.queryObject("select * from test");
 
-    for await (const row of res) {
+    for await (const row of res.rows) {
       this.client.queryArray(
         `update test set file_name = ${row.file_name +
           "_some_suffix"} where id = ${row.id}`,

@@ -3,7 +3,7 @@
 [![GitHub Workflow Status (branch)](https://img.shields.io/github/workflow/status/halvardssm/deno-nessie/ci/master?style=flat-square&logo=github)](https://github.com/halvardssm/deno-nessie/actions?query=branch%3Amaster+workflow%3ACI)
 [![(clients)](https://img.shields.io/badge/clients-doc-informational.svg?style=flat-square&logo=data:image/png;base64,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)](https://doc.deno.land/https/deno.land/x/nessie/mod.ts)
 [![nest badge](https://nest.land/badge-block.svg)](https://nest.land/package/Nessie)
-![Codecov](https://img.shields.io/codecov/c/gh/halvardssm/deno-nessie?logo=codecov&style=flat-square&token=O59WOJ5W00)
+[![Codecov](https://img.shields.io/codecov/c/gh/halvardssm/deno-nessie?logo=codecov&style=flat-square&token=O59WOJ5W00)](https://app.codecov.io/gh/halvardssm/deno-nessie)
 [![(chat)](https://img.shields.io/badge/chat-on%20discord-green.svg?style=flat-square&logo=discord)](https://discord.gg/8WXfG2tvfr)
 
 # Nessie
@@ -12,16 +12,12 @@
 
 A modular database migration tool for [Deno](https://deno.land) inspired by
 [Laravel](https://github.com/laravel/laravel) and
-[Phinx](https://github.com/cakephp/phinx). Currently supports PostgreSQL, MySQL
-(and MariaDB) and SQLite.
+[Phinx](https://github.com/cakephp/phinx). Supports PostgreSQL, MySQL (&
+MariaDB) and SQLite.
 
 If you would like to see your DB flavor supported, take a look at how to make a
 client plugin with examples in the [clients folder](./clients) or in the section
 [How to make a client](#how-to-make-a-client).
-
-> The query builder is no longer maintained. If you need the code, it has been
-> moved to [its own repo](https://github.com/halvardssm/deno-query-builder). It
-> can also be found in Nessie version 1.1.3 or older.
 
 See documentation for the
 [clients](https://doc.deno.land/https/deno.land/x/nessie/mod.ts).
@@ -32,16 +28,30 @@ Nessie is available through:
 - https://raw.githubusercontent.com/halvardssm/deno-nessie
 - https://nest.land/package/Nessie
 
-## Usage
+## CLI Usage
 
 - `init`: Generates a `nessie.config.ts` file and also the `db` folder where
-  migration and seed files will be placed.
+  migration and seed files will be placed. Two options are available: `--mode`
+  and `--dialect`.
+
+  `--mode` can be one of `config` or `folders`. If mode is not set, it will
+  create a `nessie.config.ts` file and the `db` folder structure, otherwise it
+  will create the selected one.
+
+  `--dialect` is used for the config file and can be one of `pg`, `mysql` or
+  `sqlite`. If not set, it will create a general config file including all three
+  dialects, otherwise it will include only the selected one.
 
   ```shell
   deno run -A --unstable https://deno.land/x/nessie/cli.ts init
+
+  deno run -A --unstable https://deno.land/x/nessie/cli.ts init --mode folders
+
+  deno run -A --unstable https://deno.land/x/nessie/cli.ts init --mode config --dialect pg
   ```
 
-- `make:migration [name]` & `make [name]`: Create migration
+- `make:migration [name]` & `make [name]`: Create migration, `name` has to be
+  snake- and lowercase, it can also include numbers.
 
   ```shell
   deno run -A --unstable https://deno.land/x/nessie/cli.ts make:migration create_users
@@ -49,7 +59,8 @@ Nessie is available through:
   deno run -A --unstable https://deno.land/x/nessie/cli.ts make create_users
   ```
 
-- `make:seed [name]`: Create seed
+- `make:seed [name]`: Create seed, `name` has to be snake- and lowercase, it can
+  also include numbers.
 
   ```shell
   deno run -A --unstable https://deno.land/x/nessie/cli.ts make:seed add_users
@@ -90,8 +101,8 @@ Nessie is available through:
   ```
 
 - `update_timestamps`: Update timestamps - will update timestamps to the new
-  format. Will only update timestams where the value is less than 1672531200000
-  (2023-01-01) so that the timestamps wont be updated multiple times.
+  format. Will only update timestamps where the value is less than 1672531200000
+  (2023-01-01) so that the timestamps won't be updated multiple times.
 
   ```shell
   deno run -A --unstable https://deno.land/x/nessie/cli.ts update_timestamps
@@ -99,7 +110,7 @@ Nessie is available through:
 
 ### Flags
 
-- `-c, --config`: Path to config file, will default to ./nessie.config.ts
+- `-c, --config`: Path to config file, will default to `./nessie.config.ts`
 - `-d, --debug`: Enables verbose output
 
 ### Deno flags and Permissions
@@ -111,11 +122,63 @@ actually needs.
 - `--unstable`: Needed by [std/fs/copy](https://deno.land/std@0.90.0/fs/copy.ts)
   as it uses `Deno.utimeSync` and `Deno.utime` which are still unstable
 - `--allow-read`: Nessie needs read access to be able to read the migration and
-  seed folders, it also checks for the precense of the config file.
-- `--allow-write`: When creating a new migration or seed file, Nessie needs
-  write access.
-- `--allow-net`: Nessie downloads the config, migration and seed files from
-  `https://deno.land/x/nessie`, this is the only url needed.
+  seed folders, it also checks for the presence of the config file.
+- `--allow-write`: When initiating Nessie or creating a new migration or seed
+  file, write access is required.
+- `--allow-net`: If you use a remote config or migration files, this flag is
+  needed to get access.
+
+### Config file
+
+The config interface is exported from `mod.ts` as `NessieConfig`.
+
+```ts
+export interface NessieConfig {
+  /** Can be any class which extends `AbstractClient`. */
+  client: AbstractClient<any>;
+  /**
+   * The folders where migration files are located.
+   * Can be a relative path or an absolute path.
+   * Defaults to ['./db/migrations/'] if additionalMigrationFiles is not populated
+   */
+  migrationFolders?: string[];
+  /**
+  * The folders where seed files are located.
+  * Can be a relative path or an absolute path.
+  * Defaults to ['./db/seeds/'] if additionalSeedFiles is not populated
+  */
+  seedFolders?: string[];
+  /**
+  * Additional migration files which will be added to the
+  * list to parse when running the migrate or rollback command.
+  * Can be any format supported by `import()` e.g. url or path
+  */
+  additionalMigrationFiles?: string[];
+  /**
+  * Additional seed files which will be added to the list to
+  * match against when running the seed command.
+  * Can be any format supported by `import()` e.g. remote url or path
+  */
+  additionalSeedFiles?: string[];
+  /** Enables verbose output for debugging */
+  debug?: boolean;
+}
+```
+
+### Remote Migration or Seed files
+
+With the introduction of `additionalMigrationFiles` and `additionalSeedFiles`,
+you can now include remote migration and seed files which you can fetch for
+example via ftp or using api's like gihub or gitlab. Any input which can be
+given to the dynamic `import()` can be provided.
+
+```ts
+...
+additionalMigrationFiles: ['https://example.com/some_migration_file.ts'],
+...
+```
+
+See the [example folder](./examples) for more examples.
 
 ## Contributing
 
@@ -136,29 +199,19 @@ All contributions are welcome, make sure to read the
 See [example repo](https://github.com/halvardssm/deno-rest-api) for a REST API
 which uses Oak and Nessie.
 
-Previously Nessie required the functions to return a string (or array of
-strings), but this will be changed in the next major release. There now exists
-an abstract migration class which you can extend to access the client and its
-properties. This enables better flexibility in migrations and allows a more
-complex workflow. To check this feature out and to help discover bugs, you can
-already take this new syntax for a test by checking out the example folder, or
-the examples below with the `experimental` tag.
+Nessie uses the `AbstractMigration` class which you can extend to access the
+client and its properties. This enables better flexibility in migrations and
+seeds and allows a more complex workflow.
 
 `nessie.config.ts` with all default values
 
 ```ts
 import {
-  ClientOptions,
   ClientPostgreSQL,
   NessieConfig,
 } from "https://deno.land/x/nessie/mod.ts";
 
-const clientOptions: ClientOptions = {
-  migrationFolders: ["./db/migrations"],
-  seedFolders: ["./db/seeds"],
-};
-
-const clientPg = new ClientPostgreSQL(clientOptions, {
+const clientPg = new ClientPostgreSQL({
   database: "nessie",
   hostname: "localhost",
   port: 5432,
@@ -168,18 +221,17 @@ const clientPg = new ClientPostgreSQL(clientOptions, {
 
 const config: NessieConfig = {
   client: clientPg,
-  experimental: true, // Will allow class based migrations
-  useDateTime: true, // Will use new format for migration file timestamp
+  migrationFolders: ["./db/migrations"],
+  seedFolders: ["./db/seeds"],
+  additionalMigrationFiles: [],
+  additionalSeedFiles: [],
+  debug: false,
 };
 
 export default config;
 ```
 
-**We are moving towards class based migration files**, so please consider taking
-a look at the new syntax. If you are seeking the legacy methods, please look in
-the example folder or further down on this page.
-
-Minimal example of a migration file (experimental)
+Minimal example of a migration file
 
 ```ts
 import {
@@ -190,16 +242,16 @@ import {
 
 export default class extends AbstractMigration<ClientPostgreSQL> {
   async up({ dialect }: Info): Promise<void> {
-    this.client.queryArray("CREATE TABLE table1 (id int)");
+    await this.client.queryArray("CREATE TABLE table1 (id int)");
   }
 
   async down({ dialect }: Info): Promise<void> {
-    this.client.queryArray("DROP TABLE table1");
+    await this.client.queryArray("DROP TABLE table1");
   }
 }
 ```
 
-Seed file (experimental)
+Seed file
 
 ```ts
 import {
@@ -210,33 +262,9 @@ import {
 
 export default class extends AbstractSeed<ClientPostgreSQL> {
   async run({ dialect }: Info): Promise<void> {
-    this.client.queryArray("INSERT INTO table1 VALUES (1234)");
+    await this.client.queryArray("INSERT INTO table1 VALUES (1234)");
   }
 }
-```
-
-Minimal example of a migration file (legacy)
-
-```ts
-import { Migration } from "https://deno.land/x/nessie/mod.ts";
-
-export const up: Migration = () => {
-  return "CREATE TABLE table1 (id int);";
-};
-
-export const down: Migration = () => {
-  return "DROP TABLE table1";
-};
-```
-
-Seed file (legacy)
-
-```ts
-import { Seed } from "https://deno.land/x/nessie/mod.ts";
-
-export const run: Seed = () => {
-  return "INSERT INTO testTable VALUES (1)";
-};
 ```
 
 See the [example folder](./examples) for more
