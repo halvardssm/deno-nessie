@@ -15,7 +15,7 @@ Deno.test("getConfigTemplate standard", () => {
 } from "${URL_BASE_VERSIONED}/mod.ts";
 
 /** Select one of the supported clients */
-// const client = new ClientPostgreSQL(clientOptions, {
+// const client = new ClientPostgreSQL({
 //     database: "nessie",
 //     hostname: "localhost",
 //     port: 5432,
@@ -23,7 +23,7 @@ Deno.test("getConfigTemplate standard", () => {
 //     password: "pwd",
 // });
 
-// const client = new ClientMySQL(clientOptions, {
+// const client = new ClientMySQL({
 //     hostname: "localhost",
 //     port: 3306,
 //     username: "root",
@@ -31,7 +31,7 @@ Deno.test("getConfigTemplate standard", () => {
 //     db: "nessie",
 // });
 
-// const client = new ClientSQLite(clientOptions, "./sqlite.db");
+// const client = new ClientSQLite("./sqlite.db");
 
 /** This is the final config object */
 const config: NessieConfig = {
@@ -81,7 +81,7 @@ Deno.test("getConfigTemplate mysql", () => {
     NessieConfig,
 } from "${URL_BASE_VERSIONED}/mod.ts";
 
-const client = new ClientMySQL(clientOptions, {
+const client = new ClientMySQL({
     hostname: "localhost",
     port: 3306,
     username: "root",
@@ -109,7 +109,7 @@ Deno.test("getConfigTemplate sqlite", () => {
     NessieConfig,
 } from "${URL_BASE_VERSIONED}/mod.ts";
 
-const client = new ClientSQLite(clientOptions, "./sqlite.db");
+const client = new ClientSQLite("./sqlite.db");
 
 /** This is the final config object */
 const config: NessieConfig = {
