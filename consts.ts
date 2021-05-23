@@ -1,4 +1,4 @@
-export const VERSION = "1.3.2";
+export const VERSION = "2.0.0-rc2";
 
 export const URL_BASE = `https://deno.land/x/nessie`;
 export const URL_BASE_VERSIONED = `${URL_BASE}@${VERSION}`;

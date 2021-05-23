@@ -1,4 +1,4 @@
-const REG_EXP_VERSION = /^\d+.\d+.\d+$/;
+const REG_EXP_VERSION = /^\d+\.\d+\.\d+(-rc\d+)?$/;
 const REG_EXP_README_VERSION = /shields\.io\/badge\/deno-v\d+.\d+.\d+/;
 const REG_EXP_PROGRAM_VERSION = /export const VERSION = \"\d+.\d+.\d\";/;
 const REG_EXP_DEVCONTAINER_VERSION = /ARG DENO_VERSION=\"\d+.\d+.\d\"/;
