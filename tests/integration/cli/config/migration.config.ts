@@ -4,7 +4,7 @@ export const TYPE_SEED = "seed";
 
 export const DIALECT_PG = "pg";
 export const DIALECT_MYSQL = "mysql";
-export const DIALECT_SQLITE = "sqlite3";
+export const DIALECT_SQLITE = "sqlite";
 export const DIALECTS = [
   DIALECT_PG,
   DIALECT_MYSQL,

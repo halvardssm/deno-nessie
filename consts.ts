@@ -23,11 +23,11 @@ export const REGEXP_FILE_NAME = /^[a-z\d]+(_[a-z\d]+)*$/;
 export enum DB_DIALECTS {
   PGSQL = "pg",
   MYSQL = "mysql",
-  SQLITE = "sqlite3",
+  SQLITE = "sqlite",
 }
 
 export enum DB_CLIENTS {
   pg = "ClientPostgreSQL",
   mysql = "ClientMySQL",
-  sqlite3 = "ClientSQLite",
+  sqlite = "ClientSQLite",
 }

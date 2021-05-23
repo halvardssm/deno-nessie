@@ -15,7 +15,7 @@ export default class extends AbstractMigration {
 
 const DIALECT_PG = "pg";
 const DIALECT_MYSQL = "mysql";
-const DIALECT_SQLITE = "sqlite3";
+const DIALECT_SQLITE = "sqlite";
 const DIALECTS = [
   DIALECT_PG,
   DIALECT_MYSQL,

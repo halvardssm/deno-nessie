@@ -17,7 +17,7 @@ export type SQLiteClientOptions = string | undefined;
 
 /** SQLite client */
 export class ClientSQLite extends AbstractClient<DB> {
-  dialect: DBDialects = "sqlite3";
+  dialect: DBDialects = "sqlite";
 
   #QUERY_TRANSACTION_START = `BEGIN TRANSACTION;`;
   #QUERY_TRANSACTION_COMMIT = `COMMIT;`;

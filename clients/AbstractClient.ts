@@ -26,7 +26,7 @@ export abstract class AbstractClient<Client> {
   migrationFiles: FileEntryT[] = [];
   /** Seed files read from the seed folders */
   seedFiles: FileEntryT[] = [];
-  /** The current dialect, given by the Client e.g. pg, mysql, sqlite3 */
+  /** The current dialect, given by the Client e.g. pg, mysql, sqlite */
   dialect?: DBDialects | string;
 
   protected readonly QUERY_GET_LATEST =

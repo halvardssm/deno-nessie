@@ -64,7 +64,7 @@ jobs:
           deno-version: ${{env.DENO_VERSION}}
           
       - name: Nessie Init
-        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init
+        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --dialect sqlite
         env:
           URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
 
@@ -96,8 +96,8 @@ jobs:
         env:
           URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
 
-      - name: Init with mode and sqlite3
-        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --mode config --dialect sqlite3
+      - name: Init with mode and sqlite
+        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --mode config --dialect sqlite
         env:
           URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
 
