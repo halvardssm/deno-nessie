@@ -1,6 +1,5 @@
 import { DB } from "https://deno.land/x/sqlite@v2.4.0/mod.ts";
 import { AbstractClient } from "./AbstractClient.ts";
-import { resolve } from "../deps.ts";
 import type {
   AmountMigrateT,
   AmountRollbackT,
@@ -13,7 +12,6 @@ import {
   MAX_FILE_NAME_LENGTH,
   TABLE_MIGRATIONS,
 } from "../consts.ts";
-import { isRemoteUrl } from "../cli/utils.ts";
 
 export type SQLiteClientOptions = string | undefined;
 
@@ -35,15 +33,7 @@ export class ClientSQLite extends AbstractClient<DB> {
     `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = strftime('%Y%m%d%H%M%S', CAST(substr(${COL_FILE_NAME}, 0, instr(${COL_FILE_NAME}, '-')) AS INTEGER) / 1000, 'unixepoch') || substr(${COL_FILE_NAME}, instr(${COL_FILE_NAME}, '-')) WHERE CAST(substr(${COL_FILE_NAME}, 0, instr(${COL_FILE_NAME}, '-')) AS INTEGER) < 1672531200000;`;
 
   constructor(connectionOptions?: string) {
-    let path;
-
-    if (connectionOptions) {
-      path = isRemoteUrl(connectionOptions)
-        ? connectionOptions
-        : resolve(connectionOptions);
-    }
-
-    super({ client: new DB(path) });
+    super({ client: new DB(connectionOptions) });
   }
 
   async prepare() {
