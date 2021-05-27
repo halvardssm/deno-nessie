@@ -82,7 +82,7 @@ export default config;
 export function getMigrationTemplate(dialect?: DBDialects) {
   let generic;
 
-  if (dialect && dialect in DB_DIALECTS) {
+  if (dialect && dialect in DB_CLIENTS) {
     generic = DB_CLIENTS[dialect as DB_DIALECTS];
   }
 
@@ -105,7 +105,7 @@ export default class extends AbstractMigration${generic ? `<${generic}>` : ""} {
 export function getSeedTemplate(dialect?: DBDialects) {
   let generic;
 
-  if (dialect && dialect in DB_DIALECTS) {
+  if (dialect && dialect in DB_CLIENTS) {
     generic = DB_CLIENTS[dialect as DB_DIALECTS];
   }
 
