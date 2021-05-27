@@ -2,22 +2,23 @@
 
 ## Version 2.0.0 - Unreleased
 
+- Deno v1.10.2
 - Added Coverage reporting
 - Limit filenames to only be lowercase, underscore and digits
 - Fixed parsing of migrate and rollback amount
 
-## Version 1.3.2
+## Version 1.3.2 - 2021-05-17
 
 - Deno v1.10.1
 - Fixed bug where path for async import was not a file url
 
-## Version 1.3.1
+## Version 1.3.1 - 2021-05-08
 
 - Cliffy v0.18.2
 - Replaced Denomander with Cliffy
 - Added support for multiple migration and seed folders
 
-## Version 1.3.0
+## Version 1.3.0 - 2021-05-08
 
 - Added `CHANGELOG.md` file
 - Removed dex in abstract migration and seed
@@ -27,13 +28,13 @@
 - Improved types
 - Added github funding
 
-## Version 1.2.4
+## Version 1.2.4 - 2021-04-30
 
 - Fixed broken Nest CI
 - Improved types
 - Fixed typehint for client in `AbstractMigration` and `AbstractSeed`
 
-## Version 1.2.3
+## Version 1.2.3 - 2021-04-29
 
 - Deno v1.9.2
 - PostgreSQL v0.11.2
@@ -44,11 +45,11 @@
 - Made private methods properly private with `#`
 - Fixed typo in `egg.json`
 
-## Version 1.2.2
+## Version 1.2.2 - 2021-04-12
 
 - Updated Nest config
 
-## Version 1.2.1
+## Version 1.2.1 - 2021-04-27
 
 - Updated Nest CI script to use `denoland/setup-deno` instead of
   `denolib/setup-deno`
@@ -56,7 +57,7 @@
 - Removed query builder from `egg.json`
 - Fixed `isUrl` parsing
 
-## Version 1.2.0
+## Version 1.2.0 - 2021-04-12
 
 - Deno v1.8.3
 - Deno std v0.55.0
@@ -73,7 +74,7 @@
   timestamp
 - Improved experimental class based migrations
 
-## Version 1.1.0
+## Version 1.1.0 - 2020-10-07
 
 - Deno v1.4.4
 - Deno std v0.73.0
@@ -88,7 +89,7 @@
 - Improved typings and class properties
 - Improved tests
 
-## Version 1.0.0
+## Version 1.0.0 - 2020-06-10
 
 - Initial release
 - Deno v1.0.5
