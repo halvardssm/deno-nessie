@@ -101,7 +101,7 @@ export abstract class AbstractClient<Client> {
     if (allMigrations && allMigrations.length > 0) {
       this.logger(amount, "Amount pre");
 
-      amount = this._parseAmount(amount, allMigrations.length, true);
+      amount = this._parseAmount(amount, allMigrations.length, false);
 
       this.logger(amount, "Received amount to rollback");
 
