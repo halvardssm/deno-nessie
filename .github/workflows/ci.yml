@@ -18,7 +18,7 @@ jobs:
 
     steps:
       - name: Clone repo
-        uses: actions/checkout@master
+        uses: actions/checkout@main
 
       - name: Install deno
         uses: denoland/setup-deno@main
@@ -34,7 +34,7 @@ jobs:
 
     steps:
       - name: Clone repo
-        uses: actions/checkout@master
+        uses: actions/checkout@main
 
       - name: Install deno
         uses: denoland/setup-deno@main
@@ -144,7 +144,7 @@ jobs:
 
     steps:
       - name: Clone repo
-        uses: actions/checkout@master
+        uses: actions/checkout@main
 
       - name: Install deno
         uses: denoland/setup-deno@main
@@ -200,7 +200,7 @@ jobs:
     
     steps:
       - name: Clone repo
-        uses: actions/checkout@master
+        uses: actions/checkout@main
 
       - name: Install deno
         uses: denoland/setup-deno@main
