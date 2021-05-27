@@ -84,14 +84,13 @@ const cli = async () => {
       "make:migration <fileName:string>",
       "Creates a migration file with the name. Allows lower snake case and digits e.g. `some_migration_1`.",
     )
+    .alias("make")
     .action(makeMigration)
     .command(
       "make:seed <fileName:string>",
       "Creates a seed file with the name. Allows lower snake case and digits e.g. `some_seed_1`.",
     )
     .action(makeSeed)
-    .command("make <fileName:string>", "Alias of make:migration.")
-    .action(makeMigration)
     .command(
       "seed [matcher:string]",
       "Seeds the database with the files found with the matcher in the seed folder specified in the config file. Matcher is optional, and accepts string literals and RegExp.",
@@ -104,7 +103,7 @@ const cli = async () => {
     .action(migrate)
     .command(
       "rollback [amount:string]",
-      "Rolls back migrations. Optional number of rollbacks. If not provided, it will do one.",
+      "Rolls back migrations. Optional number of rollbacks or 'all'. If not provided, it will do one.",
     )
     .action(rollback)
     .command(
@@ -182,8 +181,6 @@ const rollback: TCliffyAction = async (
   options: CommandOptions,
   amount: AmountRollbackT,
 ) => {
-  amount = amount === "all" ? amount : parseInt(amount as unknown as string);
-
   const state = await State.init(options);
   await state.client.prepare();
   await state.client.rollback(amount);

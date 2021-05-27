@@ -22,8 +22,8 @@ export {
   HelpCommand as CliffyHelpCommand,
   Select as CliffySelect,
   Toggle as CliffyToggle,
-} from "https://deno.land/x/cliffy@v0.18.2/mod.ts";
-export type { IAction as CliffyIAction } from "https://deno.land/x/cliffy@v0.18.2/mod.ts";
+} from "https://deno.land/x/cliffy@v0.19.0/mod.ts";
+export type { IAction as CliffyIAction } from "https://deno.land/x/cliffy@v0.19.0/mod.ts";
 
 /** MySQL */
 export { Client as MySQLClient } from "https://deno.land/x/mysql@v2.8.0/mod.ts";
