@@ -146,9 +146,9 @@ export default class extends AbstractMigration {
 
 Deno.test("getMigrationTemplate pg", () => {
   const expected =
-    `import { AbstractMigration, Info } from "${URL_BASE_VERSIONED}/mod.ts";
+    `import { AbstractMigration, Info, ClientPostgreSQL } from "${URL_BASE_VERSIONED}/mod.ts";
 
-export default class extends AbstractMigration {
+export default class extends AbstractMigration<ClientPostgreSQL> {
     /** Runs on migrate */
     async up(info: Info): Promise<void> {
     }
@@ -165,9 +165,9 @@ export default class extends AbstractMigration {
 
 Deno.test("getMigrationTemplate mysql", () => {
   const expected =
-    `import { AbstractMigration, Info } from "${URL_BASE_VERSIONED}/mod.ts";
+    `import { AbstractMigration, Info, ClientMySQL } from "${URL_BASE_VERSIONED}/mod.ts";
 
-export default class extends AbstractMigration {
+export default class extends AbstractMigration<ClientMySQL> {
     /** Runs on migrate */
     async up(info: Info): Promise<void> {
     }
@@ -184,9 +184,9 @@ export default class extends AbstractMigration {
 
 Deno.test("getMigrationTemplate sqlite", () => {
   const expected =
-    `import { AbstractMigration, Info } from "${URL_BASE_VERSIONED}/mod.ts";
+    `import { AbstractMigration, Info, ClientSQLite } from "${URL_BASE_VERSIONED}/mod.ts";
 
-export default class extends AbstractMigration {
+export default class extends AbstractMigration<ClientSQLite> {
     /** Runs on migrate */
     async up(info: Info): Promise<void> {
     }
@@ -218,9 +218,9 @@ export default class extends AbstractSeed {
 
 Deno.test("getSeedTemplate pg", () => {
   const expected =
-    `import { AbstractSeed, Info } from "${URL_BASE_VERSIONED}/mod.ts";
+    `import { AbstractSeed, Info, ClientPostgreSQL } from "${URL_BASE_VERSIONED}/mod.ts";
 
-export default class extends AbstractSeed {
+export default class extends AbstractSeed<ClientPostgreSQL> {
     /** Runs on seed */
     async run(info: Info): Promise<void> {
     }
@@ -233,9 +233,9 @@ export default class extends AbstractSeed {
 
 Deno.test("getSeedTemplate mysql", () => {
   const expected =
-    `import { AbstractSeed, Info } from "${URL_BASE_VERSIONED}/mod.ts";
+    `import { AbstractSeed, Info, ClientMySQL } from "${URL_BASE_VERSIONED}/mod.ts";
 
-export default class extends AbstractSeed {
+export default class extends AbstractSeed<ClientMySQL> {
     /** Runs on seed */
     async run(info: Info): Promise<void> {
     }
@@ -248,9 +248,9 @@ export default class extends AbstractSeed {
 
 Deno.test("getSeedTemplate sqlite", () => {
   const expected =
-    `import { AbstractSeed, Info } from "${URL_BASE_VERSIONED}/mod.ts";
+    `import { AbstractSeed, Info, ClientSQLite } from "${URL_BASE_VERSIONED}/mod.ts";
 
-export default class extends AbstractSeed {
+export default class extends AbstractSeed<ClientSQLite> {
     /** Runs on seed */
     async run(info: Info): Promise<void> {
     }
