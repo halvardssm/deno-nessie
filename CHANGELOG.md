@@ -1,9 +1,10 @@
 # Nessie Change Log
 
-## Version 2.0.0
+## Version 2.0.0 - Unreleased
 
 - Added Coverage reporting
 - Limit filenames to only be lowercase, underscore and digits
+- Fixed parsing of migrate and rollback amount
 
 ## Version 1.3.2
 

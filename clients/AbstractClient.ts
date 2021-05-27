@@ -43,6 +43,21 @@ export abstract class AbstractClient<Client> {
     this.client = options.client;
   }
 
+  protected _parseAmount(
+    amount: AmountRollbackT,
+    maxAmount = 0,
+    isMigration = true,
+  ): number {
+    const defaultAmount = isMigration ? maxAmount : 1;
+
+    if (amount === "all") return maxAmount;
+    if (amount === undefined) return defaultAmount;
+    if (typeof amount === "string") {
+      amount = isNaN(parseInt(amount)) ? defaultAmount : parseInt(amount);
+    }
+    return Math.min(maxAmount, amount);
+  }
+
   /** Runs the `up` method on all available migrations after filtering and sorting. */
   protected async _migrate(
     amount: AmountMigrateT,
@@ -52,7 +67,7 @@ export abstract class AbstractClient<Client> {
     this.logger(amount, "Amount pre");
 
     this._sliceMigrationFiles(latestMigration);
-    amount = typeof amount === "number" ? amount : this.migrationFiles.length;
+    amount = this._parseAmount(amount, this.migrationFiles.length, true);
 
     this.logger(latestMigration, "Latest migrations");
 
@@ -61,8 +76,6 @@ export abstract class AbstractClient<Client> {
         this.migrationFiles,
         "Filtered and sorted migration files",
       );
-
-      amount = Math.min(this.migrationFiles.length, amount);
 
       for (const [i, file] of this.migrationFiles.entries()) {
         if (i >= amount) break;
@@ -83,18 +96,14 @@ export abstract class AbstractClient<Client> {
     allMigrations: string[] | undefined,
     queryHandler: QueryHandler,
   ) {
-    this.logger(amount, "Amount pre");
-
-    amount = typeof amount === "number"
-      ? amount
-      : (amount === "all" ? (allMigrations?.length ? allMigrations.length : 0)
-      : 1);
-
-    this.logger(amount, "Received amount to rollback");
     this.logger(allMigrations, "Files to rollback");
 
     if (allMigrations && allMigrations.length > 0) {
-      amount = Math.min(allMigrations.length, amount);
+      this.logger(amount, "Amount pre");
+
+      amount = this._parseAmount(amount, allMigrations.length, false);
+
+      this.logger(amount, "Received amount to rollback");
 
       for (const [i, fileName] of allMigrations.entries()) {
         if (i >= amount) break;
