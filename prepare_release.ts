@@ -1,4 +1,5 @@
 const REG_EXP_VERSION = /^\d+\.\d+\.\d+(-rc\d+)?$/;
+const REG_EXP_VERSION_STABLE = /^\d+\.\d+\.\d+$/;
 const REG_EXP_README_VERSION = /shields\.io\/badge\/deno-v\d+.\d+.\d+/;
 const REG_EXP_PROGRAM_VERSION = /export const VERSION = \"\d+.\d+.\d\";/;
 const REG_EXP_DEVCONTAINER_VERSION = /ARG DENO_VERSION=\"\d+.\d+.\d\"/;
@@ -38,6 +39,7 @@ const setEggConfig = async (version: string) => {
   const eggFile = JSON.parse(await Deno.readTextFile(FILE_JSON_EGG)) as any;
 
   eggFile.version = version;
+  eggFile.stable = REG_EXP_VERSION_STABLE.test(version);
 
   await Deno.writeTextFile(
     FILE_JSON_EGG,
