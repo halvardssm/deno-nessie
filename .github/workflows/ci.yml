@@ -221,3 +221,12 @@ jobs:
         with:
           files: coverage.lcov
           flags: integration-update-timestamps
+
+  image-test:
+    name: Test Docker image build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Test image
+        run: make image_test

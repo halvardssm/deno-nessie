@@ -8,7 +8,7 @@ on:
     types: [published]
 
 jobs:
-  publish-egg:
+  publish-docker:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
