@@ -67,15 +67,15 @@ db_sqlite_stop:
 image_build:
 	docker build --pull --build-arg DENO_VERSION=$(DENO_VERSION) -f ./image/Dockerfile -t $(DOCKER_IMAGE):latest -t $(DOCKER_IMAGE):$(NESSIE_VERSION) .
 image_push:
-	docker push $(DOCKER_IMAGE)
+	docker push -a $(DOCKER_IMAGE)
 image_test: image_build
-	rm tests/image/sqlite.db
-	docker run -v `pwd`/tests/image:/nessie $(DOCKER_IMAGE) init --dialect sqlite
-	docker run -v `pwd`/tests/image:/nessie $(DOCKER_IMAGE) migrate
-	docker run -v `pwd`/tests/image:/nessie $(DOCKER_IMAGE) make test
-	rm tests/image/sqlite.db
+	rm tests/image/sqlite.db || true
+	docker run --rm -v `pwd`/tests/image:/nessie $(DOCKER_IMAGE) init --dialect sqlite
+	docker run --rm -v `pwd`/tests/image:/nessie $(DOCKER_IMAGE) migrate
+	docker run --rm -v `pwd`/tests/image:/nessie $(DOCKER_IMAGE) make test
+	rm tests/image/sqlite.db || true
 image_run:
-	docker run -v `pwd`/tests/image:/nessie $(DOCKER_IMAGE) help
+	docker run --rm -v `pwd`/tests/image:/nessie $(DOCKER_IMAGE) help
 
 bump_%: # version number and deno version separated by `:` e.g. 1.2.3:1.2.3
 	deno run --allow-read --allow-write prepare_release.ts $*
