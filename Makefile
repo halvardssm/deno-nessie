@@ -69,11 +69,11 @@ image_build:
 image_push:
 	docker push -a $(DOCKER_IMAGE)
 image_test: image_build
-	rm tests/image/sqlite.db || true
+	rm -rf tests/image/*
 	docker run --rm -v `pwd`/tests/image:/nessie $(DOCKER_IMAGE) init --dialect sqlite
 	docker run --rm -v `pwd`/tests/image:/nessie $(DOCKER_IMAGE) migrate
 	docker run --rm -v `pwd`/tests/image:/nessie $(DOCKER_IMAGE) make test
-	rm tests/image/sqlite.db || true
+	rm -rf tests/image/*
 image_run:
 	docker run --rm -v `pwd`/tests/image:/nessie $(DOCKER_IMAGE) help
 

@@ -15,6 +15,7 @@ const FILE_MAKEFILE = "Makefile";
 const FILES_CI = [
   ".github/workflows/ci.yml",
   ".github/workflows/publish_nest.yml",
+  ".github/workflows/publish_docker.yml",
 ];
 
 const versionsRaw = Deno.args[0];
