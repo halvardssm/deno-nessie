@@ -83,7 +83,7 @@ export class State {
       throw new Error("Config file is not found");
     }
 
-    if (!(config.client instanceof AbstractClient)) {
+    if (!config.client) {
       throw new Error("Client is not valid");
     }
 
