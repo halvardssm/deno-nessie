@@ -56,7 +56,7 @@ For a PR to be accepted, the following needs to be applied:
 ## Testing
 
 If you have `make` and `Docker` available, you can simply run `make test` (or
-`make test-clean` if you have already started the docker containers, this will
+`make test_clean` if you have already started the docker containers, this will
 be optimized in the future), otherwise boot up your databases and change the
 connections accordingly (do not commit these changes). If you have `Docker` but
 not `make`, you can look at the `Makefile` to see the commands to run.

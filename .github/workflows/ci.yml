@@ -26,7 +26,7 @@ jobs:
           deno-version: ${{env.DENO_VERSION}}
 
       - name: Run test for format and lint
-        run: make test-fmt
+        run: make test_fmt
 
   unit:
     name: Test unit
@@ -42,7 +42,7 @@ jobs:
           deno-version: ${{env.DENO_VERSION}}
 
       - name: Run unit tests
-        run: make test-unit
+        run: make test_unit
 
       - name: Generate lcov
         run: deno coverage --unstable --lcov ./coverage > coverage.lcov
@@ -152,10 +152,10 @@ jobs:
           deno-version: ${{env.DENO_VERSION}}
 
       - name: Create databases
-        run: make db-sqlite-start
+        run: make db_sqlite_start
 
       - name: Run tests
-        run: make test-integration-cli
+        run: make test_integration_cli
 
       - name: Generate lcov
         run: deno coverage --unstable --lcov ./coverage > coverage.lcov
@@ -208,10 +208,10 @@ jobs:
           deno-version: ${{env.DENO_VERSION}}
 
       - name: Create databases
-        run: make db-sqlite-start
+        run: make db_sqlite_start
 
       - name: Run tests
-        run: make test-integration-update-timestamps
+        run: make test_integration_update_timestamps
 
       - name: Generate lcov
         run: deno coverage --unstable --lcov ./coverage > coverage.lcov
