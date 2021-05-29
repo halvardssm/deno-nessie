@@ -3,7 +3,7 @@
   "name": "Nessie",
   "description": "A modular database migration module for Deno.",
   "version": "2.0.0-rc2",
-  "stable": true,
+  "stable": false,
   "repository": "https://github.com/halvardssm/deno-nessie",
   "files": [
     "./*.ts",
