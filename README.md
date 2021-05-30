@@ -5,6 +5,7 @@
 [![nest badge](https://nest.land/badge-block.svg)](https://nest.land/package/Nessie)
 [![Codecov](https://img.shields.io/codecov/c/gh/halvardssm/deno-nessie?logo=codecov&style=flat-square&token=O59WOJ5W00)](https://app.codecov.io/gh/halvardssm/deno-nessie)
 [![(chat)](https://img.shields.io/badge/chat-on%20discord-green.svg?style=flat-square&logo=discord)](https://discord.gg/8WXfG2tvfr)
+[![Docker Image Size (tag)](https://img.shields.io/docker/image-size/halvardm/nessie/latest?logo=docker&style=flat-square)](https://hub.docker.com/repository/docker/halvardm/nessie)
 
 # Nessie
 
@@ -27,6 +28,7 @@ Nessie is available through:
 - https://deno.land/x/nessie
 - https://raw.githubusercontent.com/halvardssm/deno-nessie
 - https://nest.land/package/Nessie
+- https://hub.docker.com/repository/docker/halvardm/nessie
 
 ## CLI Usage
 
@@ -179,6 +181,10 @@ additionalMigrationFiles: ['https://example.com/some_migration_file.ts'],
 ```
 
 See the [example folder](./examples) for more examples.
+
+## Docker usage
+
+See the specific [Nessie image docs](./image/README.md) for using Nessie with a docker image.
 
 ## Contributing
 

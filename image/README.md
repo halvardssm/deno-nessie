@@ -1,5 +1,9 @@
 # Nessie Docker Image
 
+This is the official Docker image for Nessie -  a modular database migration tool for Deno.
+
+[Repo](https://github.com/halvardssm/deno-nessie/)
+
 To use the Nessie Docker image, you can either extend it as you normally would
 and place the config file and migration files in `/nessie`. The default work
 directory is `/nessie` and cmd is set to the `nessie` cli.
@@ -14,7 +18,7 @@ directory is `/nessie` and cmd is set to the `nessie` cli.
 ```Dockerfile
 FROM halvardm/nessie:latest
 
-# Uncomment this line if you migrations and config file is dependend on a deps.ts file
+# Uncomment this line if your migrations and config file is dependend on a deps.ts file and copy in other dependencies
 # COPY deps.ts .
 
 COPY db .
@@ -31,10 +35,10 @@ docker run -it migrations
 ### Local development
 
 ```shell
+docker run -v `pwd`:/nessie halvardm/nessie init --dialect sqlite
+docker run -v `pwd`:/nessie halvardm/nessie make new_migration
 docker run -v `pwd`:/nessie halvardm/nessie migrate
 docker run -v `pwd`:/nessie halvardm/nessie rollback
-docker run -v `pwd`:/nessie halvardm/nessie init
-docker run -v `pwd`:/nessie halvardm/nessie make new_migration
 ```
 
 If you have a database running in docker, you will have to set up a docker
