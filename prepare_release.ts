@@ -3,7 +3,8 @@ const REG_EXP_VERSION_STABLE = /^\d+\.\d+\.\d+$/;
 const REG_EXP_README_DENO_VERSION = /shields\.io\/badge\/deno-v\d+\.\d+\.\d+/;
 const REG_EXP_DEVCONTAINER_DENO_VERSION = /ARG DENO_VERSION=\"\d+\.\d+\.\d+\"/;
 const REG_EXP_MAKEFILE_DENO_VERSION = /DENO_VERSION=\d+\.\d+\.\d+/;
-const REG_EXP_CI_DENO_VERSION = /DENO_VERSION: \d+\.\d+\.\d+(-rc\d+)?/;
+const REG_EXP_CI_DENO_VERSION = /DENO_VERSION: \d+\.\d+\.\d+/;
+const REG_EXP_CI_NESSIE_VERSION = /NESSIE_VERSION: \d+\.\d+\.\d+(-rc\d+)?/;
 const REG_EXP_MAKEFILE_NESSIE_VERSION = /NESSIE_VERSION=\d+\.\d+\.\d+(-rc\d+)?/;
 const REG_EXP_PROGRAM_NESSIE_VERSION =
   /export const VERSION = \"\d+\.\d+\.\d+(-rc\d+)?\";/;
@@ -86,18 +87,29 @@ const setProgram = async (versions: typeof VERSIONS) => {
 };
 
 const setCI = async (versions: typeof VERSIONS) => {
-  if (versions.deno) {
+  if (versions.deno || versions.nessie) {
     for (const file of FILES_CI) {
-      const cli = await Deno.readTextFile(file);
+      let res = await Deno.readTextFile(file);
 
-      const res = cli.replace(
-        REG_EXP_CI_DENO_VERSION,
-        `DENO_VERSION: ${versions.deno}`,
-      );
+      if (versions.deno) {
+        res = res.replace(
+          REG_EXP_CI_DENO_VERSION,
+          `DENO_VERSION: ${versions.deno}`,
+        );
+      }
+
+      if (versions.nessie) {
+        res = res.replace(
+          REG_EXP_CI_NESSIE_VERSION,
+          `NESSIE_VERSION: ${versions.deno}`,
+        );
+      }
 
       await Deno.writeTextFile(file, res);
 
-      console.info(`${file} updated to ${versions.deno}`);
+      console.info(
+        `${file} updated to Nessie: ${versions.nessie} and Deno: ${versions.deno}`,
+      );
     }
   }
 };
@@ -118,27 +130,29 @@ const setDevContainer = async (versions: typeof VERSIONS) => {
 };
 
 const setMakefile = async (versions: typeof VERSIONS) => {
-  let res = await Deno.readTextFile(FILE_MAKEFILE);
+  if (versions.deno || versions.nessie) {
+    let res = await Deno.readTextFile(FILE_MAKEFILE);
 
-  if (versions.nessie) {
-    res = res.replace(
-      REG_EXP_MAKEFILE_NESSIE_VERSION,
-      `NESSIE_VERSION=${versions.nessie}`,
+    if (versions.nessie) {
+      res = res.replace(
+        REG_EXP_MAKEFILE_NESSIE_VERSION,
+        `NESSIE_VERSION=${versions.nessie}`,
+      );
+    }
+
+    if (versions.deno) {
+      res = res.replace(
+        REG_EXP_MAKEFILE_DENO_VERSION,
+        `DENO_VERSION=${versions.deno}`,
+      );
+    }
+
+    await Deno.writeTextFile(FILE_MAKEFILE, res);
+
+    console.info(
+      `${FILE_MAKEFILE} updated to Nessie: ${versions.nessie} and Deno: ${versions.deno}`,
     );
   }
-
-  if (versions.deno) {
-    res = res.replace(
-      REG_EXP_MAKEFILE_DENO_VERSION,
-      `DENO_VERSION=${versions.deno}`,
-    );
-  }
-
-  await Deno.writeTextFile(FILE_MAKEFILE, res);
-
-  console.info(
-    `${FILE_MAKEFILE} updated to Nessie: ${versions.nessie} and Deno: ${versions.deno}`,
-  );
 };
 
 await setEggConfig(VERSIONS);

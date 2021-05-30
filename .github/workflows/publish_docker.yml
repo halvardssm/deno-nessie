@@ -2,6 +2,7 @@ name: Publish Docker
 
 env:
   DENO_VERSION: 1.10.2
+  NESSIE_VERSION: 2.0.0-rc4
 
 on:
   release:
@@ -12,9 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
-      - name: Get tag
-        run: echo "NESSIE_VERSION=${GITHUB_REF#refs/*/}"
 
       - name: Login to Docker Hub
         uses: docker/login-action@v1
