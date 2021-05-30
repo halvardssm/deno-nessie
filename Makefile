@@ -7,7 +7,7 @@ NESSIE_VERSION=2.0.0-rc2
 DENO_VERSION=1.10.2
 DOCKER_IMAGE=halvardm/nessie
 
-test_all: test_fmt test_unit db_all_restart test_integration_cli db_all_restart test_integration_update_timestamps
+test_all: test_fmt test_unit db_all_restart test_integration_cli db_all_restart test_integration_update_timestamps image_build image_test_clean image_test image_test_clean
 
 test_fmt:
 	deno lint --unstable --ignore=tests,examples,cli/templates
@@ -68,11 +68,11 @@ image_build:
 	docker build --pull --build-arg DENO_VERSION=$(DENO_VERSION) -f ./image/Dockerfile -t $(DOCKER_IMAGE):latest -t $(DOCKER_IMAGE):$(NESSIE_VERSION) .
 image_push:
 	docker push -a $(DOCKER_IMAGE)
-image_test: image_build
-	rm -rf tests/image/*
+image_test:
 	docker run --rm -v `pwd`/tests/image:/nessie $(DOCKER_IMAGE) init --dialect sqlite
 	docker run --rm -v `pwd`/tests/image:/nessie $(DOCKER_IMAGE) migrate
 	docker run --rm -v `pwd`/tests/image:/nessie $(DOCKER_IMAGE) make test
+image_test_clean:
 	rm -rf tests/image/*
 image_run:
 	docker run --rm -v `pwd`/tests/image:/nessie $(DOCKER_IMAGE) help

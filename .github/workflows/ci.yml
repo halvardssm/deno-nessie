@@ -228,5 +228,8 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
+      - name: Build image
+        run: make image_build
+
       - name: Test image
         run: make image_test
