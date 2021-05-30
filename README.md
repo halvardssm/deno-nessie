@@ -184,7 +184,8 @@ See the [example folder](./examples) for more examples.
 
 ## Docker usage
 
-See the specific [Nessie image docs](./image/README.md) for using Nessie with a docker image.
+See the specific [Nessie image docs](./image/README.md) for using Nessie with a
+docker image.
 
 ## Contributing
 
