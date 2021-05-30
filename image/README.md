@@ -3,7 +3,7 @@
 This is the official Docker image for Nessie - a modular database migration tool
 for Deno.
 
-[Repo](https://github.com/halvardssm/deno-nessie/)
+https://github.com/halvardssm/deno-nessie/
 
 To use the Nessie Docker image, you can either extend it as you normally would
 and place the config file and migration files in `/nessie`. The default work
