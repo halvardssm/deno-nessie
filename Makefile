@@ -70,8 +70,8 @@ image_push:
 	docker push -a $(DOCKER_IMAGE)
 image_test:
 	docker run --rm -v `pwd`/tests/image:/nessie $(DOCKER_IMAGE) init --dialect sqlite
-	docker run --rm -v `pwd`/tests/image:/nessie $(DOCKER_IMAGE) migrate
 	docker run --rm -v `pwd`/tests/image:/nessie $(DOCKER_IMAGE) make test
+	docker run --rm -v `pwd`/tests/image:/nessie $(DOCKER_IMAGE) migrate
 image_test_clean:
 	rm -rf tests/image/*
 image_run:
