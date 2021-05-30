@@ -20,7 +20,6 @@ import {
   DEFAULT_SEED_FOLDER,
   REGEXP_FILE_NAME,
 } from "../consts.ts";
-import { AbstractClient } from "../clients/AbstractClient.ts";
 import { getMigrationTemplate, getSeedTemplate } from "./templates.ts";
 
 /** The main state for the application.
