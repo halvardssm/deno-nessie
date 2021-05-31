@@ -13,8 +13,8 @@
   <a href="https://deno.land">
     <img alt="Deno Version" src="https://img.shields.io/badge/deno-v1.10.2-green.svg?style=for-the-badge&logo=deno"/>
   </a>
-  <a href="https://github.com/halvardssm/deno-nessie/actions?query=branch%3Amaster+workflow%3ACI">
-    <img alt="GitHub Workflow Status (branch)" src="https://img.shields.io/github/workflow/status/halvardssm/deno-nessie/ci/master?style=for-the-badge&logo=github">
+  <a href="https://github.com/halvardssm/deno-nessie/actions?query=branch%3Amain+workflow%3ACI">
+    <img alt="GitHub Workflow Status (branch)" src="https://img.shields.io/github/workflow/status/halvardssm/deno-nessie/CI/main?style=for-the-badge&logo=github">
   </a>
   <a href="https://app.codecov.io/gh/halvardssm/deno-nessie">
     <img alt="Codecov" src="https://img.shields.io/codecov/c/gh/halvardssm/deno-nessie?logo=codecov&style=for-the-badge&token=O59WOJ5W00" />
