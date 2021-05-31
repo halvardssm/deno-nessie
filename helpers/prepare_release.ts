@@ -1,10 +1,12 @@
-const REG_EXP_VERSION = /^\d+\.\d+\.\d+(-rc\d+)?$/;
-const REG_EXP_VERSION_STABLE = /^\d+\.\d+\.\d+$/;
+import { REG_EXP_VERSION, REG_EXP_VERSION_STABLE } from "./commons.ts";
+
 const REG_EXP_README_DENO_VERSION = /shields\.io\/badge\/deno-v\d+\.\d+\.\d+/;
 const REG_EXP_DEVCONTAINER_DENO_VERSION = /ARG DENO_VERSION=\"\d+\.\d+\.\d+\"/;
 const REG_EXP_MAKEFILE_DENO_VERSION = /DENO_VERSION=\d+\.\d+\.\d+/;
 const REG_EXP_CI_DENO_VERSION = /DENO_VERSION: \d+\.\d+\.\d+/;
 const REG_EXP_CI_NESSIE_VERSION = /NESSIE_VERSION: \d+\.\d+\.\d+(-rc\d+)?/;
+const REG_EXP_CI_LATEST_VERSION_STABLE = /LATEST_VERSION_STABLE: \d+\.\d+\.\d+/;
+const REG_EXP_CI_LATEST_VERSION_NEXT = /LATEST_VERSION_NEXT: \d+\.\d+\.\d+(-rc\d+)?/;
 const REG_EXP_MAKEFILE_NESSIE_VERSION = /NESSIE_VERSION=\d+\.\d+\.\d+(-rc\d+)?/;
 const REG_EXP_PROGRAM_NESSIE_VERSION =
   /export const VERSION = \"\d+\.\d+\.\d+(-rc\d+)?\";/;
@@ -101,8 +103,20 @@ const setCI = async (versions: typeof VERSIONS) => {
       if (versions.nessie) {
         res = res.replace(
           REG_EXP_CI_NESSIE_VERSION,
-          `NESSIE_VERSION: ${versions.deno}`,
+          `NESSIE_VERSION: ${versions.nessie}`,
         );
+
+        if(REG_EXP_VERSION_STABLE.test(versions.nessie)){
+          res = res.replace(
+            REG_EXP_CI_LATEST_VERSION_STABLE,
+            `LATEST_VERSION_STABLE: ${versions.nessie}`,
+          );
+        } else {
+          res = res.replace(
+            REG_EXP_CI_LATEST_VERSION_NEXT,
+            `LATEST_VERSION_NEXT: ${versions.nessie}`,
+          );
+        }
       }
 
       await Deno.writeTextFile(file, res);

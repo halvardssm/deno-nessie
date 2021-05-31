@@ -78,5 +78,5 @@ image_run:
 	docker run --rm -v `pwd`/tests/image:/nessie $(DOCKER_IMAGE) help
 
 bump_%: # version number and deno version separated by `:` e.g. 1.2.3:1.2.3
-	deno run --allow-read --allow-write prepare_release.ts $*
+	deno run --allow-read --allow-write helpers/prepare_release.ts $*
 	deno fmt
