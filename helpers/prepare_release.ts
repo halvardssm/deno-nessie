@@ -6,7 +6,8 @@ const REG_EXP_MAKEFILE_DENO_VERSION = /DENO_VERSION=\d+\.\d+\.\d+/;
 const REG_EXP_CI_DENO_VERSION = /DENO_VERSION: \d+\.\d+\.\d+/;
 const REG_EXP_CI_NESSIE_VERSION = /NESSIE_VERSION: \d+\.\d+\.\d+(-rc\d+)?/;
 const REG_EXP_CI_LATEST_VERSION_STABLE = /LATEST_VERSION_STABLE: \d+\.\d+\.\d+/;
-const REG_EXP_CI_LATEST_VERSION_NEXT = /LATEST_VERSION_NEXT: \d+\.\d+\.\d+(-rc\d+)?/;
+const REG_EXP_CI_LATEST_VERSION_NEXT =
+  /LATEST_VERSION_NEXT: \d+\.\d+\.\d+(-rc\d+)?/;
 const REG_EXP_MAKEFILE_NESSIE_VERSION = /NESSIE_VERSION=\d+\.\d+\.\d+(-rc\d+)?/;
 const REG_EXP_PROGRAM_NESSIE_VERSION =
   /export const VERSION = \"\d+\.\d+\.\d+(-rc\d+)?\";/;
@@ -106,7 +107,7 @@ const setCI = async (versions: typeof VERSIONS) => {
           `NESSIE_VERSION: ${versions.nessie}`,
         );
 
-        if(REG_EXP_VERSION_STABLE.test(versions.nessie)){
+        if (REG_EXP_VERSION_STABLE.test(versions.nessie)) {
           res = res.replace(
             REG_EXP_CI_LATEST_VERSION_STABLE,
             `LATEST_VERSION_STABLE: ${versions.nessie}`,

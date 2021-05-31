@@ -23,9 +23,9 @@ if (REG_EXP_VERSION_STABLE.test(versionNessie)) {
   isStable = true;
 }
 
-const isGreater = (a:string, b:string) => {
-  const aa = a.split('.').map(el=>parseInt(el)).join('.')
-  const bb = b.split('.').map(el=>parseInt(el)).join('.')
+const isGreater = (a: string, b: string) => {
+  const aa = a.split(".").map((el) => parseInt(el)).join(".");
+  const bb = b.split(".").map((el) => parseInt(el)).join(".");
   return aa.localeCompare(bb, undefined, { numeric: true }) !== -1;
 };
 
