@@ -12,6 +12,10 @@ directory is `/nessie` and cmd is set to the `nessie` cli.
 > Always use a fixed version for production software to reduce unexpected bugs,
 > and always backup your database before upgrading the nessie version.
 
+## Tags
+
+In adition to the versioned tags, which are in sync with the Nessie version, we have `latest` and `next` which are always up to date. `latest` will give you the latest stable release, while `next` will either be the latest release candidate (unstable version), or equivalent to `latest` if there are no release candidates. Release candidates mostly occurs only for major releases. As a rule of thumb, you should only use a versioned image for production.
+
 ## General Usage
 
 ### Extend dockerfile
