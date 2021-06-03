@@ -4,10 +4,6 @@ const REG_EXP_README_DENO_VERSION = /shields\.io\/badge\/deno-v\d+\.\d+\.\d+/;
 const REG_EXP_DEVCONTAINER_DENO_VERSION = /ARG DENO_VERSION=\"\d+\.\d+\.\d+\"/;
 const REG_EXP_MAKEFILE_DENO_VERSION = /DENO_VERSION=\d+\.\d+\.\d+/;
 const REG_EXP_CI_DENO_VERSION = /DENO_VERSION: \d+\.\d+\.\d+/;
-const REG_EXP_CI_NESSIE_VERSION = /NESSIE_VERSION: \d+\.\d+\.\d+(-rc\d+)?/;
-const REG_EXP_CI_LATEST_VERSION_STABLE = /LATEST_VERSION_STABLE: \d+\.\d+\.\d+/;
-const REG_EXP_CI_LATEST_VERSION_NEXT =
-  /LATEST_VERSION_NEXT: \d+\.\d+\.\d+(-rc\d+)?/;
 const REG_EXP_MAKEFILE_NESSIE_VERSION = /NESSIE_VERSION=\d+\.\d+\.\d+(-rc\d+)?/;
 const REG_EXP_PROGRAM_NESSIE_VERSION =
   /export const VERSION = \"\d+\.\d+\.\d+(-rc\d+)?\";/;
@@ -22,27 +18,12 @@ const FILES_CI = [
   ".github/workflows/publish_docker.yml",
 ];
 
-const versionsRaw = Deno.args[0];
-
-// versions should be separated by `:` e.g. `[nessieVersion]:[denoVersion]`
-// and will not allow any other form than `1.2.3` or `` on the right side
-// and `1.2.3`, `1.2.3-rf4` or `` on the left side.
-// If this is not fulfilled, the version will not upgrade
-if (!versionsRaw.includes(":")) {
-  console.info("separator not included");
-  Deno.exit(1);
-}
-
-const VERSIONS = {
-  nessie: REG_EXP_VERSION.test(versionsRaw.split(":")[0])
-    ? versionsRaw.split(":")[0]
-    : undefined,
-  deno: REG_EXP_VERSION_STABLE.test(versionsRaw.split(":")[1])
-    ? versionsRaw.split(":")[1]
-    : undefined,
+type VERSIONS = {
+  nessie: string | undefined;
+  deno: string | undefined;
 };
 
-const setEggConfig = async (versions: typeof VERSIONS) => {
+const setEggConfig = async (versions: VERSIONS) => {
   if (versions.nessie) {
     // deno-lint-ignore no-explicit-any
     const eggFile = JSON.parse(await Deno.readTextFile(FILE_JSON_EGG)) as any;
@@ -59,7 +40,7 @@ const setEggConfig = async (versions: typeof VERSIONS) => {
   }
 };
 
-const setReadMe = async (versions: typeof VERSIONS) => {
+const setReadMe = async (versions: VERSIONS) => {
   if (versions.deno) {
     const readme = await Deno.readTextFile(FILE_README);
 
@@ -74,7 +55,7 @@ const setReadMe = async (versions: typeof VERSIONS) => {
   }
 };
 
-const setProgram = async (versions: typeof VERSIONS) => {
+const setProgram = async (versions: VERSIONS) => {
   if (versions.nessie) {
     const cli = await Deno.readTextFile(FILE_PROGRAM);
 
@@ -89,7 +70,7 @@ const setProgram = async (versions: typeof VERSIONS) => {
   }
 };
 
-const setCI = async (versions: typeof VERSIONS) => {
+const setCI = async (versions: VERSIONS) => {
   if (versions.deno || versions.nessie) {
     for (const file of FILES_CI) {
       let res = await Deno.readTextFile(file);
@@ -101,35 +82,16 @@ const setCI = async (versions: typeof VERSIONS) => {
         );
       }
 
-      if (versions.nessie) {
-        res = res.replace(
-          REG_EXP_CI_NESSIE_VERSION,
-          `NESSIE_VERSION: ${versions.nessie}`,
-        );
-
-        if (REG_EXP_VERSION_STABLE.test(versions.nessie)) {
-          res = res.replace(
-            REG_EXP_CI_LATEST_VERSION_STABLE,
-            `LATEST_VERSION_STABLE: ${versions.nessie}`,
-          );
-        } else {
-          res = res.replace(
-            REG_EXP_CI_LATEST_VERSION_NEXT,
-            `LATEST_VERSION_NEXT: ${versions.nessie}`,
-          );
-        }
-      }
-
       await Deno.writeTextFile(file, res);
 
       console.info(
-        `${file} updated to Nessie: ${versions.nessie} and Deno: ${versions.deno}`,
+        `${file} updated to Deno: ${versions.deno}`,
       );
     }
   }
 };
 
-const setDevContainer = async (versions: typeof VERSIONS) => {
+const setDevContainer = async (versions: VERSIONS) => {
   if (versions.deno) {
     const cli = await Deno.readTextFile(FILE_DEVCONTAINER);
 
@@ -144,7 +106,7 @@ const setDevContainer = async (versions: typeof VERSIONS) => {
   }
 };
 
-const setMakefile = async (versions: typeof VERSIONS) => {
+const setMakefile = async (versions: VERSIONS) => {
   if (versions.deno || versions.nessie) {
     let res = await Deno.readTextFile(FILE_MAKEFILE);
 
@@ -170,9 +132,33 @@ const setMakefile = async (versions: typeof VERSIONS) => {
   }
 };
 
-await setEggConfig(VERSIONS);
-await setProgram(VERSIONS);
-await setReadMe(VERSIONS);
-await setCI(VERSIONS);
-await setDevContainer(VERSIONS);
-await setMakefile(VERSIONS);
+async function runProgram() {
+  const versionsRaw = Deno.args[0];
+
+  // versions should be separated by `:` e.g. `[nessieVersion]:[denoVersion]`
+  // and will not allow any other form than `1.2.3` or `` on the right side
+  // and `1.2.3`, `1.2.3-rf4` or `` on the left side.
+  // If this is not fulfilled, the version will not upgrade
+  if (!versionsRaw.includes(":")) {
+    console.info("separator not included");
+    Deno.exit(1);
+  }
+
+  const versions = {
+    nessie: REG_EXP_VERSION.test(versionsRaw.split(":")[0])
+      ? versionsRaw.split(":")[0]
+      : undefined,
+    deno: REG_EXP_VERSION_STABLE.test(versionsRaw.split(":")[1])
+      ? versionsRaw.split(":")[1]
+      : undefined,
+  };
+
+  await setEggConfig(versions);
+  await setProgram(versions);
+  await setReadMe(versions);
+  await setCI(versions);
+  await setDevContainer(versions);
+  await setMakefile(versions);
+}
+
+await runProgram();

@@ -1,6 +1,6 @@
 ARG DENO_VERSION=latest
 
-FROM hayd/ubuntu-deno:${DENO_VERSION}
+FROM denoland/deno:${DENO_VERSION}
 
 WORKDIR /opt/lib/nessie
 COPY . .

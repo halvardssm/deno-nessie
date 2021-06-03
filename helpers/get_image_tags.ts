@@ -1,45 +1,89 @@
-import { REG_EXP_VERSION, REG_EXP_VERSION_STABLE } from "./commons.ts";
+import * as semver from "https://deno.land/x/semver@v1.4.0/mod.ts";
+import { REG_EXP_VERSION_NEXT, REG_EXP_VERSION_STABLE } from "./commons.ts";
 
-const IMAGE = "halvardm/nessie";
-const versionNessie = Deno.args[0];
-const versionLatestStable = Deno.args[1];
-const versionLatestNext = Deno.args[2];
+async function getTags() {
+  const decoder = new TextDecoder();
+  const processTags = Deno.run({
+    cmd: [
+      "git",
+      "tag",
+      "--sort",
+      "-version:refname",
+      "--merged",
+      "main",
+    ],
+    stdout: "piped",
+  });
 
-if (
-  !REG_EXP_VERSION.test(versionNessie) ||
-  !REG_EXP_VERSION_STABLE.test(versionLatestStable) ||
-  !REG_EXP_VERSION.test(versionLatestNext)
-) {
-  console.info(
-    `Version not valid, got version: '${versionNessie}', stable: '${versionLatestStable}', next: '${versionLatestNext}'`,
-  );
-  Deno.exit(1);
+  const { code } = await processTags.status();
+  const rawOutput = await processTags.output();
+
+  if (code !== 0) {
+    await Deno.stdout.write(rawOutput);
+    Deno.exit(code);
+  }
+
+  const result = decoder.decode(rawOutput).split("\n");
+  processTags.close();
+
+  return result.filter((tag) => !tag.startsWith("v"));
 }
 
-const outputArray = [`${IMAGE}:${versionNessie}`];
-let isStable = false;
+async function getCurrentTag() {
+  const decoder = new TextDecoder();
+  const processTags = Deno.run({
+    cmd: [
+      "git",
+      "describe",
+      "--tags",
+      "--abbrev=0",
+    ],
+    stdout: "piped",
+  });
 
-if (REG_EXP_VERSION_STABLE.test(versionNessie)) {
-  isStable = true;
+  const { code } = await processTags.status();
+  const rawOutput = await processTags.output();
+
+  if (code !== 0) {
+    await Deno.stdout.write(rawOutput);
+    Deno.exit(code);
+  }
+
+  const result = decoder.decode(rawOutput);
+  processTags.close();
+
+  return result;
 }
 
-const isGreater = (a: string, b: string) => {
-  const aa = a.split(".").map((el) => parseInt(el)).join(".");
-  const bb = b.split(".").map((el) => parseInt(el)).join(".");
-  return aa.localeCompare(bb, undefined, { numeric: true }) !== -1;
-};
+async function generateTagsArray() {
+  const IMAGE = "halvardm/nessie";
 
-if (isStable && isGreater(versionNessie, versionLatestStable)) {
-  outputArray.push(`${IMAGE}:latest`);
+  const tags = await getTags();
+  const current = await getCurrentTag();
+
+  const latestStable =
+    tags.filter((tag) => REG_EXP_VERSION_STABLE.test(tag))[0];
+  const latestNext = tags.filter((tag) => REG_EXP_VERSION_NEXT.test(tag))[0];
+
+  const outputArray = [`${IMAGE}:${current}`];
+
+  if (
+    REG_EXP_VERSION_STABLE.test(current) && semver.gte(current, latestStable)
+  ) {
+    outputArray.push(`${IMAGE}:latest`);
+  }
+
+  if (semver.gte(current, latestNext)) {
+    outputArray.push(`${IMAGE}:next`);
+  }
+
+  const result = outputArray.join(",");
+
+  const encoder = new TextEncoder();
+
+  await Deno.stdout.write(encoder.encode(result));
 }
 
-if (isGreater(versionNessie, versionLatestNext)) {
-  outputArray.push(`${IMAGE}:next`);
-}
+await generateTagsArray();
 
-const output = outputArray.join(",");
-
-const encoder = new TextEncoder();
-const encodedOutput = encoder.encode(output + "\n");
-await Deno.stdout.write(encodedOutput);
 Deno.exit(0);
