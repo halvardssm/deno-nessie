@@ -17,24 +17,31 @@ const strings = [
     name: "Migrate 1",
     string: [TYPE_MIGRATE, "1"],
     solution: [
-      "Migrated 20210508115213_test1.ts",
-      "Migration complete",
+      "Starting migration of 3 files",
+      "Migrating 20210508115213_test1.ts",
+      "Done in",
+      "Migrations completed in",
     ],
   },
   {
     name: "Migrate all",
     string: [TYPE_MIGRATE],
     solution: [
-      "Migrated 20210508125213_test2.ts",
-      "Migrated 20210508135213_test3.ts",
-      "Migration complete",
+      "Starting migration of 2 files",
+      "Migrating 20210508125213_test2.ts",
+      "Done in ",
+      "Migrating 20210508135213_test3.ts",
+      "Migrations completed in ",
     ],
   },
   {
     name: "Seed",
     string: [TYPE_SEED, "seed.ts"],
     solution: [
-      "Seeding complete",
+      "Starting seeding of 1 files",
+      "Seeding seed.ts",
+      "Done in",
+      "Seeding completed in ",
     ],
   },
   {
@@ -46,26 +53,34 @@ const strings = [
     name: "Rollback test3 and test2",
     string: [TYPE_ROLLBACK, "2"],
     solution: [
-      "Rolled back 20210508135213_test3.ts",
-      "Rolled back 20210508125213_test2.ts",
+      "Starting rollback of 2 files",
+      "Rolling back 20210508135213_test3.ts",
+      "Done in ",
+      "Rolling back 20210508125213_test2.ts",
+      "Rollback completed in ",
     ],
   },
   {
     name: "Migrate test2 and test3",
     string: [TYPE_MIGRATE, "2"],
     solution: [
-      "Migrated 20210508125213_test2.ts",
-      "Migrated 20210508135213_test3.ts",
-      "Migration complete",
+      "Starting migration of 2 files",
+      "Migrating 20210508125213_test2.ts",
+      "Done in ",
+      "Migrating 20210508135213_test3.ts",
+      "Migrations completed in ",
     ],
   },
   {
     name: "Rollback all",
     string: [TYPE_ROLLBACK, "all"],
     solution: [
-      "Rolled back 20210508135213_test3.ts",
-      "Rolled back 20210508125213_test2.ts",
-      "Rolled back 20210508115213_test1.ts",
+      "Starting rollback of 3 files",
+      "Done in",
+      "Rolling back 20210508135213_test3.ts",
+      "Rolling back 20210508125213_test2.ts",
+      "Rolling back 20210508115213_test1.ts",
+      "Rollback completed in ",
     ],
   },
   {
@@ -84,7 +99,13 @@ for await (const dialect of DIALECTS) {
       hasFailed = response[response.length - 1].includes("Code was");
 
       assert(!hasFailed, response.join("\n"));
-      assertArrayIncludes(response, solution);
+
+      solution.forEach((el) =>
+        assert(
+          response.some((res) => res.includes(el)),
+          `Missing '${el}' from response`,
+        )
+      );
     });
   }
 }

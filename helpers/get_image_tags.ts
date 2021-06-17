@@ -18,15 +18,16 @@ async function getTags() {
   const { code } = await processTags.status();
   const rawOutput = await processTags.output();
 
+  const result = decoder.decode(rawOutput);
+
   if (code !== 0) {
-    await Deno.stdout.write(rawOutput);
+    console.error(result);
     Deno.exit(code);
   }
 
-  const result = decoder.decode(rawOutput).split("\n");
   processTags.close();
 
-  return result.filter((tag) => !tag.startsWith("v"));
+  return result.split("\n").filter((tag) => !tag.startsWith("v"));
 }
 
 async function getCurrentTag() {
@@ -44,12 +45,13 @@ async function getCurrentTag() {
   const { code } = await processTags.status();
   const rawOutput = await processTags.output();
 
+  const result = decoder.decode(rawOutput);
+
   if (code !== 0) {
-    await Deno.stdout.write(rawOutput);
+    console.error(result);
     Deno.exit(code);
   }
 
-  const result = decoder.decode(rawOutput);
   processTags.close();
 
   return result;

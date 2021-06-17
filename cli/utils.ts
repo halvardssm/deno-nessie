@@ -40,3 +40,23 @@ export function isMigrationFile(name: string): boolean {
   return REGEXP_MIGRATION_FILE_NAME.test(name) &&
     name.length < MAX_FILE_NAME_LENGTH;
 }
+
+/** Returns duration in milliseconds */
+export async function getDurationForFunction<T>(
+  fn: () => Promise<T>,
+): Promise<[number, T]> {
+  const t1 = performance.now();
+
+  const res = await fn();
+
+  const t2 = performance.now() - t1;
+
+  return [t2, res];
+}
+
+export function getDurationFromTimestamp(
+  startTime: number,
+  endTime?: number,
+): string {
+  return (((endTime ?? performance.now()) - startTime) / 1000).toFixed(2);
+}

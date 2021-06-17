@@ -228,9 +228,7 @@ const updateTimestamps: TCliffyAction = async (
     .map(({ oldPath, newPath }) => `${oldPath} => ${newPath}`)
     .join("\n");
 
-  const encoder = new TextEncoder();
-
-  await Deno.stdout.write(encoder.encode(output));
+  console.info(output);
 };
 
 /** Main application */

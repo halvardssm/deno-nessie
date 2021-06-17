@@ -16,6 +16,8 @@ import type {
 } from "../wrappers/AbstractMigration.ts";
 import { AbstractSeed, AbstractSeedProps } from "../wrappers/AbstractSeed.ts";
 import { COL_FILE_NAME, TABLE_MIGRATIONS } from "../consts.ts";
+import { green } from "../deps.ts";
+import { getDurationFromTimestamp } from "../cli/utils.ts";
 
 /** The abstract client which handles most of the logic related to database communication. */
 export abstract class AbstractClient<Client> {
@@ -65,29 +67,45 @@ export abstract class AbstractClient<Client> {
     queryHandler: QueryHandler,
   ) {
     this.logger(amount, "Amount pre");
+    this.logger(latestMigration, "Latest migrations");
 
     this._sliceMigrationFiles(latestMigration);
     amount = this._parseAmount(amount, this.migrationFiles.length, true);
 
-    this.logger(latestMigration, "Latest migrations");
+    this.logger(
+      this.migrationFiles,
+      "Filtered and sorted migration files",
+    );
 
-    if (this.migrationFiles.length > 0) {
-      this.logger(
-        this.migrationFiles,
-        "Filtered and sorted migration files",
-      );
-
-      for (const [i, file] of this.migrationFiles.entries()) {
-        if (i >= amount) break;
-
-        await this._migrationHandler(file, queryHandler);
-
-        console.info(`Migrated ${file.name}`);
-      }
-      console.info("Migration complete");
-    } else {
+    if (amount < 1) {
       console.info("Nothing to migrate");
+      return;
     }
+
+    console.info(
+      green(`Starting migration of ${this.migrationFiles.length} files`),
+      "\n----\n",
+    );
+
+    const t1 = performance.now();
+
+    for (const [i, file] of this.migrationFiles.entries()) {
+      if (i >= amount) break;
+
+      console.info(green(`Migrating ${file.name}`));
+
+      const t2 = performance.now();
+
+      await this._migrationHandler(file, queryHandler);
+
+      const duration2 = getDurationFromTimestamp(t2);
+
+      console.info(`Done in ${duration2} seconds\n----\n`);
+    }
+
+    const duration1 = getDurationFromTimestamp(t1);
+
+    console.info(green(`Migrations completed in ${duration1} seconds`));
   }
 
   /** Runs the `down` method on defined number of migrations after retrieving them from the DB. */
@@ -97,31 +115,47 @@ export abstract class AbstractClient<Client> {
     queryHandler: QueryHandler,
   ) {
     this.logger(allMigrations, "Files to rollback");
+    this.logger(amount, "Amount pre");
 
-    if (allMigrations && allMigrations.length > 0) {
-      this.logger(amount, "Amount pre");
-
-      amount = this._parseAmount(amount, allMigrations.length, false);
-
-      this.logger(amount, "Received amount to rollback");
-
-      for (const [i, fileName] of allMigrations.entries()) {
-        if (i >= amount) break;
-
-        const file = this.migrationFiles
-          .find((migrationFile) => migrationFile.name === fileName);
-
-        if (!file) {
-          throw new Error(`Migration file '${fileName}' is not found`);
-        }
-
-        await this._migrationHandler(file, queryHandler, true);
-
-        console.info(`Rolled back ${file.name}`);
-      }
-    } else {
+    if (!allMigrations || allMigrations.length < 1) {
       console.info("Nothing to rollback");
+      return;
     }
+
+    amount = this._parseAmount(amount, allMigrations.length, false);
+    this.logger(amount, "Received amount to rollback");
+
+    console.info(
+      green(`Starting rollback of ${amount} files`),
+      "\n----\n",
+    );
+
+    const t1 = performance.now();
+
+    for (const [i, fileName] of allMigrations.entries()) {
+      if (i >= amount) break;
+
+      const file = this.migrationFiles
+        .find((migrationFile) => migrationFile.name === fileName);
+
+      if (!file) {
+        throw new Error(`Migration file '${fileName}' is not found`);
+      }
+
+      console.info(`Rolling back ${file.name}`);
+
+      const t2 = performance.now();
+
+      await this._migrationHandler(file, queryHandler, true);
+
+      const duration2 = getDurationFromTimestamp(t2);
+
+      console.info(`Done in ${duration2} seconds\n----\n`);
+    }
+
+    const duration1 = getDurationFromTimestamp(t1);
+
+    console.info(green(`Rollback completed in ${duration1} seconds`));
   }
 
   /** Runs the `run` method on seed files. Filters on the matcher. */
@@ -133,23 +167,41 @@ export abstract class AbstractClient<Client> {
     if (files.length < 1) {
       console.info(`No seed file found with matcher '${matcher}'`);
       return;
-    } else {
-      for await (const file of files) {
-        // deno-lint-ignore no-explicit-any
-        const exposedObject: Info<any> = {
-          dialect: this.dialect!,
-        };
-
-        const SeedClass: new (
-          props: AbstractSeedProps<Client>,
-        ) => AbstractSeed<this> = (await import(file.path)).default;
-
-        const seed = new SeedClass({ client: this.client });
-        await seed.run(exposedObject);
-      }
-
-      console.info("Seeding complete");
     }
+
+    console.info(
+      green(`Starting seeding of ${files.length} files`),
+      "\n----\n",
+    );
+
+    const t1 = performance.now();
+
+    for await (const file of files) {
+      // deno-lint-ignore no-explicit-any
+      const exposedObject: Info<any> = {
+        dialect: this.dialect!,
+      };
+
+      console.info(`Seeding ${file.name}`);
+
+      const SeedClass: new (
+        props: AbstractSeedProps<Client>,
+      ) => AbstractSeed<this> = (await import(file.path)).default;
+
+      const seed = new SeedClass({ client: this.client });
+
+      const t2 = performance.now();
+
+      await seed.run(exposedObject);
+
+      const duration2 = getDurationFromTimestamp(t2);
+
+      console.info(`Done in ${duration2} seconds\n----\n`);
+    }
+
+    const duration1 = getDurationFromTimestamp(t1);
+
+    console.info(green(`Seeding completed in ${duration1} seconds`));
   }
 
   /** Sets the logger for the client. Given by the State. */

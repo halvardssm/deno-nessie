@@ -8,6 +8,7 @@ DENO_VERSION=1.10.3
 DOCKER_IMAGE=halvardm/nessie
 
 test_all: test_fmt test_unit db_all_restart test_integration_cli db_all_restart test_integration_update_timestamps image_build image_test_clean image_test image_test_clean
+test: test_all
 
 test_fmt:
 	deno lint --unstable --ignore=tests,examples,cli/templates
