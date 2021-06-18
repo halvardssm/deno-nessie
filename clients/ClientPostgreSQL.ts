@@ -12,6 +12,7 @@ import {
   MAX_FILE_NAME_LENGTH,
   TABLE_MIGRATIONS,
 } from "../consts.ts";
+import { NessieError } from "../cli/errors.ts";
 
 export type { PostgreSQLClientOptions };
 
@@ -80,7 +81,7 @@ export class ClientPostgreSQL extends AbstractClient<PostgreSQLClient> {
       try {
         ra.push(await this.client.queryArray(qs));
       } catch (e) {
-        throw new Error(query + "\n" + e + "\n" + ra.join("\n"));
+        throw new NessieError(query + "\n" + e + "\n" + ra.join("\n"));
       }
     }
 

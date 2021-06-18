@@ -15,12 +15,12 @@ import type {
   StateOptions,
 } from "../types.ts";
 import {
-  DEFAULT_CONFIG_FILE,
   DEFAULT_MIGRATION_FOLDER,
   DEFAULT_SEED_FOLDER,
   REGEXP_FILE_NAME,
 } from "../consts.ts";
 import { getMigrationTemplate, getSeedTemplate } from "./templates.ts";
+import { NessieError } from "./errors.ts";
 
 /** The main state for the application.
  *
@@ -62,28 +62,19 @@ export class State {
   static async init(options: CommandOptions) {
     if (options.debug) console.log("Checking config path");
 
-    let config: NessieConfig;
+    const path = isUrl(options.config)
+      ? options.config
+      : "file://" + resolve(Deno.cwd(), options.config);
 
-    if (options.config) {
-      const path = isUrl(options.config)
-        ? options.config
-        : "file://" + resolve(Deno.cwd(), options.config);
-
-      const configRaw = await import(path);
-      config = configRaw.default;
-    } else if (await exists(DEFAULT_CONFIG_FILE)) {
-      if (options.debug) console.log("Checking project root");
-
-      const path = "file://" + resolve(Deno.cwd(), DEFAULT_CONFIG_FILE);
-
-      const configRaw = await import(path);
-      config = configRaw.default;
-    } else {
-      throw new Error("Config file is not found");
+    if (!await exists(path)) {
+      throw new NessieError(`Config file is not found at ${path}`);
     }
 
+    const configRaw = await import(path);
+    const config: NessieConfig = configRaw.default;
+
     if (!config.client) {
-      throw new Error("Client is not valid");
+      throw new NessieError("Client is not valid");
     }
 
     const { migrationFolders, seedFolders } = this
@@ -115,11 +106,13 @@ export class State {
     if (
       options.migrationFolders && !arrayIsUnique(options.migrationFolders)
     ) {
-      throw new Error("Entries for the migration folders has to be unique");
+      throw new NessieError(
+        "Entries for the migration folders has to be unique",
+      );
     }
 
     if (options.seedFolders && !arrayIsUnique(options.seedFolders)) {
-      throw new Error("Entries for the seed folders has to be unique");
+      throw new NessieError("Entries for the seed folders has to be unique");
     }
 
     options.migrationFolders?.forEach((folder) => {
@@ -134,7 +127,7 @@ export class State {
     }
 
     if (!arrayIsUnique(migrationFolders)) {
-      throw new Error(
+      throw new NessieError(
         "Entries for the resolved migration folders has to be unique",
       );
     }
@@ -148,7 +141,7 @@ export class State {
     }
 
     if (!arrayIsUnique(seedFolders)) {
-      throw new Error(
+      throw new NessieError(
         "Entries for the resolved seed folders has to be unique",
       );
     }
@@ -189,7 +182,7 @@ export class State {
     });
 
     if (!arrayIsUnique(migrationFiles.map((file) => file.name))) {
-      throw new Error(
+      throw new NessieError(
         "Entries for the migration files has to be unique",
       );
     }
@@ -219,7 +212,7 @@ export class State {
     });
 
     if (!arrayIsUnique(seedFiles.map((file) => file.name))) {
-      throw new Error(
+      throw new NessieError(
         "Entries for the resolved seed files has to be unique",
       );
     }
@@ -232,7 +225,7 @@ export class State {
   /** Makes the migration */
   async makeMigration(migrationName = "migration") {
     if (!REGEXP_FILE_NAME.test(migrationName) || migrationName.length >= 80) {
-      throw new Error(
+      throw new NessieError(
         "Migration name has to be snakecase and only include a-z (all lowercase) and 1-9",
       );
     }
@@ -244,7 +237,7 @@ export class State {
     this.logger(fileName, "Migration file name");
 
     if (!isMigrationFile(fileName)) {
-      throw new Error(`Migration name '${fileName}' is not valid`);
+      throw new NessieError(`Migration name '${fileName}' is not valid`);
     }
 
     const selectedFolder = await this._folderPrompt(
@@ -268,7 +261,7 @@ export class State {
   /** Makes the seed */
   async makeSeed(seedName = "seed") {
     if (!REGEXP_FILE_NAME.test(seedName)) {
-      throw new Error(
+      throw new NessieError(
         "Seed name has to be snakecase and only include a-z (all lowercase) and 1-9",
       );
     }

@@ -12,6 +12,7 @@ import {
   MAX_FILE_NAME_LENGTH,
   TABLE_MIGRATIONS,
 } from "../consts.ts";
+import { NessieError } from "../cli/errors.ts";
 
 export type SQLiteClientOptions = string | undefined;
 
@@ -78,7 +79,7 @@ export class ClientSQLite extends AbstractClient<SQLiteClient> {
         if (e?.message === "Query was empty") {
           ra.push(undefined);
         } else {
-          throw new Error(query + "\n" + e + "\n" + ra.join("\n"));
+          throw new NessieError(query + "\n" + e + "\n" + ra.join("\n"));
         }
       }
     }

@@ -163,7 +163,8 @@ actually needs.
   seed folders, it also checks for the presence of the config file.
 - `--allow-write`: When initiating Nessie or creating a new migration or seed
   file, write access is required.
-- `--allow-net`: If you use a remote config or migration files, this flag is
+- `--allow-net`: This is needed to import the nessie code in your config file.
+  It is also needed if you use a remote config or migration files, this flag is
   needed to get access.
 
 ### Config file

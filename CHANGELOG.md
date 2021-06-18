@@ -8,6 +8,9 @@
 - Limit filenames to only be lowercase, underscore and digits
 - Fixed parsing of migrate and rollback amount
 - Added Docker image
+- Improved output for migration, rollback and seeding
+- Added NessieError to give clearity to the errors origin
+- Removed fallback of config file to root
 
 ## Version 1.3.2 - 2021-05-17
 

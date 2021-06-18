@@ -7,6 +7,7 @@ import {
   dirname,
   format,
   resolve,
+  yellow,
 } from "./deps.ts";
 import {
   DB_CLIENTS,
@@ -25,6 +26,7 @@ import {
 } from "./types.ts";
 import { getConfigTemplate } from "./cli/templates.ts";
 import { isFileUrl, isMigrationFile } from "./cli/utils.ts";
+import { NessieError } from "./cli/errors.ts";
 
 // deno-lint-ignore no-explicit-any
 type TCliffyAction<T extends unknown[] = any[]> = CliffyIAction<
@@ -41,10 +43,7 @@ const cli = async () => {
     .name("Nessie Migrations")
     .version(VERSION)
     .description("A database migration tool for Deno.")
-    .option("-d, --debug [debug:boolean]", "Enables verbose output", {
-      global: true,
-      default: false,
-    })
+    .option("-d, --debug", "Enables verbose output", { global: true })
     .option(
       "-c, --config <config:string>",
       "Path to config file.",
@@ -57,7 +56,7 @@ const cli = async () => {
       {
         value: (value: string): string => {
           if (!["config", "folders"].includes(value)) {
-            throw new Error(
+            throw new NessieError(
               `Mode must be one of 'config' or 'folders', but got '${value}'.`,
             );
           }
@@ -71,7 +70,7 @@ const cli = async () => {
       {
         value: (value: string): string => {
           if (!(value in DB_CLIENTS)) {
-            throw new Error(
+            throw new NessieError(
               `Mode must be one of '${DB_DIALECTS.PGSQL}', '${DB_DIALECTS.MYSQL}' or '${DB_DIALECTS.SQLITE}', but got '${value}'.`,
             );
           }
@@ -238,7 +237,17 @@ const run = async () => {
 
     Deno.exit();
   } catch (e) {
-    console.error(e);
+    if (e instanceof NessieError) {
+      console.error(e);
+    } else {
+      console.error(
+        e,
+        "\n",
+        yellow(
+          "This error is most likely unrelated to Nessie, and is probably related to the client, the connection config or the query you are trying to execute.",
+        ),
+      );
+    }
     Deno.exit(1);
   }
 };

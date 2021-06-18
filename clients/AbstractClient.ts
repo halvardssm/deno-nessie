@@ -18,6 +18,7 @@ import { AbstractSeed, AbstractSeedProps } from "../wrappers/AbstractSeed.ts";
 import { COL_FILE_NAME, TABLE_MIGRATIONS } from "../consts.ts";
 import { green } from "../deps.ts";
 import { getDurationFromTimestamp } from "../cli/utils.ts";
+import { NessieError } from "../cli/errors.ts";
 
 /** The abstract client which handles most of the logic related to database communication. */
 export abstract class AbstractClient<Client> {
@@ -139,7 +140,7 @@ export abstract class AbstractClient<Client> {
         .find((migrationFile) => migrationFile.name === fileName);
 
       if (!file) {
-        throw new Error(`Migration file '${fileName}' is not found`);
+        throw new NessieError(`Migration file '${fileName}' is not found`);
       }
 
       console.info(`Rolling back ${file.name}`);

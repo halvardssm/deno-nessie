@@ -55,7 +55,7 @@ export interface NessieConfig {
   */
   additionalSeedFiles?: string[];
   /** Enables verbose output for debugging */
-  debug?: boolean;
+  debug: boolean;
 }
 
 export interface AbstractClientOptions<Client> {
@@ -69,7 +69,7 @@ export type FileEntryT = {
 
 export type CommandOptions = {
   debug: boolean;
-  config?: string;
+  config: string;
 };
 
 export interface CommandOptionsInit extends CommandOptions {
