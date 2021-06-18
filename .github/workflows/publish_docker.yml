@@ -27,7 +27,7 @@ jobs:
 
       - name: Get tags
         run: |
-          IMAGE_TAGS=$(deno run helpers/get_image_tags.ts)
+          IMAGE_TAGS=$(deno run --allow-run helpers/get_image_tags.ts)
           echo "IMAGE_TAGS=$IMAGE_TAGS"
 
       - name: Build and push
