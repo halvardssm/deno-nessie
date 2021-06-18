@@ -55,7 +55,7 @@ export interface NessieConfig {
   */
   additionalSeedFiles?: string[];
   /** Enables verbose output for debugging */
-  debug: boolean;
+  debug?: boolean;
 }
 
 export interface AbstractClientOptions<Client> {

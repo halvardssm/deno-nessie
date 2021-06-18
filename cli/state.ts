@@ -4,9 +4,16 @@ import {
   CliffyToggle,
   exists,
   format,
+  fromFileUrl,
   resolve,
 } from "../deps.ts";
-import { arrayIsUnique, getLogger, isMigrationFile, isUrl } from "./utils.ts";
+import {
+  arrayIsUnique,
+  getLogger,
+  isFileUrl,
+  isMigrationFile,
+  isUrl,
+} from "./utils.ts";
 import type {
   CommandOptions,
   FileEntryT,
@@ -66,7 +73,7 @@ export class State {
       ? options.config
       : "file://" + resolve(Deno.cwd(), options.config);
 
-    if (!await exists(path)) {
+    if (!isFileUrl(path) && !(await exists(fromFileUrl(path)))) {
       throw new NessieError(`Config file is not found at ${path}`);
     }
 
