@@ -54,7 +54,7 @@ async function getCurrentTag() {
 
   processTags.close();
 
-  return result;
+  return result.trim();
 }
 
 async function generateTagsArray() {
@@ -69,21 +69,27 @@ async function generateTagsArray() {
 
   const outputArray = [`${IMAGE}:${current}`];
 
-  if (
-    REG_EXP_VERSION_STABLE.test(current) && semver.gte(current, latestStable)
-  ) {
-    outputArray.push(`${IMAGE}:latest`);
+  try {
+    if (
+      REG_EXP_VERSION_STABLE.test(current) && semver.gte(current, latestStable)
+    ) {
+      outputArray.push(`${IMAGE}:latest`);
+    }
+
+    if (semver.gte(current, latestNext)) {
+      outputArray.push(`${IMAGE}:next`);
+    }
+
+    const result = outputArray.join(",");
+
+    const encoder = new TextEncoder();
+
+    await Deno.stdout.write(encoder.encode(result + "\n"));
+  } catch (e) {
+    console.log({ current, latestStable, latestNext, outputArray });
+    console.error(e);
+    Deno.exit(1);
   }
-
-  if (semver.gte(current, latestNext)) {
-    outputArray.push(`${IMAGE}:next`);
-  }
-
-  const result = outputArray.join(",");
-
-  const encoder = new TextEncoder();
-
-  await Deno.stdout.write(encoder.encode(result));
 }
 
 await generateTagsArray();
