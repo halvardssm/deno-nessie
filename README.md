@@ -86,6 +86,10 @@ Nessie is available through:
   deno run -A --unstable https://deno.land/x/nessie/cli.ts init --mode folders
 
   deno run -A --unstable https://deno.land/x/nessie/cli.ts init --mode config --dialect pg
+
+  deno run -A --unstable https://deno.land/x/nessie/cli.ts init --mode config --dialect sqlite
+
+  deno run -A --unstable https://deno.land/x/nessie/cli.ts init --mode config --dialect mysql
   ```
 
 - `make:migration [name]` & `make [name]`: Create migration, `name` has to be
