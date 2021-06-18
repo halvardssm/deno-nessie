@@ -3,8 +3,8 @@ DB_MYSQL_PORT=5001
 DB_USER=root
 DB_PWD=pwd
 DB_NAME=nessie
-NESSIE_VERSION=2.0.0-rc4
-DENO_VERSION=1.10.3
+NESSIE_VERSION=2.0.0-rc5
+DENO_VERSION=1.11.1
 DOCKER_IMAGE=halvardm/nessie
 
 test_all: test_fmt test_unit db_all_restart test_integration_cli db_all_restart test_integration_update_timestamps image_build image_test_clean image_test image_test_clean
@@ -80,4 +80,4 @@ image_run:
 
 bump_%: # version number and deno version separated by `:` e.g. 1.2.3:1.2.3
 	deno run --allow-read --allow-write helpers/prepare_release.ts $*
-	deno fmt
+	deno fmt --ignore=coverage

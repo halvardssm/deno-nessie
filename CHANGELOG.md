@@ -2,8 +2,10 @@
 
 ## Version 2.0.0 - Unreleased
 
-- Deno v1.10.3
-- Cliffy v0.19.1
+- Deno v1.11.1
+- Deno std v0.99.0
+- Cliffy v0.19.2
+- MySQL v2.9.0
 - Added Coverage reporting
 - Limit filenames to only be lowercase, underscore and digits
 - Fixed parsing of migrate and rollback amount
