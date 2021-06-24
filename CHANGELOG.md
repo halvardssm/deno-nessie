@@ -1,6 +1,6 @@
 # Nessie Change Log
 
-## Version 2.0.0 - Unreleased
+## Version 2.0.0 - 2021-06-24
 
 - Deno v1.11.2
 - Deno std v0.99.0
