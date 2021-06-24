@@ -1,9 +1,9 @@
 {
-  "$schema": "https://x.nest.land/eggs@0.3.6/src/schema.json",
+  "$schema": "https://x.nest.land/eggs@0.3.8/src/schema.json",
   "name": "Nessie",
   "description": "A modular database migration module for Deno.",
-  "version": "2.0.0-rc5",
-  "stable": false,
+  "version": "2.0.0",
+  "stable": true,
   "repository": "https://github.com/halvardssm/deno-nessie",
   "files": [
     "./*.ts",
@@ -12,12 +12,11 @@
     "./wrappers/**/*",
     "./README.md"
   ],
-  "check": false,
+  "checkAll": false,
   "checkFormat": false,
   "checkTests": false,
   "checkInstallation": false,
   "entry": "./mod.ts",
-  "homepage": "https://github.com/halvardssm/deno-nessie",
   "ignore": [],
   "unlisted": false
 }

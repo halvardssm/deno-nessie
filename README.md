@@ -44,10 +44,8 @@
 
 <p align="center"><img src="./.github/logo.png" alt="Nessie logo" width="200" height="200"></p>
 
-🚨 **Version 2.0.0 is soon to be released**: Follow the release candidates to try
-out the new features, assist with finding bugs, and give feedback! V2.0.0
-(unstable) is available on the branch
-[v2](https://github.com/halvardssm/deno-nessie/tree/v2) until release.
+🎉 **Version 2 is released**: To migrate from version 1 follow the steps in the
+[migration section](#migrate-from-version-1) bellow.
 
 > If you would like to see your DB flavor supported, take a look at how to make
 > a client plugin with examples in the [clients folder](./clients) or in the
@@ -343,3 +341,34 @@ seed the database. Handles the `run` method in seed files.
 
 `close`: Will be the last method run before the program is finished. This should
 close the database connection.
+
+See the existing examples in the [clients](./clients) folder for reference.
+
+## Migrate from version 1
+
+If you are migrating from version 1, and starting from scratch is not an option,
+there are a couple of steps to perform. If you have any questions regarding the
+steps, please open a new discussion (not an issue).
+
+> ⚠️ The contributors of Nessie takes no responsibility for any dataloss which
+> might occur, so make sure to back up all existing data in your databases
+> before migrating and test it locally before executing any changes to your
+> production environment.
+
+1. Back up existing data
+2. Update the `nessie.config.ts` file to the new syntax (see the
+   [examples](./examples) folder)
+3. (Skip this step if you already updated the timestamps) Run the
+   `update_timestamps` command from the CLI to update the migration file names
+   and database entries (only the `nessie_migrations` table). Use the latest
+   version of Nessie e.g.
+
+   ```shell
+   deno run -A --unstable https://deno.land/x/nessie@2.0.0/cli.ts update_timestamps
+   ```
+4. Update all imports of Nessie to the latest version in your migration and seed
+   files
+5. Update the migration and seed files to use the new format (class based
+   migration files)
+
+If you come across any issues, you can open a new discussion on GitHub.
