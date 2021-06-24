@@ -2,7 +2,7 @@
 
 ## Version 2.0.0 - Unreleased
 
-- Deno v1.11.1
+- Deno v1.11.2
 - Deno std v0.99.0
 - Cliffy v0.19.2
 - MySQL v2.9.0
@@ -13,6 +13,13 @@
 - Improved output for migration, rollback and seeding
 - Added NessieError to give clearity to the errors origin
 - Removed fallback of config file to root
+- Templates are now strings and will no longer be fetched from remote
+- Fixed test
+  - Added unit tests
+  - Moved existing tests to integration test folder
+- Updated CLI options and commands
+- Renamed sqlite3 to sqlite
+- Changed badges to for-the-badge style
 
 ## Version 1.3.2 - 2021-05-17
 
