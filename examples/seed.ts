@@ -1,5 +1,10 @@
-import { Seed } from "https://deno.land/x/nessie/mod.ts";
-
-export const run: Seed = () => {
-  return "INSERT INTO table1 VALUES (1234)";
-};
+import {
+  AbstractSeed,
+  ClientPostgreSQL,
+  Info,
+} from "https://deno.land/x/nessie/mod.ts";
+export default class extends AbstractSeed<ClientPostgreSQL> {
+  async run({ dialect }: Info): Promise<void> {
+    await this.client.queryArray("INSERT INTO table1 VALUES (1234)");
+  }
+}

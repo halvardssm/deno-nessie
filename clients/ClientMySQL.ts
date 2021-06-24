@@ -1,9 +1,8 @@
-import { Client, ClientConfig } from "https://deno.land/x/mysql@v2.8.0/mod.ts";
+import { MySQLClient, MySQLClientOptions } from "../deps.ts";
 import { AbstractClient } from "./AbstractClient.ts";
 import type {
   AmountMigrateT,
   AmountRollbackT,
-  ClientOptions,
   DBDialects,
   QueryT,
 } from "../types.ts";
@@ -13,10 +12,13 @@ import {
   MAX_FILE_NAME_LENGTH,
   TABLE_MIGRATIONS,
 } from "../consts.ts";
+import { NessieError } from "../cli/errors.ts";
+
+export type { MySQLClientOptions };
 
 /** MySQL client */
-export class ClientMySQL extends AbstractClient<Client> {
-  #clientOptions: ClientConfig;
+export class ClientMySQL extends AbstractClient<MySQLClient> {
+  #clientOptions: MySQLClientOptions;
   dialect: DBDialects = "mysql";
 
   #QUERY_TRANSACTION_START = `START TRANSACTION;`;
@@ -32,14 +34,8 @@ export class ClientMySQL extends AbstractClient<Client> {
   #QUERY_UPDATE_TIMESTAMPS =
     `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = CONCAT(FROM_UNIXTIME(CAST(substring_index(${COL_FILE_NAME}, '-', 1) AS SIGNED) / 1000, '%Y%m%d%H%i%S'), substring(file_name, instr( file_name,'-'))) WHERE CAST(substring_index(${COL_FILE_NAME}, '-', 1) AS SIGNED) < 1672531200000;`;
 
-  constructor(
-    options: ClientOptions,
-    connectionOptions: ClientConfig,
-  ) {
-    super({
-      ...options,
-      client: new Client(),
-    });
+  constructor(connectionOptions: MySQLClientOptions) {
+    super({ client: new MySQLClient() });
     this.#clientOptions = connectionOptions;
   }
 
@@ -92,7 +88,7 @@ export class ClientMySQL extends AbstractClient<Client> {
         if (e?.message === "Query was empty") {
           ra.push(undefined);
         } else {
-          throw new Error(query + "\n" + e + "\n" + ra.join("\n"));
+          throw new NessieError(query + "\n" + e + "\n" + ra.join("\n"));
         }
       }
     }
@@ -128,6 +124,6 @@ export class ClientMySQL extends AbstractClient<Client> {
   }
 
   async seed(matcher?: string) {
-    await this._seed(matcher, this.query.bind(this));
+    await this._seed(matcher);
   }
 }

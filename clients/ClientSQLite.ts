@@ -1,10 +1,8 @@
-import { DB } from "https://deno.land/x/sqlite@v2.4.0/mod.ts";
+import { SQLiteClient } from "../deps.ts";
 import { AbstractClient } from "./AbstractClient.ts";
-import { resolve } from "../deps.ts";
 import type {
   AmountMigrateT,
   AmountRollbackT,
-  ClientOptions,
   DBDialects,
   QueryT,
 } from "../types.ts";
@@ -14,10 +12,13 @@ import {
   MAX_FILE_NAME_LENGTH,
   TABLE_MIGRATIONS,
 } from "../consts.ts";
+import { NessieError } from "../cli/errors.ts";
+
+export type SQLiteClientOptions = string | undefined;
 
 /** SQLite client */
-export class ClientSQLite extends AbstractClient<DB> {
-  dialect: DBDialects = "sqlite3";
+export class ClientSQLite extends AbstractClient<SQLiteClient> {
+  dialect: DBDialects = "sqlite";
 
   #QUERY_TRANSACTION_START = `BEGIN TRANSACTION;`;
   #QUERY_TRANSACTION_COMMIT = `COMMIT;`;
@@ -32,11 +33,8 @@ export class ClientSQLite extends AbstractClient<DB> {
   #QUERY_UPDATE_TIMESTAMPS =
     `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = strftime('%Y%m%d%H%M%S', CAST(substr(${COL_FILE_NAME}, 0, instr(${COL_FILE_NAME}, '-')) AS INTEGER) / 1000, 'unixepoch') || substr(${COL_FILE_NAME}, instr(${COL_FILE_NAME}, '-')) WHERE CAST(substr(${COL_FILE_NAME}, 0, instr(${COL_FILE_NAME}, '-')) AS INTEGER) < 1672531200000;`;
 
-  constructor(options: ClientOptions, connectionOptions: string) {
-    super({
-      ...options,
-      client: new DB(resolve(connectionOptions)),
-    });
+  constructor(connectionOptions?: string) {
+    super({ client: new SQLiteClient(connectionOptions) });
   }
 
   async prepare() {
@@ -81,7 +79,7 @@ export class ClientSQLite extends AbstractClient<DB> {
         if (e?.message === "Query was empty") {
           ra.push(undefined);
         } else {
-          throw new Error(query + "\n" + e + "\n" + ra.join("\n"));
+          throw new NessieError(query + "\n" + e + "\n" + ra.join("\n"));
         }
       }
     }
@@ -114,6 +112,6 @@ export class ClientSQLite extends AbstractClient<DB> {
   }
 
   async seed(matcher?: string) {
-    await this._seed(matcher, this.query.bind(this));
+    await this._seed(matcher);
   }
 }

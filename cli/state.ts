@@ -1,136 +1,298 @@
-import { CliffySelect, exists, format } from "../deps.ts";
-import { isUrl, parsePath } from "./utils.ts";
-import type { CommandOptions, NessieConfig } from "../types.ts";
 import {
-  DEFAULT_CONFIG_FILE,
-  MAX_FILE_NAME_LENGTH,
-  URL_TEMPLATE_BASE,
+  basename,
+  CliffySelect,
+  CliffyToggle,
+  exists,
+  format,
+  fromFileUrl,
+  resolve,
+} from "../deps.ts";
+import {
+  arrayIsUnique,
+  getLogger,
+  isFileUrl,
+  isMigrationFile,
+  isUrl,
+} from "./utils.ts";
+import type {
+  CommandOptions,
+  FileEntryT,
+  LoggerFn,
+  NessieConfig,
+  StateOptions,
+} from "../types.ts";
+import {
+  DEFAULT_MIGRATION_FOLDER,
+  DEFAULT_SEED_FOLDER,
+  REGEXP_FILE_NAME,
 } from "../consts.ts";
+import { getMigrationTemplate, getSeedTemplate } from "./templates.ts";
+import { NessieError } from "./errors.ts";
 
 /** The main state for the application.
  *
  * Contains the client, and handles the communication to the database.
  */
 export class State {
-  private readonly enableDebug: boolean;
-  private readonly configFile: string;
-  private config?: NessieConfig;
-  client?: NessieConfig["client"];
+  readonly #config: NessieConfig;
+  readonly #migrationFolders: string[];
+  readonly #seedFolders: string[];
+  readonly #migrationFiles: FileEntryT[];
+  readonly #seedFiles: FileEntryT[];
+  client: NessieConfig["client"];
 
-  constructor(options: CommandOptions) {
-    this.enableDebug = !!options.debug;
-    this.configFile = parsePath(options.config || DEFAULT_CONFIG_FILE);
+  logger: LoggerFn = () => {};
 
-    this.logger([this.enableDebug, this.configFile], "State");
+  constructor(options: StateOptions) {
+    this.#config = options.config;
+    this.#migrationFolders = options.migrationFolders;
+    this.#seedFolders = options.seedFolders;
+    this.#migrationFiles = options.migrationFiles;
+    this.#seedFiles = options.seedFiles;
+
+    if (options.debug || this.#config.debug) {
+      this.logger = getLogger();
+    }
+
+    this.client = options.config.client;
+    this.client.setLogger(this.logger);
+
+    this.logger({
+      migrationFolders: this.#migrationFolders,
+      seedFolders: this.#seedFolders,
+      migrationFiles: this.#migrationFiles,
+      seedFiles: this.#seedFiles,
+    }, "State");
   }
 
   /** Initializes the state with a client */
-  async init() {
-    this.logger("Checking config path");
+  static async init(options: CommandOptions) {
+    if (options.debug) console.log("Checking config path");
 
-    if (isUrl(this.configFile) || exists(this.configFile)) {
-      const configRaw = await import(this.configFile);
-      this.config = configRaw.default;
-    } else if (
-      isUrl(parsePath(DEFAULT_CONFIG_FILE)) ||
-      exists(parsePath(DEFAULT_CONFIG_FILE))
+    const path = isUrl(options.config)
+      ? options.config
+      : "file://" + resolve(Deno.cwd(), options.config);
+
+    if (!isFileUrl(path) && !(await exists(fromFileUrl(path)))) {
+      throw new NessieError(`Config file is not found at ${path}`);
+    }
+
+    const configRaw = await import(path);
+    const config: NessieConfig = configRaw.default;
+
+    if (!config.client) {
+      throw new NessieError("Client is not valid");
+    }
+
+    const { migrationFolders, seedFolders } = this
+      ._parseMigrationAndSeedFolders(config);
+    const { migrationFiles, seedFiles } = this._parseMigrationAndSeedFiles(
+      config,
+      migrationFolders,
+      seedFolders,
+    );
+
+    config.client.migrationFiles = migrationFiles;
+    config.client.seedFiles = seedFiles;
+
+    return new State({
+      config,
+      debug: options.debug,
+      migrationFolders,
+      migrationFiles,
+      seedFolders,
+      seedFiles,
+    });
+  }
+
+  /** Parses and sets the migrationFolders and seedFolders */
+  private static _parseMigrationAndSeedFolders(options: NessieConfig) {
+    const migrationFolders: string[] = [];
+    const seedFolders: string[] = [];
+
+    if (
+      options.migrationFolders && !arrayIsUnique(options.migrationFolders)
     ) {
-      this.logger("Checking project root");
-
-      const configRaw = await import(parsePath(DEFAULT_CONFIG_FILE));
-      this.config = configRaw.default;
-    } else {
-      throw new Error("Config file is not found");
+      throw new NessieError(
+        "Entries for the migration folders has to be unique",
+      );
     }
 
-    this.client = this.config!.client;
-
-    this.client.setLogger(this.logger.bind(this));
-
-    if (this.config?.experimental) {
-      this.client?.isExperimental?.();
+    if (options.seedFolders && !arrayIsUnique(options.seedFolders)) {
+      throw new NessieError("Entries for the seed folders has to be unique");
     }
 
-    return this;
+    options.migrationFolders?.forEach((folder) => {
+      migrationFolders.push(resolve(Deno.cwd(), folder));
+    });
+
+    if (
+      migrationFolders.length < 1 &&
+      options.additionalMigrationFiles === undefined
+    ) {
+      migrationFolders.push(resolve(Deno.cwd(), DEFAULT_MIGRATION_FOLDER));
+    }
+
+    if (!arrayIsUnique(migrationFolders)) {
+      throw new NessieError(
+        "Entries for the resolved migration folders has to be unique",
+      );
+    }
+
+    options.seedFolders?.forEach((folder) => {
+      seedFolders.push(resolve(Deno.cwd(), folder));
+    });
+
+    if (seedFolders.length < 1 && options.additionalSeedFiles === undefined) {
+      seedFolders.push(resolve(Deno.cwd(), DEFAULT_SEED_FOLDER));
+    }
+
+    if (!arrayIsUnique(seedFolders)) {
+      throw new NessieError(
+        "Entries for the resolved seed folders has to be unique",
+      );
+    }
+    return { migrationFolders, seedFolders };
+  }
+
+  /** Parses and sets the migrationFiles and seedFiles */
+  private static _parseMigrationAndSeedFiles(
+    options: NessieConfig,
+    migrationFolders: string[],
+    seedFolders: string[],
+  ) {
+    const migrationFiles: FileEntryT[] = [];
+    const seedFiles: FileEntryT[] = [];
+
+    migrationFolders.forEach((folder) => {
+      const filesRaw: FileEntryT[] = Array.from(Deno.readDirSync(folder))
+        .filter((file) => file.isFile && isMigrationFile(file.name))
+        .map((file) => ({
+          name: file.name,
+          path: "file://" + resolve(folder, file.name),
+        }));
+
+      migrationFiles.push(...filesRaw);
+    });
+
+    options.additionalMigrationFiles?.forEach((file) => {
+      const path = isUrl(file) ? file : "file://" + resolve(Deno.cwd(), file);
+
+      const fileName = basename(path);
+
+      if (isMigrationFile(fileName)) {
+        migrationFiles.push({
+          name: fileName,
+          path,
+        });
+      }
+    });
+
+    if (!arrayIsUnique(migrationFiles.map((file) => file.name))) {
+      throw new NessieError(
+        "Entries for the migration files has to be unique",
+      );
+    }
+
+    migrationFiles.sort((a, b) => parseInt(a.name) - parseInt(b.name));
+
+    seedFolders.forEach((folder) => {
+      const filesRaw = Array.from(Deno.readDirSync(folder))
+        .filter((file) => file.isFile)
+        .map((file) => ({
+          name: file.name,
+          path: "file://" + resolve(folder, file.name),
+        }));
+
+      seedFiles.push(...filesRaw);
+    });
+
+    options.additionalSeedFiles?.forEach((file) => {
+      const path = isUrl(file) ? file : "file://" + resolve(Deno.cwd(), file);
+
+      const fileName = basename(path);
+
+      seedFiles.push({
+        name: fileName,
+        path,
+      });
+    });
+
+    if (!arrayIsUnique(seedFiles.map((file) => file.name))) {
+      throw new NessieError(
+        "Entries for the resolved seed files has to be unique",
+      );
+    }
+
+    seedFiles.sort((a, b) => a.name.localeCompare(b.name));
+
+    return { migrationFiles, seedFiles };
   }
 
   /** Makes the migration */
   async makeMigration(migrationName = "migration") {
-    if (migrationName.includes(" ")) {
-      throw new Error("Migration name cannot include spaces ` `");
+    if (!REGEXP_FILE_NAME.test(migrationName) || migrationName.length >= 80) {
+      throw new NessieError(
+        "Migration name has to be snakecase and only include a-z (all lowercase) and 1-9",
+      );
     }
 
-    let prefix;
+    const prefix = format(new Date(), "yyyyMMddHHmmss");
 
-    if (this.config!.useDateTime) {
-      const timestamp = new Date();
-      prefix = format(timestamp, "yyyyMMddHHmmss");
-    } else {
-      prefix = Date.now();
-    }
+    const fileName = `${prefix}_${migrationName}.ts`;
 
-    const fileName = `${prefix}-${migrationName}.ts`;
+    this.logger(fileName, "Migration file name");
 
-    if (fileName.length > MAX_FILE_NAME_LENGTH) {
-      throw new Error("Migration name can't be longer than 80 characters");
-    } else {
-      this.logger(fileName, "Migration file name");
+    if (!isMigrationFile(fileName)) {
+      throw new NessieError(`Migration name '${fileName}' is not valid`);
     }
 
     const selectedFolder = await this._folderPrompt(
-      this.client!.migrationFolders,
+      this.#migrationFolders.filter((folder) => !isUrl(folder)),
     );
 
-    await Deno.mkdir(selectedFolder, { recursive: true });
+    const template = getMigrationTemplate(this.client.dialect);
 
-    const responseFile = await fetch(URL_TEMPLATE_BASE + "/migration.ts");
+    const filePath = resolve(selectedFolder, fileName);
 
-    await Deno.writeTextFile(
-      `${selectedFolder}/${fileName}`,
-      await responseFile.text(),
-    );
+    if (await exists(filePath)) {
+      const overwrite = await this._fileExistsPrompt(filePath);
+      if (!overwrite) return;
+    }
 
-    console.info(
-      `Created migration ${fileName} at ${selectedFolder}`,
-    );
+    await Deno.writeTextFile(filePath, template);
+
+    console.info(`Created migration ${filePath}`);
   }
 
   /** Makes the seed */
   async makeSeed(seedName = "seed") {
-    const fileName = `${seedName}.ts`;
-    if (this.client?.seedFiles.find((el) => el.name === seedName)) {
-      console.info(`Seed with name '${seedName}' already exists.`);
+    if (!REGEXP_FILE_NAME.test(seedName)) {
+      throw new NessieError(
+        "Seed name has to be snakecase and only include a-z (all lowercase) and 1-9",
+      );
     }
+
+    const fileName = `${seedName}.ts`;
 
     this.logger(fileName, "Seed file name");
 
-    const selectedFolder = await this._folderPrompt(this.client!.seedFolders);
-
-    await Deno.mkdir(selectedFolder, { recursive: true });
-
-    const responseFile = await fetch(URL_TEMPLATE_BASE + "seed.ts");
-
-    await Deno.writeTextFile(
-      `${selectedFolder}/${fileName}`,
-      await responseFile.text(),
+    const selectedFolder = await this._folderPrompt(
+      this.#seedFolders.filter((folder) => !isUrl(folder)),
     );
 
-    console.info(
-      `Created seed ${fileName} at ${selectedFolder}`,
-    );
-  }
+    const template = getSeedTemplate(this.client.dialect);
 
-  /** A logger to use throughout the application, outputs when the debugger is enabled */
-  // deno-lint-ignore no-explicit-any
-  logger(output?: any, title?: string): void {
-    try {
-      if (this.enableDebug) {
-        title ? console.log(title + ": ") : null;
-        console.log(output);
-      }
-    } catch {
-      console.error("Error at: " + title);
+    const filePath = resolve(selectedFolder, fileName);
+
+    if (await exists(filePath)) {
+      const overwrite = await this._fileExistsPrompt(filePath);
+      if (!overwrite) return;
     }
+
+    await Deno.writeTextFile(filePath, template);
+
+    console.info(`Created seed ${fileName} at ${selectedFolder}`);
   }
 
   private async _folderPrompt(folders: string[]) {
@@ -152,5 +314,15 @@ export class State {
     this.logger(promptSelection, "Prompt input final");
 
     return folders[promptSelection];
+  }
+
+  private async _fileExistsPrompt(file: string): Promise<boolean> {
+    const result: boolean = await CliffyToggle.prompt(
+      `The file ${file} already exists, do you want to overwrite the existing file?`,
+    );
+
+    this.logger(result, "Toggle selection");
+
+    return result;
   }
 }

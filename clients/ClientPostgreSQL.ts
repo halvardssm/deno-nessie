@@ -1,12 +1,8 @@
-import {
-  Client,
-  ConnectionOptions,
-} from "https://deno.land/x/postgres@v0.11.2/mod.ts";
+import { PostgreSQLClient, PostgreSQLClientOptions } from "../deps.ts";
 import { AbstractClient } from "./AbstractClient.ts";
 import type {
   AmountMigrateT,
   AmountRollbackT,
-  ClientOptions,
   DBDialects,
   QueryT,
 } from "../types.ts";
@@ -16,11 +12,12 @@ import {
   MAX_FILE_NAME_LENGTH,
   TABLE_MIGRATIONS,
 } from "../consts.ts";
+import { NessieError } from "../cli/errors.ts";
 
-export type { ConnectionOptions };
+export type { PostgreSQLClientOptions };
 
 /** PostgreSQL client */
-export class ClientPostgreSQL extends AbstractClient<Client> {
+export class ClientPostgreSQL extends AbstractClient<PostgreSQLClient> {
   dialect: DBDialects = "pg";
 
   #QUERY_TRANSACTION_START = `BEGIN TRANSACTION;`;
@@ -35,14 +32,8 @@ export class ClientPostgreSQL extends AbstractClient<Client> {
   #QUERY_UPDATE_TIMESTAMPS =
     `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = to_char(to_timestamp(CAST(SPLIT_PART(${COL_FILE_NAME}, '-', 1) AS BIGINT) / 1000), 'yyyymmddHH24MISS') || '-' || SPLIT_PART(${COL_FILE_NAME}, '-', 2) WHERE CAST(SPLIT_PART(${COL_FILE_NAME}, '-', 1) AS BIGINT) < 1672531200000;`;
 
-  constructor(
-    options: ClientOptions,
-    connectionOptions: ConnectionOptions,
-  ) {
-    super({
-      ...options,
-      client: new Client(connectionOptions),
-    });
+  constructor(connectionOptions: PostgreSQLClientOptions) {
+    super({ client: new PostgreSQLClient(connectionOptions) });
   }
 
   async prepare() {
@@ -90,7 +81,7 @@ export class ClientPostgreSQL extends AbstractClient<Client> {
       try {
         ra.push(await this.client.queryArray(qs));
       } catch (e) {
-        throw new Error(query + "\n" + e + "\n" + ra.join("\n"));
+        throw new NessieError(query + "\n" + e + "\n" + ra.join("\n"));
       }
     }
 
@@ -121,6 +112,6 @@ export class ClientPostgreSQL extends AbstractClient<Client> {
   }
 
   async seed(matcher?: string) {
-    await this._seed(matcher, this.query.bind(this));
+    await this._seed(matcher);
   }
 }
