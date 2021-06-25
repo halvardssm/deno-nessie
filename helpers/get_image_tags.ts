@@ -9,8 +9,6 @@ async function getTags() {
       "tag",
       "--sort",
       "-version:refname",
-      "--merged",
-      "main",
     ],
     stdout: "piped",
   });
