@@ -33,8 +33,8 @@ body:
       required: true
   - type: textarea
     attributes:
-      label: Reproducing steps
-      description: Describe the bug
+      label: Steps to reproduce
+      description: Add steps to reproduce the issue
       placeholder: |
         Steps to reproduce the behavior:
 

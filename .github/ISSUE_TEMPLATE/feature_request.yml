@@ -5,6 +5,7 @@ labels: [idea]
 body:
   - type: textarea
     attributes:
-      label: Your idea
+      label: The Idea
+      description: Add your idea, and be as descriptive as possible.
     validations:
       required: true
