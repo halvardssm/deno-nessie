@@ -7,21 +7,21 @@ body:
     attributes:
       label: Operating System
       description: What operating system are you using?
-      placeholder: Example: macOS Big Sur 11.4
+      placeholder: macOS Big Sur 11.4
     validations:
       required: true
   - type: input
     attributes:
       label: Deno version
       description: What version of Deno are you using?
-      placeholder: Example: 1.0.0
+      placeholder: 1.0.0
     validations:
       required: true
   - type: input
     attributes:
       label: Nessie version
       description: What version of Nessie are you using?
-      placeholder: Example: 2.0.0
+      placeholder: 2.0.0
     validations:
       required: true
   - type: textarea
