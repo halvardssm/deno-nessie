@@ -5,7 +5,9 @@ import {
   CliffyHelpCommand,
   CliffyIAction,
   dirname,
+  exists,
   format,
+  green,
   resolve,
   yellow,
 } from "./deps.ts";
@@ -16,6 +18,7 @@ import {
   DEFAULT_MIGRATION_FOLDER,
   DEFAULT_SEED_FOLDER,
   REGEXP_MIGRATION_FILE_NAME_LEGACY,
+  SPONSOR_NOTICE,
   VERSION,
 } from "./consts.ts";
 import {
@@ -46,7 +49,7 @@ const cli = async () => {
   await new CliffyCommand<void, [], CommandOptions>()
     .name("Nessie Migrations")
     .version(VERSION)
-    .description("A database migration tool for Deno.")
+    .description("A database migration tool for Deno.\n" + SPONSOR_NOTICE)
     .option("-d, --debug", "Enables verbose output", { global: true })
     .option(
       "-c, --config <config:string>",
@@ -148,24 +151,53 @@ const initNessie: TCliffyAction<any[], CommandOptionsInit> = async (
   const template = getConfigTemplate(options.dialect);
 
   if (options.mode !== "folders") {
-    await Deno.writeTextFile(
-      resolve(Deno.cwd(), DEFAULT_CONFIG_FILE),
-      template,
-    );
+    const filePath = resolve(Deno.cwd(), DEFAULT_CONFIG_FILE);
+    const fileExists = await exists(filePath);
+
+    if (fileExists) {
+      console.info(green("Config file already exists"));
+    } else {
+      await Deno.writeTextFile(
+        filePath,
+        template,
+      );
+
+      console.info(green("Created config file"));
+    }
   }
 
   if (options.mode !== "config") {
-    await Deno.mkdir(resolve(Deno.cwd(), DEFAULT_MIGRATION_FOLDER), {
-      recursive: true,
-    });
-    await Deno.mkdir(resolve(Deno.cwd(), DEFAULT_SEED_FOLDER), {
-      recursive: true,
-    });
-    await Deno.create(
-      resolve(Deno.cwd(), DEFAULT_MIGRATION_FOLDER, ".gitkeep"),
+    const migrationFolderExists = await exists(
+      resolve(Deno.cwd(), DEFAULT_MIGRATION_FOLDER),
     );
-    await Deno.create(resolve(Deno.cwd(), DEFAULT_SEED_FOLDER, ".gitkeep"));
+    const seedFolderExists = await exists(
+      resolve(Deno.cwd(), DEFAULT_SEED_FOLDER),
+    );
+
+    if (migrationFolderExists) {
+      console.info(green("Migration folder already exists"));
+    } else {
+      await Deno.mkdir(resolve(Deno.cwd(), DEFAULT_MIGRATION_FOLDER), {
+        recursive: true,
+      });
+      await Deno.create(
+        resolve(Deno.cwd(), DEFAULT_MIGRATION_FOLDER, ".gitkeep"),
+      );
+      console.info(green("Created migration folder"));
+    }
+
+    if (seedFolderExists) {
+      console.info(green("Seed folder already exists"));
+    } else {
+      await Deno.mkdir(resolve(Deno.cwd(), DEFAULT_SEED_FOLDER), {
+        recursive: true,
+      });
+      await Deno.create(resolve(Deno.cwd(), DEFAULT_SEED_FOLDER, ".gitkeep"));
+      console.info(green("Created seed folder"));
+    }
   }
+
+  console.info(SPONSOR_NOTICE);
 };
 
 const makeMigration: TCliffyAction = async (

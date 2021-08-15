@@ -13,7 +13,11 @@ export {
 } from "https://deno.land/std@0.104.0/testing/asserts.ts";
 export { exists } from "https://deno.land/std@0.104.0/fs/mod.ts";
 export { format } from "https://deno.land/std@0.104.0/datetime/mod.ts";
-export { green, yellow } from "https://deno.land/std@0.104.0/fmt/colors.ts";
+export {
+  bold,
+  green,
+  yellow,
+} from "https://deno.land/std@0.104.0/fmt/colors.ts";
 
 /** Cliffy */
 export {
