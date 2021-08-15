@@ -1,8 +1,13 @@
-import { assert, assertEquals, fromFileUrl, resolve } from "../../../deps.ts";
+import {
+  assert,
+  assertEquals,
+  fromFileUrl,
+  MySQLClient,
+  PostgreSQLClient,
+  resolve,
+  SQLiteClient,
+} from "../../../deps.ts";
 import { TABLE_MIGRATIONS } from "../../../consts.ts";
-import { Client as MySQL } from "https://deno.land/x/mysql@v2.8.0/mod.ts";
-import { Client as PostgreSQL } from "https://deno.land/x/postgres@v0.11.2/mod.ts";
-import { DB as SQLite } from "https://deno.land/x/sqlite@v2.3.0/mod.ts";
 
 const emptyMigration =
   `import { AbstractMigration, Info } from "../../../mod.ts";
@@ -151,16 +156,16 @@ for await (const dialect of DIALECTS) {
       let migrationFilesDb: string[];
 
       if (dialect === DIALECT_PG) {
-        client = new PostgreSQL(dbConnection);
+        client = new PostgreSQLClient(dbConnection);
         await client.connect();
         const { rows: migrationFilesDbRaw } = await client.queryObject(
           `SELECT * FROM ${TABLE_MIGRATIONS}`,
         );
         await client.end();
         migrationFilesDb = migrationFilesDbRaw
-          .map((el) => el.file_name as string);
+          .map((el: any) => el.file_name as string);
       } else if (dialect === DIALECT_MYSQL) {
-        client = new MySQL();
+        client = new MySQLClient();
         await client.connect(dbConnection);
         const migrationFilesDbRaw = await client.query(
           `SELECT * FROM ${TABLE_MIGRATIONS}`,
@@ -168,7 +173,7 @@ for await (const dialect of DIALECTS) {
         await client.close();
         migrationFilesDb = migrationFilesDbRaw.map((el: any) => el.file_name);
       } else {
-        client = new SQLite(dbConnection);
+        client = new SQLiteClient(dbConnection);
         const migrationFilesDbRaw = [...client.query(
           `SELECT * FROM ${TABLE_MIGRATIONS}`,
         )];

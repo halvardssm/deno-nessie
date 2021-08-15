@@ -23,18 +23,22 @@ import {
   AmountRollbackT,
   CommandOptions,
   CommandOptionsInit,
+  CommandOptionsStatus,
 } from "./types.ts";
 import { getConfigTemplate } from "./cli/templates.ts";
 import { isFileUrl, isMigrationFile } from "./cli/utils.ts";
 import { NessieError } from "./cli/errors.ts";
 
-// deno-lint-ignore no-explicit-any
-type TCliffyAction<T extends unknown[] = any[]> = CliffyIAction<
+type TCliffyAction<
+  // deno-lint-ignore no-explicit-any
+  T extends unknown[] = any[],
+  O extends CommandOptions = CommandOptions,
+> = CliffyIAction<
   void,
   T,
   void,
-  CommandOptions,
-  CliffyCommand<void, [], CommandOptions, void, undefined>
+  O,
+  CliffyCommand<void, [], O, void, undefined>
 >;
 
 /** Initializes CliffyCommand */
@@ -110,13 +114,37 @@ const cli = async () => {
       "Update the timestamp format from milliseconds to timestamp. This command should be run inside of the folder where you store your migrations. Will only update timestams where the value is less than 1672531200000 (2023-01-01) so that the timestamps won't be updated multiple times.",
     )
     .action(updateTimestamps)
+    .command(
+      "status",
+      "Outputs the status of Nessie. Will output detailed information about current state of the migrations.",
+    )
+    .action(status)
+    .option(
+      "--output <output:string>",
+      `Sets the output format, can be one of 'log' or 'json'.`,
+      {
+        default: "log",
+        value: (value: string): string => {
+          if (!["log", "json"].includes(value)) {
+            throw new NessieError(
+              `Output must be one of 'log' or 'json', but got '${value}'.`,
+            );
+          }
+          return value;
+        },
+      },
+    )
+    .option("--file-names", "Adds filenames to output")
     .command("completions", new CliffyCompletionsCommand())
     .command("help", new CliffyHelpCommand())
     .parse(Deno.args);
 };
 
 /** Initializes Nessie */
-const initNessie: TCliffyAction = async (options: CommandOptionsInit) => {
+// deno-lint-ignore no-explicit-any
+const initNessie: TCliffyAction<any[], CommandOptionsInit> = async (
+  options,
+) => {
   const template = getConfigTemplate(options.dialect);
 
   if (options.mode !== "folders") {
@@ -141,7 +169,7 @@ const initNessie: TCliffyAction = async (options: CommandOptionsInit) => {
 };
 
 const makeMigration: TCliffyAction = async (
-  options: CommandOptions,
+  options,
   fileName: string,
 ) => {
   const state = await State.init(options);
@@ -149,7 +177,7 @@ const makeMigration: TCliffyAction = async (
 };
 
 const makeSeed: TCliffyAction = async (
-  options: CommandOptions,
+  options,
   fileName: string,
 ) => {
   const state = await State.init(options);
@@ -157,7 +185,7 @@ const makeSeed: TCliffyAction = async (
 };
 
 const seed: TCliffyAction = async (
-  options: CommandOptions,
+  options,
   matcher: string | undefined,
 ) => {
   const state = await State.init(options);
@@ -167,7 +195,7 @@ const seed: TCliffyAction = async (
 };
 
 const migrate: TCliffyAction = async (
-  options: CommandOptions,
+  options,
   amount: AmountMigrateT,
 ) => {
   const state = await State.init(options);
@@ -177,7 +205,7 @@ const migrate: TCliffyAction = async (
 };
 
 const rollback: TCliffyAction = async (
-  options: CommandOptions,
+  options,
   amount: AmountRollbackT,
 ) => {
   const state = await State.init(options);
@@ -186,9 +214,7 @@ const rollback: TCliffyAction = async (
   await state.client.close();
 };
 
-const updateTimestamps: TCliffyAction = async (
-  options: CommandOptions,
-) => {
+const updateTimestamps: TCliffyAction = async (options) => {
   const state = await State.init(options);
   await state.client.prepare();
   await state.client.updateTimestamps();
@@ -228,6 +254,66 @@ const updateTimestamps: TCliffyAction = async (
     .join("\n");
 
   console.info(output);
+};
+
+// deno-lint-ignore no-explicit-any
+const status: TCliffyAction<any[], CommandOptionsStatus> = async (options) => {
+  const state = await State.init(options);
+  await state.client.prepare();
+  const allCompletedMigrations = await state.client.getAll();
+  await state.client.close();
+
+  const newAvailableMigrations = state.client.migrationFiles
+    .filter((el) => !allCompletedMigrations.includes(el.name));
+
+  // deno-lint-ignore no-explicit-any
+  const outputJson: Record<string, any> = {
+    totalAvailableMigrationFiles: state.client.migrationFiles.length,
+    completedMigrations: allCompletedMigrations.length,
+    newAvailableMigrations: newAvailableMigrations.length,
+  };
+
+  if (options.fileNames) {
+    outputJson.totalAvailableMigrationFileNames = state.client.migrationFiles
+      .map((el) => el.name);
+    outputJson.completedMigrationNames = allCompletedMigrations;
+    outputJson.newAvailableMigrationNames = state.client.migrationFiles
+      .map((el) => el.name);
+  }
+
+  switch (options.output) {
+    case "json":
+      console.info(JSON.stringify(outputJson, undefined, 0));
+      break;
+    case "log":
+    default:
+      {
+        let output = "Status\n\n";
+        const tabbedLines = (str: string) => {
+          output += `\t${str}\n`;
+        };
+
+        output +=
+          `totalAvailableMigrationFiles: ${outputJson.totalAvailableMigrationFiles}\n`;
+        if (options.fileNames) {
+          outputJson.totalAvailableMigrationFileNames.forEach(tabbedLines);
+        }
+
+        output += `completedMigrations: ${outputJson.completedMigrations}\n`;
+        if (options.fileNames) {
+          outputJson.completedMigrationNames.forEach(tabbedLines);
+        }
+
+        output +=
+          `newAvailableMigrations: ${outputJson.newAvailableMigrations}\n`;
+        if (options.fileNames) {
+          outputJson.newAvailableMigrationNames.forEach(tabbedLines);
+        }
+
+        console.info(output);
+      }
+      break;
+  }
 };
 
 /** Main application */

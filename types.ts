@@ -77,6 +77,11 @@ export interface CommandOptionsInit extends CommandOptions {
   dialect?: DB_DIALECTS;
 }
 
+export interface CommandOptionsStatus extends CommandOptions {
+  fileNames?: boolean;
+  output?: "log" | "json";
+}
+
 export interface StateOptions {
   debug: boolean;
   config: NessieConfig;

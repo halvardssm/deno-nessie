@@ -1,5 +1,15 @@
 # Nessie Change Log
 
+## Unreleased
+
+- Deno v1.13.0
+- Deno std v0.104.0
+- Cliffy v0.19.5
+- MySQL v2.10.0
+- PostgreSQL v0.11.3
+- SQLite v3.0.0
+- Added status command
+
 ## Version 2.0.0 - 2021-06-24
 
 - Deno v1.11.2

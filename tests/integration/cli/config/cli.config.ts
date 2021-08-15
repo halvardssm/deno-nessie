@@ -1,6 +1,7 @@
 export const TYPE_MIGRATE = "migrate";
 export const TYPE_ROLLBACK = "rollback";
 export const TYPE_SEED = "seed";
+export const TYPE_STATUS = "status";
 
 export const DIALECT_PG = "pg";
 export const DIALECT_MYSQL = "mysql";
