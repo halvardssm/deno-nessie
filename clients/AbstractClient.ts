@@ -268,4 +268,6 @@ export abstract class AbstractClient<Client> {
   /** Universal wrapper for db query execution */
   // deno-lint-ignore no-explicit-any
   abstract query(query: QueryT): Promise<any>;
+  /** Gets all entries from the migration table */
+  abstract getAll(): Promise<string[]>;
 }

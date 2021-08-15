@@ -140,6 +140,37 @@ Nessie is available through:
   deno run -A --unstable https://deno.land/x/nessie/cli.ts seed ".+.ts"
   ```
 
+- `status`: Outputs the status of Nessie. Will output detailed information about
+  current state of the migrations. Includes two flags: `--output` and
+  `--file-names`.
+
+  `--output` sets the output format and can be one of `log` or `json`. If not
+  set, `log` is chosen by default. If result is used programatically, chose
+  `json` as the format of `log` can change with every patch version, while the
+  format of `json` will be considered more stable.
+
+  `--file-names` adds the file names to each of the outputs.
+
+  ```shell
+  deno run -A --unstable https://deno.land/x/nessie/cli.ts status
+  totalAvailableMigrationFiles: 1
+  completedMigrations: 0
+  newAvailableMigrations: 1
+
+  deno run -A --unstable https://deno.land/x/nessie/cli.ts status --output json
+  {"totalAvailableMigrationFiles":1,"completedMigrations":0,"newAvailableMigrations":1}
+
+  deno run -A --unstable https://deno.land/x/nessie/cli.ts status --file-names
+  totalAvailableMigrationFiles: 1
+    20210508115213_test1.ts
+  completedMigrations: 0
+  newAvailableMigrations: 1
+    20210508115213_test1.ts
+
+  deno run -A --unstable https://deno.land/x/nessie/cli.ts status --file-names --output json
+  {"totalAvailableMigrationFiles":1,"completedMigrations":0,"newAvailableMigrations":1,"totalAvailableMigrationFileNames":["20210508115213_test1.ts"],"completedMigrationNames":[],"newAvailableMigrationNames":["20210508115213_test1.ts"]}
+  ```
+
 - `update_timestamps`: Update timestamps - will update timestamps to the new
   format. Will only update timestamps where the value is less than 1672531200000
   (2023-01-01) so that the timestamps won't be updated multiple times.

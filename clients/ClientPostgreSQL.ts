@@ -102,16 +102,26 @@ export class ClientPostgreSQL extends AbstractClient<PostgreSQLClient> {
   }
 
   async rollback(amount: AmountRollbackT) {
-    const allMigrations = await this.client.queryArray(this.QUERY_GET_ALL);
+    const allMigrations = await this.getAll();
 
     await this._rollback(
       amount,
-      allMigrations.rows?.map((el) => el?.[0]) as string[],
+      allMigrations,
       this.query.bind(this),
     );
   }
 
   async seed(matcher?: string) {
     await this._seed(matcher);
+  }
+
+  async getAll() {
+    const allMigrations = await this.client.queryArray<[string]>(
+      this.QUERY_GET_ALL,
+    );
+
+    const parsedMigrations: string[] = allMigrations.rows?.map((el) => el?.[0]);
+
+    return parsedMigrations;
   }
 }

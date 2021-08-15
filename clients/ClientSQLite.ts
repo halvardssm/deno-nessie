@@ -94,9 +94,10 @@ export class ClientSQLite extends AbstractClient<SQLiteClient> {
 
   async migrate(amount: AmountMigrateT) {
     const latestMigration = await this.query(this.QUERY_GET_LATEST);
+
     await this._migrate(
       amount,
-      latestMigration?.[0]?.[0]?.[0],
+      latestMigration?.[0]?.[0]?.[0] as string,
       this.query.bind(this),
     );
   }
@@ -106,12 +107,20 @@ export class ClientSQLite extends AbstractClient<SQLiteClient> {
 
     await this._rollback(
       amount,
-      allMigrations?.[0]?.flatMap((el) => el?.[0]),
+      allMigrations?.[0]?.flatMap((el) => el?.[0] as string),
       this.query.bind(this),
     );
   }
 
   async seed(matcher?: string) {
     await this._seed(matcher);
+  }
+
+  async getAll() {
+    const allMigrations = await this.query(this.QUERY_GET_ALL);
+    const parsedMigrations = allMigrations?.[0]
+      ?.flatMap((el) => el?.[0]) as string[];
+
+    return parsedMigrations;
   }
 }

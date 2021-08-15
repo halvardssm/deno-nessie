@@ -110,20 +110,25 @@ export class ClientMySQL extends AbstractClient<MySQLClient> {
   }
 
   async rollback(amount: AmountRollbackT) {
-    const allMigrations = await this.query(this.QUERY_GET_ALL);
-
-    const parsedMigrations: string[] = allMigrations?.[0].map((
-      el: Record<string, string>,
-    ) => el?.[COL_FILE_NAME]);
+    const allMigrations = await this.getAll();
 
     await this._rollback(
       amount,
-      parsedMigrations,
+      allMigrations,
       this.query.bind(this),
     );
   }
 
   async seed(matcher?: string) {
     await this._seed(matcher);
+  }
+
+  async getAll() {
+    const allMigrations = await this.query(this.QUERY_GET_ALL);
+
+    const parsedMigrations: string[] = allMigrations?.[0]
+      .map((el: Record<string, string>) => el?.[COL_FILE_NAME]);
+
+    return parsedMigrations;
   }
 }
