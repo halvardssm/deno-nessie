@@ -44,6 +44,11 @@
 
 <p align="center"><img src="./.github/logo.png" alt="Nessie logo" width="200" height="200"></p>
 
+**Call for donations**: If you are using Nessie commercially, please consider
+supporting the future development. See
+[this issue](https://github.com/halvardssm/deno-nessie/issues/130) for more
+information.
+
 🎉 **Version 2 is released**: To migrate from version 1 follow the steps in the
 [migration section](#migrate-from-version-1) bellow.
 

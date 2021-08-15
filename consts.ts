@@ -1,4 +1,12 @@
+import { bold, yellow } from "./deps.ts";
+
 export const VERSION = "2.0.0";
+
+export const SPONSOR_NOTICE = bold(
+  yellow(
+    "If you are using Nessie commercially, please consider supporting the future development.\nGive a donation here: https://github.com/halvardssm/deno-nessie",
+  ),
+);
 
 export const URL_BASE = `https://deno.land/x/nessie`;
 export const URL_BASE_VERSIONED = `${URL_BASE}@${VERSION}`;
