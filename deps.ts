@@ -36,8 +36,8 @@ export type { ClientConfig as MySQLClientOptions } from "https://deno.land/x/mys
 /** PostgreSQL */
 export {
   Client as PostgreSQLClient,
-} from "https://deno.land/x/postgres@0.11.3/mod.ts";
-export type { ConnectionOptions as PostgreSQLClientOptions } from "https://deno.land/x/postgres@0.11.3/mod.ts";
+} from "https://deno.land/x/postgres@v0.12.0/mod.ts";
+export type { ClientOptions as PostgreSQLClientOptions } from "https://deno.land/x/postgres@v0.12.0/mod.ts";
 
 /** SQLite */
-export { DB as SQLiteClient } from "https://deno.land/x/sqlite@v3.0.0/mod.ts";
+export { DB as SQLiteClient } from "https://deno.land/x/sqlite@v3.1.1/mod.ts";
