@@ -33,8 +33,8 @@ export class ClientSQLite extends AbstractClient<SQLiteClient> {
   #QUERY_UPDATE_TIMESTAMPS =
     `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = strftime('%Y%m%d%H%M%S', CAST(substr(${COL_FILE_NAME}, 0, instr(${COL_FILE_NAME}, '-')) AS INTEGER) / 1000, 'unixepoch') || substr(${COL_FILE_NAME}, instr(${COL_FILE_NAME}, '-')) WHERE CAST(substr(${COL_FILE_NAME}, 0, instr(${COL_FILE_NAME}, '-')) AS INTEGER) < 1672531200000;`;
 
-  constructor(connectionOptions?: string) {
-    super({ client: new SQLiteClient(connectionOptions) });
+  constructor(...params: ConstructorParameters<typeof SQLiteClient>) {
+    super({ client: new SQLiteClient(...params) });
   }
 
   async prepare() {
