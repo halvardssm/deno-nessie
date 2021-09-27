@@ -1,4 +1,4 @@
-import { MySQLClient, MySQLClientOptions } from "../deps.ts";
+import { MySQLClient } from "../deps.ts";
 import { AbstractClient } from "./AbstractClient.ts";
 import type {
   AmountMigrateT,
@@ -14,7 +14,7 @@ import {
 } from "../consts.ts";
 import { NessieError } from "../cli/errors.ts";
 
-export type { MySQLClientOptions };
+export type MySQLClientOptions = Parameters<MySQLClient["connect"]>;
 
 /** MySQL client */
 export class ClientMySQL extends AbstractClient<MySQLClient> {
@@ -34,13 +34,13 @@ export class ClientMySQL extends AbstractClient<MySQLClient> {
   #QUERY_UPDATE_TIMESTAMPS =
     `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = CONCAT(FROM_UNIXTIME(CAST(substring_index(${COL_FILE_NAME}, '-', 1) AS SIGNED) / 1000, '%Y%m%d%H%i%S'), substring(file_name, instr( file_name,'-'))) WHERE CAST(substring_index(${COL_FILE_NAME}, '-', 1) AS SIGNED) < 1672531200000;`;
 
-  constructor(connectionOptions: MySQLClientOptions) {
+  constructor(...connectionOptions: MySQLClientOptions) {
     super({ client: new MySQLClient() });
     this.#clientOptions = connectionOptions;
   }
 
   async prepare() {
-    await this.client.connect(this.#clientOptions);
+    await this.client.connect(...this.#clientOptions);
     const queryResult = await this.query(this.#QUERY_MIGRATION_TABLE_EXISTS);
 
     const migrationTableExists = queryResult?.[0]?.length > 0;
@@ -52,7 +52,7 @@ export class ClientMySQL extends AbstractClient<MySQLClient> {
   }
 
   async updateTimestamps() {
-    await this.client.connect(this.#clientOptions);
+    await this.client.connect(...this.#clientOptions);
     const queryResult = await this.query(this.#QUERY_MIGRATION_TABLE_EXISTS);
 
     const migrationTableExists = queryResult?.[0]?.length > 0;

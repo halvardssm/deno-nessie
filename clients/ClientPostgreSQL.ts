@@ -1,4 +1,4 @@
-import { PostgreSQLClient, PostgreSQLClientOptions } from "../deps.ts";
+import { PostgreSQLClient } from "../deps.ts";
 import { AbstractClient } from "./AbstractClient.ts";
 import type {
   AmountMigrateT,
@@ -14,7 +14,9 @@ import {
 } from "../consts.ts";
 import { NessieError } from "../cli/errors.ts";
 
-export type { PostgreSQLClientOptions };
+export type PostgreSQLClientOptions = ConstructorParameters<
+  typeof PostgreSQLClient
+>;
 
 /** PostgreSQL client */
 export class ClientPostgreSQL extends AbstractClient<PostgreSQLClient> {
@@ -32,7 +34,7 @@ export class ClientPostgreSQL extends AbstractClient<PostgreSQLClient> {
   #QUERY_UPDATE_TIMESTAMPS =
     `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = to_char(to_timestamp(CAST(SPLIT_PART(${COL_FILE_NAME}, '-', 1) AS BIGINT) / 1000), 'yyyymmddHH24MISS') || '-' || SPLIT_PART(${COL_FILE_NAME}, '-', 2) WHERE CAST(SPLIT_PART(${COL_FILE_NAME}, '-', 1) AS BIGINT) < 1672531200000;`;
 
-  constructor(...params: ConstructorParameters<typeof PostgreSQLClient>) {
+  constructor(...params: PostgreSQLClientOptions) {
     super({ client: new PostgreSQLClient(...params) });
   }
 
