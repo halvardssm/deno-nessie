@@ -32,8 +32,8 @@ export class ClientPostgreSQL extends AbstractClient<PostgreSQLClient> {
   #QUERY_UPDATE_TIMESTAMPS =
     `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = to_char(to_timestamp(CAST(SPLIT_PART(${COL_FILE_NAME}, '-', 1) AS BIGINT) / 1000), 'yyyymmddHH24MISS') || '-' || SPLIT_PART(${COL_FILE_NAME}, '-', 2) WHERE CAST(SPLIT_PART(${COL_FILE_NAME}, '-', 1) AS BIGINT) < 1672531200000;`;
 
-  constructor(connectionOptions: PostgreSQLClientOptions) {
-    super({ client: new PostgreSQLClient(connectionOptions) });
+  constructor(...params: ConstructorParameters<typeof PostgreSQLClient>) {
+    super({ client: new PostgreSQLClient(...params) });
   }
 
   async prepare() {
