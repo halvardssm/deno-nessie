@@ -37,22 +37,22 @@ export interface NessieConfig {
    */
   migrationFolders?: string[];
   /**
-  * The folders where seed files are located.
-  * Can be a relative path or an absolute path.
-  * Defaults to ['./db/seeds/'] if additionalSeedFiles is not populated
-  */
+   * The folders where seed files are located.
+   * Can be a relative path or an absolute path.
+   * Defaults to ['./db/seeds/'] if additionalSeedFiles is not populated
+   */
   seedFolders?: string[];
   /**
-  * Additional migration files which will be added to the
-  * list to parse when running the migrate or rollback command.
-  * Can be any format supported by `import()` e.g. url or path
-  */
+   * Additional migration files which will be added to the
+   * list to parse when running the migrate or rollback command.
+   * Can be any format supported by `import()` e.g. url or path
+   */
   additionalMigrationFiles?: string[];
   /**
-  * Additional seed files which will be added to the list to
-  * match against when running the seed command.
-  * Can be any format supported by `import()` e.g. url or path
-  */
+   * Additional seed files which will be added to the list to
+   * match against when running the seed command.
+   * Can be any format supported by `import()` e.g. url or path
+   */
   additionalSeedFiles?: string[];
   /** Enables verbose output for debugging */
   debug?: boolean;

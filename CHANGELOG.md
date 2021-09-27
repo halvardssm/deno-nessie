@@ -1,5 +1,13 @@
 # Nessie Change Log
 
+## Next release
+
+- Deno v1.14.1
+- Deno std v0.108.0
+- Cliffy v0.19.6
+- MySQL v2.10.1
+- Improved constructor type for clients
+
 ## Version 2.0.1 - 2021-08-30
 
 - Deno v1.13.2
