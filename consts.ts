@@ -1,6 +1,6 @@
 import { bold, yellow } from "./deps.ts";
 
-export const VERSION = "2.0.1";
+export const VERSION = "2.0.2";
 
 export const SPONSOR_NOTICE = bold(
   yellow(

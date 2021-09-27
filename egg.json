@@ -2,7 +2,7 @@
   "$schema": "https://x.nest.land/eggs@0.3.8/src/schema.json",
   "name": "Nessie",
   "description": "A modular database migration module for Deno.",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "stable": true,
   "repository": "https://github.com/halvardssm/deno-nessie",
   "files": [
