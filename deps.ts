@@ -35,7 +35,7 @@ export { Client as MySQLClient } from "https://deno.land/x/mysql@v2.10.1/mod.ts"
 /** PostgreSQL */
 export {
   Client as PostgreSQLClient,
-} from "https://deno.land/x/postgres@v0.12.0/mod.ts";
+} from "https://deno.land/x/postgres@v0.13.0/mod.ts";
 
 /** SQLite */
 export { DB as SQLiteClient } from "https://deno.land/x/sqlite@v3.1.1/mod.ts";
