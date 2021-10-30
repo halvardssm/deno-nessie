@@ -59,29 +59,49 @@ information.
 > See documentation for the
 > [clients](https://doc.deno.land/https/deno.land/x/nessie/mod.ts).
 
-Nessie is available through:
+> Even though all examples in this readme applies unversioned usage, you should
+> always use a version when using Nessie.
+
+---
+
+## Contents
+
+- [Available Via](#available-via)
+- [CLI Usage](#cli-usage)
+- [Docker Usage](#docker-usage)
+- [Contributing](#contributing)
+- [Uses](#uses)
+- [Examples](#examples)
+- [How to Make a Client](#how-to-make-a-client)
+- [Migrate from Version 1](#migrate-from-version-1)
+
+## Available Via
 
 - https://deno.land/x/nessie
 - https://raw.githubusercontent.com/halvardssm/deno-nessie
 - https://nest.land/package/Nessie
 - https://hub.docker.com/repository/docker/halvardm/nessie
 
-> Even though all examples in this readme applies unversioned usage, you should
-> always use a version when using Nessie.
-
 ## CLI Usage
+
+> It is suggested you restrict the permissions Nessie has as much as possible,
+> to only the permissions its needs. An example of this is:
+>
+> ```shell
+> deno install --unstable --allow-net=<db hostname/ip>:<db port> --allow-read=. --allow-write=nessie.config.ts,db -f  https://deno.land/x/nessie/cli.ts
+> ```
 
 - `init`: Generates a `nessie.config.ts` file and also the `db` folder where
   migration and seed files will be placed. Two options are available: `--mode`
   and `--dialect`.
 
-  `--mode` can be one of `config` or `folders`. If mode is not set, it will
-  create a `nessie.config.ts` file and the `db` folder structure, otherwise it
-  will create the selected one.
+  - `--mode` can be one of `config` or `folders`. If mode is not set, it will
+    create a `nessie.config.ts` file and the `db` folder structure, otherwise it
+    will create the selected one.
 
-  `--dialect` is used for the config file and can be one of `pg`, `mysql` or
-  `sqlite`. If not set, it will create a general config file including all three
-  dialects, otherwise it will include only the selected one.
+  - `--dialect` is used for the config file and can be one of `pg`, `mysql` or
+    `sqlite`. If not set, it will create a general config file including all
+    three dialects, otherwise it will include only the selected one.
 
   ```shell
   deno run -A --unstable https://deno.land/x/nessie/cli.ts init
