@@ -84,16 +84,13 @@ information.
 
 ## CLI Usage
 
-It is suggested you restrict the permissions Nessie has as much as possible, to only the permissions its needs. An example of this is:
+> It is suggested you restrict the permissions Nessie has as much as possible, to only the permissions its needs. An example of this is:
+>
+> ```shell
+> deno install --unstable --allow-net=<db hostname/ip>:<db port> --allow-read=. --allow-write=nessie.config.ts,db -f  https://deno.land/x/nessie/cli.ts
+> ```
 
-If using `init` via 
-```shell
-deno install --unstable --allow-net=<db hostname/ip>:<db port> --allow-read=. --allow-write=nessie.config.ts,db -f  https://deno.land/x/nessie/cli.ts
-```
-
-- `init`
-
-  `init` generates a `nessie.config.ts` file and also the `db` folder where
+- `init`: Generates a `nessie.config.ts` file and also the `db` folder where
     migration and seed files will be placed. Two options are available: `--mode`
     and `--dialect`.
 
@@ -105,17 +102,17 @@ deno install --unstable --allow-net=<db hostname/ip>:<db port> --allow-read=. --
   `sqlite`. If not set, it will create a general config file including all three
   dialects, otherwise it will include only the selected one.
 
-    ```shell
-    deno run -A --unstable https://deno.land/x/nessie/cli.ts init
+  ```shell
+  deno run -A --unstable https://deno.land/x/nessie/cli.ts init
 
-    deno run -A --unstable https://deno.land/x/nessie/cli.ts init --mode folders
+  deno run -A --unstable https://deno.land/x/nessie/cli.ts init --mode folders
 
-    deno run -A --unstable https://deno.land/x/nessie/cli.ts init --mode config --dialect pg
+  deno run -A --unstable https://deno.land/x/nessie/cli.ts init --mode config --dialect pg
 
-    deno run -A --unstable https://deno.land/x/nessie/cli.ts init --mode config --dialect sqlite
+  deno run -A --unstable https://deno.land/x/nessie/cli.ts init --mode config --dialect sqlite
 
-    deno run -A --unstable https://deno.land/x/nessie/cli.ts init --mode config --dialect mysql
-    ```
+  deno run -A --unstable https://deno.land/x/nessie/cli.ts init --mode config --dialect mysql
+  ```
 
 - `make:migration [name]` & `make [name]`: Create migration, `name` has to be
   snake- and lowercase, it can also include numbers.
