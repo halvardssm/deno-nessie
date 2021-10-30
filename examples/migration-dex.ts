@@ -26,8 +26,10 @@ export default class extends AbstractMigration<ClientPostgreSQL> {
 
     for await (const row of res.rows) {
       this.client.queryArray(
-        `update test set file_name = ${row.file_name +
-          "_some_suffix"} where id = ${row.id}`,
+        `update test set file_name = ${
+          row.file_name +
+          "_some_suffix"
+        } where id = ${row.id}`,
       );
     }
   }
