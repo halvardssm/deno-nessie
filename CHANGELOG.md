@@ -1,10 +1,11 @@
 # Nessie Change Log
 
-## Version Next
+## Version 2.0.3 - 2021-10-30
 
 - Deno v1.15.3
 - Deno std v0.113.0
 - Cliffy v0.20.0
+- Improved readme
 
 ## Version 2.0.2 - 2021-09-28
 
