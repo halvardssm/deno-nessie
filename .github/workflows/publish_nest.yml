@@ -2,7 +2,7 @@ name: Publish Egg
 
 env:
   DENO_VERSION: 1.15.3
-  NEST_VERSION: 0.3.8
+  NEST_VERSION: 0.3.9
 
 on:
   release:
