@@ -1,6 +1,6 @@
 # Nessie Change Log
 
-## Next
+## Version 2.0.4 - 2021-10-31
 
 - Added support for custom seed and migration templates
 
