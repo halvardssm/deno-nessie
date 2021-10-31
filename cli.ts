@@ -210,6 +210,7 @@ const initNessie: TCliffyAction<any[], CommandOptionsInit> = async (
   console.info(SPONSOR_NOTICE);
 };
 
+// deno-lint-ignore no-explicit-any
 const makeMigration: TCliffyAction<any[], CommandOptionsMakeMigration> = async (
   options,
   fileName: string,
@@ -218,6 +219,7 @@ const makeMigration: TCliffyAction<any[], CommandOptionsMakeMigration> = async (
   await state.makeMigration(fileName);
 };
 
+// deno-lint-ignore no-explicit-any
 const makeSeed: TCliffyAction<any[], CommandOptionsMakeSeed> = async (
   options,
   fileName: string,
