@@ -58,6 +58,16 @@ const cli = async () => {
       "Path to config file.",
       { global: true, default: `./${DEFAULT_CONFIG_FILE}` },
     )
+    .option(
+      "--seedTemplate <template:string>",
+      "Path or URL to a custom seed template. Only used together with the make commands.",
+      { global: true },
+    )
+    .option(
+      "--migrationTemplate <template:string>",
+      "Path or URL to a custom migration template. Only used together with the make commands.",
+      { global: true },
+    )
     .command("init", "Generates the config file.")
     .option(
       "--mode <mode:string>",
@@ -93,18 +103,10 @@ const cli = async () => {
       "Creates a migration file with the name. Allows lower snake case and digits e.g. `some_migration_1`.",
     )
     .alias("make")
-    .option(
-      "--template <migrationTemplate:string>",
-      "Path or URL to a custom migration template.",
-    )
     .action(makeMigration)
     .command(
       "make:seed <fileName:string>",
       "Creates a seed file with the name. Allows lower snake case and digits e.g. `some_seed_1`.",
-    )
-    .option(
-      "--template <seedTemplate:string>",
-      "Path or URL to a custom seed template.",
     )
     .action(makeSeed)
     .command(
