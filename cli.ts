@@ -26,6 +26,8 @@ import {
   AmountRollbackT,
   CommandOptions,
   CommandOptionsInit,
+  CommandOptionsMakeMigration,
+  CommandOptionsMakeSeed,
   CommandOptionsStatus,
 } from "./types.ts";
 import { getConfigTemplate } from "./cli/templates.ts";
@@ -91,10 +93,18 @@ const cli = async () => {
       "Creates a migration file with the name. Allows lower snake case and digits e.g. `some_migration_1`.",
     )
     .alias("make")
+    .option(
+      "--template <migrationTemplate:string>",
+      "Path or URL to a custom migration template.",
+    )
     .action(makeMigration)
     .command(
       "make:seed <fileName:string>",
       "Creates a seed file with the name. Allows lower snake case and digits e.g. `some_seed_1`.",
+    )
+    .option(
+      "--template <seedTemplate:string>",
+      "Path or URL to a custom seed template.",
     )
     .action(makeSeed)
     .command(
@@ -200,7 +210,7 @@ const initNessie: TCliffyAction<any[], CommandOptionsInit> = async (
   console.info(SPONSOR_NOTICE);
 };
 
-const makeMigration: TCliffyAction = async (
+const makeMigration: TCliffyAction<any[], CommandOptionsMakeMigration> = async (
   options,
   fileName: string,
 ) => {
@@ -208,7 +218,7 @@ const makeMigration: TCliffyAction = async (
   await state.makeMigration(fileName);
 };
 
-const makeSeed: TCliffyAction = async (
+const makeSeed: TCliffyAction<any[], CommandOptionsMakeSeed> = async (
   options,
   fileName: string,
 ) => {
@@ -370,4 +380,4 @@ const run = async () => {
   }
 };
 
-run();
+await run();

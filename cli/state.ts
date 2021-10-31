@@ -15,7 +15,7 @@ import {
   isUrl,
 } from "./utils.ts";
 import type {
-  CommandOptions,
+  AllCommandOptions,
   FileEntryT,
   LoggerFn,
   NessieConfig,
@@ -66,7 +66,7 @@ export class State {
   }
 
   /** Initializes the state with a client */
-  static async init(options: CommandOptions) {
+  static async init(options: AllCommandOptions) {
     if (options.debug) console.log("Checking config path");
 
     const path = isUrl(options.config)
@@ -94,6 +94,13 @@ export class State {
 
     config.client.migrationFiles = migrationFiles;
     config.client.seedFiles = seedFiles;
+
+    if (options.migrationTemplate) {
+      config.migrationTemplate = options.migrationTemplate;
+    }
+    if (options.seedTemplate) {
+      config.seedTemplate = options.seedTemplate;
+    }
 
     return new State({
       config,
@@ -251,7 +258,9 @@ export class State {
       this.#migrationFolders.filter((folder) => !isUrl(folder)),
     );
 
-    const template = getMigrationTemplate(this.client.dialect);
+    const template = this.#config.migrationTemplate
+      ? await Deno.readTextFile(this.#config.migrationTemplate)
+      : getMigrationTemplate(this.client.dialect);
 
     const filePath = resolve(selectedFolder, fileName);
 
@@ -281,7 +290,9 @@ export class State {
       this.#seedFolders.filter((folder) => !isUrl(folder)),
     );
 
-    const template = getSeedTemplate(this.client.dialect);
+    const template = this.#config.seedTemplate
+      ? await Deno.readTextFile(this.#config.seedTemplate)
+      : getSeedTemplate(this.client.dialect);
 
     const filePath = resolve(selectedFolder, fileName);
 
