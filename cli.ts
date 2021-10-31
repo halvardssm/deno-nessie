@@ -52,7 +52,7 @@ const cli = async () => {
     .name("Nessie Migrations")
     .version(VERSION)
     .description("A database migration tool for Deno.\n" + SPONSOR_NOTICE)
-    .option("-d, --debug", "Enables verbose output", { global: true })
+    .option("-d, --debug", "Enables verbose output.", { global: true })
     .option(
       "-c, --config <config:string>",
       "Path to config file.",
@@ -60,12 +60,12 @@ const cli = async () => {
     )
     .option(
       "--seedTemplate <template:string>",
-      "Path or URL to a custom seed template. Only used together with the make commands.",
+      "Path or URL to a custom seed template. Only used together with the `make` commands.",
       { global: true },
     )
     .option(
       "--migrationTemplate <template:string>",
-      "Path or URL to a custom migration template. Only used together with the make commands.",
+      "Path or URL to a custom migration template. Only used together with the `make` commands.",
       { global: true },
     )
     .command("init", "Generates the config file.")

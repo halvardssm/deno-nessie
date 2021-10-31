@@ -116,19 +116,29 @@ information.
   ```
 
 - `make:migration [name]` & `make [name]`: Create migration, `name` has to be
-  snake- and lowercase, it can also include numbers.
+  snake- and lowercase, it can also include numbers. You can also provide the
+  flag `--migrationTemplate <template path or url>` or use the
+  `migrationTemplate` property in the config file to tell Nessie which template
+  to use when generating a new migration.
 
   ```shell
   deno run -A --unstable https://deno.land/x/nessie/cli.ts make:migration create_users
 
   deno run -A --unstable https://deno.land/x/nessie/cli.ts make create_users
+
+  deno run -A --unstable https://deno.land/x/nessie/cli.ts make --migrationTemplate some_custom_template create_users
   ```
 
 - `make:seed [name]`: Create seed, `name` has to be snake- and lowercase, it can
-  also include numbers.
+  also include numbers. You can also provide the flag
+  `--seedTemplate <template path or url>` or use the `seedTemplate` property in
+  the config file to tell Nessie which template to use when generating a new
+  migration.
 
   ```shell
   deno run -A --unstable https://deno.land/x/nessie/cli.ts make:seed add_users
+
+  deno run -A --unstable https://deno.land/x/nessie/cli.ts make:seed --seedTemplate some_custom_template add_users
   ```
 
 - `migrate [amount?]`: Run migration - will migrate your migrations in your
@@ -207,7 +217,11 @@ information.
 ### Flags
 
 - `-c, --config`: Path to config file, will default to `./nessie.config.ts`
-- `-d, --debug`: Enables verbose output
+- `-d, --debug`: Enables verbose output.
+- `--migrationTemplate`: Path or URL to a custom migration template. Only used
+  together with the `make` commands.
+- `--seedTemplate`: Path or URL to a custom seed template. Only used together
+  with the `make` commands.
 
 ### Deno flags and Permissions
 
@@ -257,6 +271,10 @@ export interface NessieConfig {
    * Can be any format supported by `import()` e.g. remote url or path
    */
   additionalSeedFiles?: string[];
+  /** Custom migration template, can be path or url. When also using the CLI flag `--migrationTemplate`, it will have precidence. */
+  migrationTemplate?: string;
+  /** Custom seed template, can be path or url. When also using the CLI flag `--seedTemplate`, it will have precidence. */
+  seedTemplate?: string;
   /** Enables verbose output for debugging */
   debug?: boolean;
 }
@@ -270,10 +288,28 @@ example via ftp or using api's like gihub or gitlab. Any input which can be
 given to the dynamic `import()` can be provided.
 
 ```ts
+// nessie.config.ts
 ...
 additionalMigrationFiles: ['https://example.com/some_migration_file.ts'],
+additionalSeedFiles: ['https://example.com/some_seed_file.ts'],
 ...
 ```
+
+See the [example folder](./examples) for more examples.
+
+### Custom Migration or Seed templates
+
+As your project grows, or you are starting to have multiple project but want the
+same logic across the migrations, you might find it tedious to change the seed
+and migration files after creating them. To get around this, you can provide the
+options `migrationTemplate` and `seedTemplate` in the config file, or use the
+corresponding flags from the command line. There are no restrictions to what the
+file has to contain, so you can even provide an empty file if that is your
+preferred starting point.
+
+A general usecase for providing custom templates is in the case that you use a
+custom `AbstractMigration` or `AbstractSeed` class, and want to use this for all
+your future migrations and seeds.
 
 See the [example folder](./examples) for more examples.
 
@@ -329,6 +365,8 @@ const config: NessieConfig = {
   seedFolders: ["./db/seeds"],
   additionalMigrationFiles: [],
   additionalSeedFiles: [],
+  migrationTemplate: undefined,
+  seedTemplate: undefined,
   debug: false,
 };
 
