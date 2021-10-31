@@ -54,6 +54,10 @@ export interface NessieConfig {
    * Can be any format supported by `import()` e.g. url or path
    */
   additionalSeedFiles?: string[];
+  /** Custom migration template, can be path or url. When also using the CLI flag `--migrationTemplate`, it will have precidence. */
+  migrationTemplate?: string;
+  /** Custom seed template, can be path or url. When also using the CLI flag `--seedTemplate`, it will have precidence. */
+  seedTemplate?: string;
   /** Enables verbose output for debugging */
   debug?: boolean;
 }
@@ -81,6 +85,20 @@ export interface CommandOptionsStatus extends CommandOptions {
   fileNames?: boolean;
   output?: "log" | "json";
 }
+
+export interface CommandOptionsMakeSeed extends CommandOptions {
+  seedTemplate?: string;
+}
+
+export interface CommandOptionsMakeMigration extends CommandOptions {
+  migrationTemplate?: string;
+}
+
+export type AllCommandOptions =
+  & CommandOptionsInit
+  & CommandOptionsStatus
+  & CommandOptionsMakeSeed
+  & CommandOptionsMakeMigration;
 
 export interface StateOptions {
   debug: boolean;

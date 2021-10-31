@@ -56,6 +56,8 @@ jobs:
   cli:
     name: Test CLI
     runs-on: ubuntu-latest
+    env:
+      URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
 
     steps:
       - name: Install deno
@@ -65,50 +67,48 @@ jobs:
           
       - name: Nessie Init
         run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --dialect sqlite
-        env:
-          URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
 
       - run: sed -i "s|from \".*\"|from \"https://raw.githubusercontent.com/$URL_PATH/mod.ts\"|" nessie.config.ts && cat nessie.config.ts
-        env:
-          URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
 
       - name: Create migration
         run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make test
-        env:
-          URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
 
       - name: Create migration
         run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make:migration test2
-        env:
-          URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
 
       - name: Create seed
         run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make:seed test
-        env:
-          URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
+
+      - run: echo "test" >> test_template 
+
+      - name: Create migration from custom template
+        run: |
+          deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make:migration --migrationTemplate test_template test_migration_template
+          TEMPLATE_PATH=$(find db/migrations -type f -name "*test_migration_template.ts")
+          TEMPLATE_CONTENT=$(cat $TEMPLATE_PATH)
+          if [[ $TEMPLATE_CONTENT != "test" ]]; then echo "File $TEMPLATE_PATH was not correct, was:\n$TEMPLATE_CONTENT" && exit 1; fi
+
+      - name: Create seed from custom template
+        run: |
+          deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make:seed --seedTemplate test_template test_seed_template
+          TEMPLATE_PATH=$(find db/seeds -type f -name "test_seed_template.ts")
+          TEMPLATE_CONTENT=$(cat $TEMPLATE_PATH)
+          if [[ $TEMPLATE_CONTENT != "test" ]]; then echo "File $TEMPLATE_PATH was not correct, was:\n$TEMPLATE_CONTENT" && exit 1; fi
 
       - name: Clean files and folders
         run: rm -rf db && rm -rf nessie.config.ts
 
       - name: Init with mode and pg
         run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --mode config --dialect pg
-        env:
-          URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
 
       - name: Init with mode and mysql
         run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --mode config --dialect mysql
-        env:
-          URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
 
       - name: Init with mode and sqlite
         run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --mode config --dialect sqlite
-        env:
-          URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
 
       - name: Init with folders only
         run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --mode folders
-        env:
-          URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
 
   cli-migrations:
     name: Test CLI Migrations

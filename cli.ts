@@ -26,6 +26,8 @@ import {
   AmountRollbackT,
   CommandOptions,
   CommandOptionsInit,
+  CommandOptionsMakeMigration,
+  CommandOptionsMakeSeed,
   CommandOptionsStatus,
 } from "./types.ts";
 import { getConfigTemplate } from "./cli/templates.ts";
@@ -50,11 +52,21 @@ const cli = async () => {
     .name("Nessie Migrations")
     .version(VERSION)
     .description("A database migration tool for Deno.\n" + SPONSOR_NOTICE)
-    .option("-d, --debug", "Enables verbose output", { global: true })
+    .option("-d, --debug", "Enables verbose output.", { global: true })
     .option(
       "-c, --config <config:string>",
       "Path to config file.",
       { global: true, default: `./${DEFAULT_CONFIG_FILE}` },
+    )
+    .option(
+      "--seedTemplate <template:string>",
+      "Path or URL to a custom seed template. Only used together with the `make` commands.",
+      { global: true },
+    )
+    .option(
+      "--migrationTemplate <template:string>",
+      "Path or URL to a custom migration template. Only used together with the `make` commands.",
+      { global: true },
     )
     .command("init", "Generates the config file.")
     .option(
@@ -200,7 +212,8 @@ const initNessie: TCliffyAction<any[], CommandOptionsInit> = async (
   console.info(SPONSOR_NOTICE);
 };
 
-const makeMigration: TCliffyAction = async (
+// deno-lint-ignore no-explicit-any
+const makeMigration: TCliffyAction<any[], CommandOptionsMakeMigration> = async (
   options,
   fileName: string,
 ) => {
@@ -208,7 +221,8 @@ const makeMigration: TCliffyAction = async (
   await state.makeMigration(fileName);
 };
 
-const makeSeed: TCliffyAction = async (
+// deno-lint-ignore no-explicit-any
+const makeSeed: TCliffyAction<any[], CommandOptionsMakeSeed> = async (
   options,
   fileName: string,
 ) => {
@@ -370,4 +384,4 @@ const run = async () => {
   }
 };
 
-run();
+await run();
