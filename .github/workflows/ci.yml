@@ -91,7 +91,7 @@ jobs:
       - name: Create seed from custom template
         run: |
           deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make:seed --seedTemplate test_template test_seed_template
-          TEMPLATE_PATH=$(find db/migrations -type f -name "*test_seed_template.ts")
+          TEMPLATE_PATH=$(find db/seed -type f -name "test_seed_template.ts")
           TEMPLATE_CONTENT=$(cat $TEMPLATE_PATH)
           if [[ $TEMPLATE_CONTENT != "test" ]]; then echo "File $TEMPLATE_PATH was not correct, was:\n$TEMPLATE_CONTENT" && exit 1; fi
 
