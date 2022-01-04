@@ -9,6 +9,7 @@ import { DB_DIALECTS, URL_BASE_VERSIONED } from "../../consts.ts";
 Deno.test("getConfigTemplate standard", () => {
   const expected = `import {
     ClientMySQL,
+    ClientMySQL55,
     ClientPostgreSQL,
     ClientSQLite,
     NessieConfig,
@@ -24,6 +25,14 @@ Deno.test("getConfigTemplate standard", () => {
 // });
 
 // const client = new ClientMySQL({
+//     hostname: "localhost",
+//     port: 3306,
+//     username: "root",
+//     // password: "pwd", // uncomment this line for <8
+//     db: "nessie",
+// });
+
+// const client = new ClientMySQL55({
 //     hostname: "localhost",
 //     port: 3306,
 //     username: "root",
