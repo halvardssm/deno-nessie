@@ -12,8 +12,7 @@ export const URL_BASE = `https://deno.land/x/nessie`;
 export const URL_BASE_VERSIONED = `${URL_BASE}@${VERSION}`;
 
 export const URL_TEMPLATE_BASE = `${URL_BASE}/cli/templates/`;
-export const URL_TEMPLATE_BASE_VERSIONED =
-  `${URL_BASE_VERSIONED}/cli/templates/`;
+export const URL_TEMPLATE_BASE_VERSIONED = `${URL_BASE_VERSIONED}/cli/templates/`;
 
 export const DEFAULT_CONFIG_FILE = "nessie.config.ts";
 export const DEFAULT_MIGRATION_FOLDER = "./db/migrations";
@@ -37,5 +36,6 @@ export enum DB_DIALECTS {
 export enum DB_CLIENTS {
   pg = "ClientPostgreSQL",
   mysql = "ClientMySQL",
+  mysql55 = "ClientMySQL55",
   sqlite = "ClientSQLite",
 }
