@@ -1,5 +1,15 @@
 # Nessie Change Log
 
+## Version Next
+
+- Deno v1.17.1
+- Deno std v0.119.0
+- Cliffy v0.20.1
+- MySQL v2.10.2
+- PostgreSQL v0.14.2
+- SQLite v3.2.0
+- Changed client queries from private constants to getters
+
 ## Version 2.0.4 - 2021-10-31
 
 - Added support for custom seed and migration templates

@@ -1,7 +1,7 @@
 name: Publish Docker
 
 env:
-  DENO_VERSION: 1.15.3
+  DENO_VERSION: 1.17.1
 
 on:
   release:
