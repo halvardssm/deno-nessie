@@ -32,10 +32,13 @@ export abstract class AbstractClient<Client> {
   /** The current dialect, given by the Client e.g. pg, mysql, sqlite */
   dialect?: DBDialects | string;
 
-  protected readonly QUERY_GET_LATEST =
-    `SELECT ${COL_FILE_NAME} FROM ${TABLE_MIGRATIONS} ORDER BY ${COL_FILE_NAME} DESC LIMIT 1;`;
-  protected readonly QUERY_GET_ALL =
-    `SELECT ${COL_FILE_NAME} FROM ${TABLE_MIGRATIONS} ORDER BY ${COL_FILE_NAME} DESC;`;
+  protected get QUERY_GET_LATEST() {
+    return `SELECT ${COL_FILE_NAME} FROM ${TABLE_MIGRATIONS} ORDER BY ${COL_FILE_NAME} DESC LIMIT 1;`;
+  }
+
+  protected get QUERY_GET_ALL() {
+    return `SELECT ${COL_FILE_NAME} FROM ${TABLE_MIGRATIONS} ORDER BY ${COL_FILE_NAME} DESC;`;
+  }
 
   protected QUERY_MIGRATION_INSERT: QueryWithString = (fileName) =>
     `INSERT INTO ${TABLE_MIGRATIONS} (${COL_FILE_NAME}) VALUES ('${fileName}');`;
