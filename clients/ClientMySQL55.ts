@@ -4,11 +4,11 @@ import type { AmountMigrateT, AmountRollbackT, DBDialects, QueryT } from "../typ
 import { COL_CREATED_AT, COL_FILE_NAME, MAX_FILE_NAME_LENGTH, TABLE_MIGRATIONS } from "../consts.ts";
 import { NessieError } from "../cli/errors.ts";
 
-export type MySQLClientOptions = Parameters<MySQLClient["connect"]>;
+export type MySQLClientOptions55 = Parameters<MySQLClient["connect"]>;
 
 /** MySQL client */
-export class ClientMySQL extends AbstractClient<MySQLClient> {
-  #clientOptions: MySQLClientOptions;
+export class ClientMySQL55 extends AbstractClient<MySQLClient> {
+  #clientOptions: MySQLClientOptions55;
   dialect: DBDialects = "mysql";
 
   #QUERY_TRANSACTION_START = `START TRANSACTION;`;
@@ -17,11 +17,11 @@ export class ClientMySQL extends AbstractClient<MySQLClient> {
 
   #QUERY_MIGRATION_TABLE_EXISTS = `SELECT * FROM information_schema.tables WHERE table_name = '${TABLE_MIGRATIONS}' LIMIT 1;`;
 
-  #QUERY_CREATE_MIGRATION_TABLE = `CREATE TABLE ${TABLE_MIGRATIONS} (id bigint UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, ${COL_FILE_NAME} varchar(${MAX_FILE_NAME_LENGTH}) NOT NULL UNIQUE, ${COL_CREATED_AT} datetime NOT NULL DEFAULT CURRENT_TIMESTAMP);`;
+  #QUERY_CREATE_MIGRATION_TABLE = `CREATE TABLE ${TABLE_MIGRATIONS} (id bigint UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, ${COL_FILE_NAME} varchar(${MAX_FILE_NAME_LENGTH}) NOT NULL UNIQUE, ${COL_CREATED_AT} timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP);`;
 
   #QUERY_UPDATE_TIMESTAMPS = `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = CONCAT(FROM_UNIXTIME(CAST(substring_index(${COL_FILE_NAME}, '-', 1) AS SIGNED) / 1000, '%Y%m%d%H%i%S'), substring(file_name, instr( file_name,'-'))) WHERE CAST(substring_index(${COL_FILE_NAME}, '-', 1) AS SIGNED) < 1672531200000;`;
 
-  constructor(...connectionOptions: MySQLClientOptions) {
+  constructor(...connectionOptions: MySQLClientOptions55) {
     super({ client: new MySQLClient() });
     this.#clientOptions = connectionOptions;
   }
