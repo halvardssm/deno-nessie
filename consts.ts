@@ -37,5 +37,6 @@ export enum DB_DIALECTS {
 export enum DB_CLIENTS {
   pg = "ClientPostgreSQL",
   mysql = "ClientMySQL",
+  mysql55 = "ClientMySQL55",
   sqlite = "ClientSQLite",
 }
