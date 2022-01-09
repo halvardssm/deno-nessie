@@ -18,53 +18,64 @@ export type MySQLClientOptions = Parameters<MySQLClient["connect"]>;
 
 /** MySQL client */
 export class ClientMySQL extends AbstractClient<MySQLClient> {
-  #clientOptions: MySQLClientOptions;
+  protected clientOptions: MySQLClientOptions;
   dialect: DBDialects = "mysql";
 
-  #QUERY_TRANSACTION_START = `START TRANSACTION;`;
-  #QUERY_TRANSACTION_COMMIT = `COMMIT;`;
-  #QUERY_TRANSACTION_ROLLBACK = `ROLLBACK;`;
+  protected get QUERY_TRANSACTION_START() {
+    return `START TRANSACTION;`;
+  }
 
-  #QUERY_MIGRATION_TABLE_EXISTS =
-    `SELECT * FROM information_schema.tables WHERE table_name = '${TABLE_MIGRATIONS}' LIMIT 1;`;
+  protected get QUERY_TRANSACTION_COMMIT() {
+    return `COMMIT;`;
+  }
 
-  #QUERY_CREATE_MIGRATION_TABLE =
-    `CREATE TABLE ${TABLE_MIGRATIONS} (id bigint UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, ${COL_FILE_NAME} varchar(${MAX_FILE_NAME_LENGTH}) NOT NULL UNIQUE, ${COL_CREATED_AT} datetime NOT NULL DEFAULT CURRENT_TIMESTAMP);`;
+  protected get QUERY_TRANSACTION_ROLLBACK() {
+    return `ROLLBACK;`;
+  }
 
-  #QUERY_UPDATE_TIMESTAMPS =
-    `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = CONCAT(FROM_UNIXTIME(CAST(substring_index(${COL_FILE_NAME}, '-', 1) AS SIGNED) / 1000, '%Y%m%d%H%i%S'), substring(file_name, instr( file_name,'-'))) WHERE CAST(substring_index(${COL_FILE_NAME}, '-', 1) AS SIGNED) < 1672531200000;`;
+  protected get QUERY_MIGRATION_TABLE_EXISTS() {
+    return `SELECT * FROM information_schema.tables WHERE table_name = '${TABLE_MIGRATIONS}' LIMIT 1;`;
+  }
+
+  protected get QUERY_CREATE_MIGRATION_TABLE() {
+    return `CREATE TABLE ${TABLE_MIGRATIONS} (id bigint UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY, ${COL_FILE_NAME} varchar(${MAX_FILE_NAME_LENGTH}) NOT NULL UNIQUE, ${COL_CREATED_AT} datetime NOT NULL DEFAULT CURRENT_TIMESTAMP);`;
+  }
+
+  protected get QUERY_UPDATE_TIMESTAMPS() {
+    return `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = CONCAT(FROM_UNIXTIME(CAST(substring_index(${COL_FILE_NAME}, '-', 1) AS SIGNED) / 1000, '%Y%m%d%H%i%S'), substring(file_name, instr( file_name,'-'))) WHERE CAST(substring_index(${COL_FILE_NAME}, '-', 1) AS SIGNED) < 1672531200000;`;
+  }
 
   constructor(...connectionOptions: MySQLClientOptions) {
     super({ client: new MySQLClient() });
-    this.#clientOptions = connectionOptions;
+    this.clientOptions = connectionOptions;
   }
 
   async prepare() {
-    await this.client.connect(...this.#clientOptions);
-    const queryResult = await this.query(this.#QUERY_MIGRATION_TABLE_EXISTS);
+    await this.client.connect(...this.clientOptions);
+    const queryResult = await this.query(this.QUERY_MIGRATION_TABLE_EXISTS);
 
     const migrationTableExists = queryResult?.[0]?.length > 0;
 
     if (!migrationTableExists) {
-      await this.query(this.#QUERY_CREATE_MIGRATION_TABLE);
+      await this.query(this.QUERY_CREATE_MIGRATION_TABLE);
       console.info("Database setup complete");
     }
   }
 
   async updateTimestamps() {
-    await this.client.connect(...this.#clientOptions);
-    const queryResult = await this.query(this.#QUERY_MIGRATION_TABLE_EXISTS);
+    await this.client.connect(...this.clientOptions);
+    const queryResult = await this.query(this.QUERY_MIGRATION_TABLE_EXISTS);
 
     const migrationTableExists = queryResult?.[0]?.length > 0;
 
     if (migrationTableExists) {
-      await this.query(this.#QUERY_TRANSACTION_START);
+      await this.query(this.QUERY_TRANSACTION_START);
       try {
-        await this.query(this.#QUERY_UPDATE_TIMESTAMPS);
-        await this.query(this.#QUERY_TRANSACTION_COMMIT);
+        await this.query(this.QUERY_UPDATE_TIMESTAMPS);
+        await this.query(this.QUERY_TRANSACTION_COMMIT);
         console.info("Updated timestamps");
       } catch (e) {
-        await this.query(this.#QUERY_TRANSACTION_ROLLBACK);
+        await this.query(this.QUERY_TRANSACTION_ROLLBACK);
         throw e;
       }
     }

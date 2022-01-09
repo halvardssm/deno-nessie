@@ -22,17 +22,24 @@ export type PostgreSQLClientOptions = ConstructorParameters<
 export class ClientPostgreSQL extends AbstractClient<PostgreSQLClient> {
   dialect: DBDialects = "pg";
 
-  #QUERY_TRANSACTION_START = `BEGIN TRANSACTION;`;
-  #QUERY_TRANSACTION_COMMIT = `COMMIT TRANSACTION;`;
-  #QUERY_TRANSACTION_ROLLBACK = `ROLLBACK TRANSACTION;`;
-
-  #QUERY_MIGRATION_TABLE_EXISTS = `SELECT to_regclass('${TABLE_MIGRATIONS}');`;
-
-  #QUERY_CREATE_MIGRATION_TABLE =
-    `CREATE TABLE ${TABLE_MIGRATIONS} (id bigserial PRIMARY KEY, ${COL_FILE_NAME} varchar(${MAX_FILE_NAME_LENGTH}) UNIQUE, ${COL_CREATED_AT} timestamp (0) default current_timestamp);`;
-
-  #QUERY_UPDATE_TIMESTAMPS =
-    `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = to_char(to_timestamp(CAST(SPLIT_PART(${COL_FILE_NAME}, '-', 1) AS BIGINT) / 1000), 'yyyymmddHH24MISS') || '-' || SPLIT_PART(${COL_FILE_NAME}, '-', 2) WHERE CAST(SPLIT_PART(${COL_FILE_NAME}, '-', 1) AS BIGINT) < 1672531200000;`;
+  protected get QUERY_TRANSACTION_START() {
+    return `BEGIN TRANSACTION;`;
+  }
+  protected get QUERY_TRANSACTION_COMMIT() {
+    return `COMMIT TRANSACTION;`;
+  }
+  protected get QUERY_TRANSACTION_ROLLBACK() {
+    return `ROLLBACK TRANSACTION;`;
+  }
+  protected get QUERY_MIGRATION_TABLE_EXISTS() {
+    return `SELECT to_regclass('${TABLE_MIGRATIONS}');`;
+  }
+  protected get QUERY_CREATE_MIGRATION_TABLE() {
+    return `CREATE TABLE ${TABLE_MIGRATIONS} (id bigserial PRIMARY KEY, ${COL_FILE_NAME} varchar(${MAX_FILE_NAME_LENGTH}) UNIQUE, ${COL_CREATED_AT} timestamp (0) default current_timestamp);`;
+  }
+  protected get QUERY_UPDATE_TIMESTAMPS() {
+    return `UPDATE ${TABLE_MIGRATIONS} SET ${COL_FILE_NAME} = to_char(to_timestamp(CAST(SPLIT_PART(${COL_FILE_NAME}, '-', 1) AS BIGINT) / 1000), 'yyyymmddHH24MISS') || '-' || SPLIT_PART(${COL_FILE_NAME}, '-', 2) WHERE CAST(SPLIT_PART(${COL_FILE_NAME}, '-', 1) AS BIGINT) < 1672531200000;`;
+  }
 
   constructor(...params: PostgreSQLClientOptions) {
     super({ client: new PostgreSQLClient(...params) });
@@ -42,13 +49,13 @@ export class ClientPostgreSQL extends AbstractClient<PostgreSQLClient> {
     await this.client.connect();
 
     const queryResult = await this.client
-      .queryArray(this.#QUERY_MIGRATION_TABLE_EXISTS);
+      .queryArray(this.QUERY_MIGRATION_TABLE_EXISTS);
 
     const migrationTableExists =
       queryResult.rows?.[0]?.[0] === TABLE_MIGRATIONS;
 
     if (!migrationTableExists) {
-      await this.client.queryArray(this.#QUERY_CREATE_MIGRATION_TABLE);
+      await this.client.queryArray(this.QUERY_CREATE_MIGRATION_TABLE);
       console.info("Database setup complete");
     }
   }
@@ -56,20 +63,20 @@ export class ClientPostgreSQL extends AbstractClient<PostgreSQLClient> {
   async updateTimestamps() {
     await this.client.connect();
     const queryResult = await this.client.queryArray(
-      this.#QUERY_MIGRATION_TABLE_EXISTS,
+      this.QUERY_MIGRATION_TABLE_EXISTS,
     );
 
     const migrationTableExists =
       queryResult.rows?.[0]?.[0] === TABLE_MIGRATIONS;
 
     if (migrationTableExists) {
-      await this.client.queryArray(this.#QUERY_TRANSACTION_START);
+      await this.client.queryArray(this.QUERY_TRANSACTION_START);
       try {
-        await this.client.queryArray(this.#QUERY_UPDATE_TIMESTAMPS);
-        await this.client.queryArray(this.#QUERY_TRANSACTION_COMMIT);
+        await this.client.queryArray(this.QUERY_UPDATE_TIMESTAMPS);
+        await this.client.queryArray(this.QUERY_TRANSACTION_COMMIT);
         console.info("Updated timestamps");
       } catch (e) {
-        await this.client.queryArray(this.#QUERY_TRANSACTION_ROLLBACK);
+        await this.client.queryArray(this.QUERY_TRANSACTION_ROLLBACK);
         throw e;
       }
     }
