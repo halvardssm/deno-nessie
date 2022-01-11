@@ -3,8 +3,8 @@ DB_MYSQL_PORT=5001
 DB_USER=root
 DB_PWD=pwd
 DB_NAME=nessie
-NESSIE_VERSION=2.0.4
-DENO_VERSION=1.17.1
+NESSIE_VERSION=2.0.5
+DENO_VERSION=1.17.2
 DOCKER_IMAGE=halvardm/nessie
 
 test_all: test_fmt test_unit db_all_restart test_integration_cli db_all_restart test_integration_update_timestamps image_build image_test_clean image_test image_test_clean

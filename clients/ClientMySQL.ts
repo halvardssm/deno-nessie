@@ -16,7 +16,12 @@ import { NessieError } from "../cli/errors.ts";
 
 export type MySQLClientOptions = Parameters<MySQLClient["connect"]>;
 
-/** MySQL client */
+/**
+ * MySQL client
+ *
+ * This is for MySQL versions >5.5, if you want to use version <=5.5,
+ * use ClientMySQL55 instead.
+ */
 export class ClientMySQL extends AbstractClient<MySQLClient> {
   protected clientOptions: MySQLClientOptions;
   dialect: DBDialects = "mysql";
