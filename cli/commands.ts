@@ -39,6 +39,7 @@ type TCliffyAction<
   CliffyCommand<void, [], O, void, undefined>
 >;
 
+// deno-lint-ignore no-explicit-any
 export const initNessie: TCliffyAction<any[], CommandOptionsInit> = async (
   /** Initializes Nessie */
   // deno-lint-ignore no-explicit-any
@@ -96,6 +97,7 @@ export const initNessie: TCliffyAction<any[], CommandOptionsInit> = async (
   console.info(SPONSOR_NOTICE);
 };
 
+// deno-lint-ignore no-explicit-any
 export const makeMigration: TCliffyAction<any[], CommandOptionsMakeMigration> =
   async (
     // deno-lint-ignore no-explicit-any
