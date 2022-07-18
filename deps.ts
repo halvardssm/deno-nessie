@@ -38,4 +38,4 @@ export {
 } from "https://deno.land/x/postgres@v0.14.2/mod.ts";
 
 /** SQLite */
-export { DB as SQLiteClient } from "https://deno.land/x/sqlite@v3.3.1/mod.ts";
+export { DB as SQLiteClient } from "https://deno.land/x/sqlite@v3.4.0/mod.ts";
