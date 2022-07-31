@@ -1,5 +1,10 @@
 # Nessie Change Log
 
+## Version Next
+
+- Deno v1.24.1
+- Support for CockroachDB with the PostgreSQL client
+
 ## Version 2.0.5 - 2022-01-11
 
 - Deno v1.17.2
