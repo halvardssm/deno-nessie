@@ -326,7 +326,7 @@ All contributions are welcome, make sure to read the
 ## Uses
 
 - [Cliffy](https://deno.land/x/cliffy/)
-- [Deno Postgres](https://deno.land/x/postgres/)
+- [Deno Postgres](https://deno.land/x/postgres/) - Also compatible with CockroachDB
 - [Deno MySQL](https://deno.land/x/mysql/) - Currently it works with password
   for 5.*, but for >=8 you have to send a blank password, see
   [issue 37](https://github.com/manyuanrong/deno_mysql/issues/37)
