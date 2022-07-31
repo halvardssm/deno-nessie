@@ -1,12 +1,16 @@
 # Nessie Change Log
 
-## Version Next
+## Version 2.0.7 - 2022-07-31
 
 - Deno v1.24.1
 - Deno std v0.150.0
 - Cliffy v0.24.3
 - PostgreSQL v0.16.1
 - Support for CockroachDB with the PostgreSQL client
+
+## Version 2.0.6 - 2022-04-15
+
+- Refactored comands so that Nessie can run programatically
 
 ## Version 2.0.5 - 2022-01-11
 
