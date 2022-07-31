@@ -52,10 +52,6 @@ information.
 🎉 **Version 2 is released**: To migrate from version 1 follow the steps in the
 [migration section](#migrate-from-version-1) bellow.
 
-> If you would like to see your DB flavor supported, take a look at how to make
-> a client plugin with examples in the [clients folder](./clients) or in the
-> section [How to make a client](#how-to-make-a-client).
-
 > See documentation for the
 > [clients](https://doc.deno.land/https/deno.land/x/nessie/mod.ts).
 
@@ -66,14 +62,21 @@ information.
 
 ## Contents
 
+- [Contents](#contents)
 - [Available Via](#available-via)
 - [CLI Usage](#cli-usage)
-- [Docker Usage](#docker-usage)
-- [Contributing](#contributing)
+  - [Flags](#flags)
+  - [Deno flags and Permissions](#deno-flags-and-permissions)
+  - [Config file](#config-file)
+  - [Remote Migration or Seed files](#remote-migration-or-seed-files)
+  - [Custom Migration or Seed templates](#custom-migration-or-seed-templates)
+- [Docker usage](#docker-usage)
 - [Uses](#uses)
 - [Examples](#examples)
-- [How to Make a Client](#how-to-make-a-client)
-- [Migrate from Version 1](#migrate-from-version-1)
+- [Clients](#clients)
+  - [How to make a client](#how-to-make-a-client)
+- [Migrate from version 1](#migrate-from-version-1)
+- [Contributing](#contributing)
 
 ## Available Via
 
@@ -318,19 +321,11 @@ See the [example folder](./examples) for more examples.
 See the specific [Nessie image docs](./image/README.md) for using Nessie with a
 docker image.
 
-## Contributing
-
-All contributions are welcome, make sure to read the
-[contribution guideline](./.github/CONTRIBUTING.md).
-
 ## Uses
 
 - [Cliffy](https://deno.land/x/cliffy/)
-- [Deno Postgres](https://deno.land/x/postgres/) - Also compatible with
-  CockroachDB
-- [Deno MySQL](https://deno.land/x/mysql/) - Currently it works with password
-  for 5.*, but for >=8 you have to send a blank password, see
-  [issue 37](https://github.com/manyuanrong/deno_mysql/issues/37)
+- [Deno Postgres](https://deno.land/x/postgres/)
+- [Deno MySQL](https://deno.land/x/mysql/)
 - [Deno SQLite](https://deno.land/x/sqlite/)
 
 ## Examples
@@ -412,7 +407,22 @@ export default class extends AbstractSeed<ClientPostgreSQL> {
 
 See the [example folder](./examples) for more
 
-## How to make a client
+## Clients
+
+Provided clients are
+
+- [PostgreSQL](./clients/ClientPostgreSQL.ts) (also works for CockroachDB)
+- [MySQL](./clients/ClientMySQL.ts) & [MySQL 5.5](./clients/ClientMySQL55.ts)
+  - Currently it works with password for 5.*, but for >=8 you have to send a
+    blank password, see
+    [issue 37](https://github.com/manyuanrong/deno_mysql/issues/37)
+- [SQLite](./clients/ClientSQLite.ts)
+
+> If you would like to see your DB flavor supported, take a look at how to make
+> a client plugin with examples in the [clients folder](./clients) or in the
+> next section .
+
+### How to make a client
 
 A client needs to extend [AbstractClient](./clients/AbstractClient.ts).
 
@@ -467,3 +477,8 @@ steps, please open a new discussion (not an issue).
    migration files)
 
 If you come across any issues, you can open a new discussion on GitHub.
+
+## Contributing
+
+All contributions are welcome, make sure to read the
+[contribution guideline](./.github/CONTRIBUTING.md).
