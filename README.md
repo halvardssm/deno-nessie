@@ -11,7 +11,7 @@
     <img alt="Docs" src="https://img.shields.io/badge/Nessie-doc-informational.svg?style=for-the-badge&logo=data:image/png;base64,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" />
   </a>
   <a href="https://deno.land">
-    <img alt="Deno Version" src="https://img.shields.io/badge/deno-v1.17.2-green.svg?style=for-the-badge&logo=deno"/>
+    <img alt="Deno Version" src="https://img.shields.io/badge/deno-v1.24.1-green.svg?style=for-the-badge&logo=deno"/>
   </a>
   <a href="https://github.com/halvardssm/deno-nessie/actions?query=branch%3Amain+workflow%3ACI">
     <img alt="GitHub Workflow Status (branch)" src="https://img.shields.io/github/workflow/status/halvardssm/deno-nessie/CI/main?style=for-the-badge&logo=github">
@@ -52,10 +52,6 @@ information.
 🎉 **Version 2 is released**: To migrate from version 1 follow the steps in the
 [migration section](#migrate-from-version-1) bellow.
 
-> If you would like to see your DB flavor supported, take a look at how to make
-> a client plugin with examples in the [clients folder](./clients) or in the
-> section [How to make a client](#how-to-make-a-client).
-
 > See documentation for the
 > [clients](https://doc.deno.land/https/deno.land/x/nessie/mod.ts).
 
@@ -66,14 +62,21 @@ information.
 
 ## Contents
 
+- [Contents](#contents)
 - [Available Via](#available-via)
 - [CLI Usage](#cli-usage)
-- [Docker Usage](#docker-usage)
-- [Contributing](#contributing)
+  - [Flags](#flags)
+  - [Deno flags and Permissions](#deno-flags-and-permissions)
+  - [Config file](#config-file)
+  - [Remote Migration or Seed files](#remote-migration-or-seed-files)
+  - [Custom Migration or Seed templates](#custom-migration-or-seed-templates)
+- [Docker usage](#docker-usage)
 - [Uses](#uses)
 - [Examples](#examples)
-- [How to Make a Client](#how-to-make-a-client)
-- [Migrate from Version 1](#migrate-from-version-1)
+- [Clients](#clients)
+  - [How to make a client](#how-to-make-a-client)
+- [Migrate from version 1](#migrate-from-version-1)
+- [Contributing](#contributing)
 
 ## Available Via
 
@@ -318,18 +321,11 @@ See the [example folder](./examples) for more examples.
 See the specific [Nessie image docs](./image/README.md) for using Nessie with a
 docker image.
 
-## Contributing
-
-All contributions are welcome, make sure to read the
-[contribution guideline](./.github/CONTRIBUTING.md).
-
 ## Uses
 
 - [Cliffy](https://deno.land/x/cliffy/)
-- [Deno Postgres](https://deno.land/x/postgres/) - Also compatible with CockroachDB
-- [Deno MySQL](https://deno.land/x/mysql/) - Currently it works with password
-  for 5.*, but for >=8 you have to send a blank password, see
-  [issue 37](https://github.com/manyuanrong/deno_mysql/issues/37)
+- [Deno Postgres](https://deno.land/x/postgres/)
+- [Deno MySQL](https://deno.land/x/mysql/)
 - [Deno SQLite](https://deno.land/x/sqlite/)
 
 ## Examples
@@ -411,7 +407,22 @@ export default class extends AbstractSeed<ClientPostgreSQL> {
 
 See the [example folder](./examples) for more
 
-## How to make a client
+## Clients
+
+Provided clients are
+
+- [PostgreSQL](./clients/ClientPostgreSQL.ts) (also works for CockroachDB)
+- [MySQL](./clients/ClientMySQL.ts) & [MySQL 5.5](./clients/ClientMySQL55.ts)
+  - Currently it works with password for 5.*, but for >=8 you have to send a
+    blank password, see
+    [issue 37](https://github.com/manyuanrong/deno_mysql/issues/37)
+- [SQLite](./clients/ClientSQLite.ts)
+
+> If you would like to see your DB flavor supported, take a look at how to make
+> a client plugin with examples in the [clients folder](./clients) or in the
+> next section .
+
+### How to make a client
 
 A client needs to extend [AbstractClient](./clients/AbstractClient.ts).
 
@@ -466,3 +477,8 @@ steps, please open a new discussion (not an issue).
    migration files)
 
 If you come across any issues, you can open a new discussion on GitHub.
+
+## Contributing
+
+All contributions are welcome, make sure to read the
+[contribution guideline](./.github/CONTRIBUTING.md).
