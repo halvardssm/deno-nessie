@@ -1,7 +1,7 @@
 name: Publish Egg
 
 env:
-  DENO_VERSION: 1.24.1
+  DENO_VERSION: 1.26.0
   NEST_VERSION: 0.3.10
 
 on:
@@ -12,9 +12,9 @@ jobs:
   publish-egg:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
 
-      - uses: denoland/setup-deno@main
+      - uses: denoland/setup-deno@v1
         with:
           deno-version: ${{env.DENO_VERSION}}
 

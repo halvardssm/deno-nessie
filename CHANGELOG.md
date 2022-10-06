@@ -1,5 +1,14 @@
 # Nessie Change Log
 
+## Version Next
+
+- Deno v1.26.0
+- Deno std v0.159.0
+- Cliffy v0.25.2
+- SQLite v3.5.0
+- Added schedule ci script to test on regular intervals
+- Removed devcontainer
+
 ## Version 2.0.7 - 2022-07-31
 
 - Deno v1.24.1

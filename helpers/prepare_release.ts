@@ -1,7 +1,6 @@
 import { REG_EXP_VERSION, REG_EXP_VERSION_STABLE } from "./commons.ts";
 
 const REG_EXP_README_DENO_VERSION = /shields\.io\/badge\/deno-v\d+\.\d+\.\d+/;
-const REG_EXP_DEVCONTAINER_DENO_VERSION = /ARG DENO_VERSION=\"\d+\.\d+\.\d+\"/;
 const REG_EXP_MAKEFILE_DENO_VERSION = /DENO_VERSION=\d+\.\d+\.\d+/;
 const REG_EXP_CI_DENO_VERSION = /DENO_VERSION: \d+\.\d+\.\d+/;
 const REG_EXP_MAKEFILE_NESSIE_VERSION = /NESSIE_VERSION=\d+\.\d+\.\d+(-rc\d+)?/;
@@ -10,7 +9,6 @@ const REG_EXP_PROGRAM_NESSIE_VERSION =
 const FILE_JSON_EGG = "egg.json";
 const FILE_README = "README.md";
 const FILE_PROGRAM = "consts.ts";
-const FILE_DEVCONTAINER = ".devcontainer/Dockerfile";
 const FILE_MAKEFILE = "Makefile";
 const FILES_CI = [
   ".github/workflows/ci.yml",
@@ -91,21 +89,6 @@ const setCI = async (versions: VERSIONS) => {
   }
 };
 
-const setDevContainer = async (versions: VERSIONS) => {
-  if (versions.deno) {
-    const cli = await Deno.readTextFile(FILE_DEVCONTAINER);
-
-    const res = cli.replace(
-      REG_EXP_DEVCONTAINER_DENO_VERSION,
-      `ARG DENO_VERSION=${versions.deno}`,
-    );
-
-    await Deno.writeTextFile(FILE_DEVCONTAINER, res);
-
-    console.info(`${FILE_DEVCONTAINER} updated to ${versions.deno}`);
-  }
-};
-
 const setMakefile = async (versions: VERSIONS) => {
   if (versions.deno || versions.nessie) {
     let res = await Deno.readTextFile(FILE_MAKEFILE);
@@ -157,7 +140,6 @@ async function runProgram() {
   await setProgram(versions);
   await setReadMe(versions);
   await setCI(versions);
-  await setDevContainer(versions);
   await setMakefile(versions);
 }
 

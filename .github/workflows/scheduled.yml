@@ -1,20 +1,14 @@
 name: CI
 
-env:
-  DENO_VERSION: 1.26.0
-
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
   schedule:
     - cron:  '24 8 * * 0,3,5'
 
 jobs:
   fmt:
+    strategy:
+      matrix:
+        version: [vx.x.x, canary]
     name: Test format and lint
     runs-on: ubuntu-latest
 
@@ -25,12 +19,15 @@ jobs:
       - name: Install deno
         uses: denoland/setup-deno@v1
         with: 
-          deno-version: ${{env.DENO_VERSION}}
+          deno-version: ${{ matrix.version }}
 
       - name: Run test for format and lint
         run: make test_fmt
 
   unit:
+    strategy:
+      matrix:
+        version: [vx.x.x, canary]
     name: Test unit
     runs-on: ubuntu-latest
 
@@ -41,7 +38,7 @@ jobs:
       - name: Install deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: ${{env.DENO_VERSION}}
+          deno-version: ${{ matrix.version }}
 
       - name: Run unit tests
         run: make test_unit
@@ -56,16 +53,19 @@ jobs:
           flags: unit
 
   cli:
+    strategy:
+      matrix:
+        version: [vx.x.x, canary]
     name: Test CLI
     runs-on: ubuntu-latest
     env:
-      URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
+      URL_PATH: ${{github.repository}}/main
 
     steps:
       - name: Install deno
         uses: denoland/setup-deno@v1
         with: 
-          deno-version: ${{env.DENO_VERSION}}
+          deno-version: ${{ matrix.version }}
           
       - name: Nessie Init
         run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --dialect sqlite
@@ -113,6 +113,9 @@ jobs:
         run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --mode folders
 
   cli-migrations:
+    strategy:
+      matrix:
+        version: [vx.x.x, canary]
     name: Test CLI Migrations
     runs-on: ubuntu-latest
 
@@ -151,7 +154,7 @@ jobs:
       - name: Install deno
         uses: denoland/setup-deno@v1
         with:
-          deno-version: ${{env.DENO_VERSION}}
+          deno-version: ${{ matrix.version }}
 
       - name: Create databases
         run: make db_sqlite_start
@@ -167,62 +170,6 @@ jobs:
         with:
           files: coverage.lcov
           flags: integration-cli
-  
-  cli-update-timestamps:
-    name: Test CLI Update timestamps
-    runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_USER: root
-          POSTGRES_PASSWORD: pwd
-          POSTGRES_DB: nessie
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5000:5432
-
-      mysql:
-        image: mysql
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: true
-          MYSQL_DATABASE: nessie
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-        ports:
-          - 5001:3306
-    
-    steps:
-      - name: Clone repo
-        uses: actions/checkout@v3
-
-      - name: Install deno
-        uses: denoland/setup-deno@v1
-        with:
-          deno-version: ${{env.DENO_VERSION}}
-
-      - name: Create databases
-        run: make db_sqlite_start
-
-      - name: Run tests
-        run: make test_integration_update_timestamps
-
-      - name: Generate lcov
-        run: deno coverage --unstable --lcov ./coverage > coverage.lcov
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v1
-        with:
-          files: coverage.lcov
-          flags: integration-update-timestamps
 
   image-test:
     name: Test Docker image build
