@@ -6,18 +6,18 @@ export {
   relative,
   resolve,
   toFileUrl,
-} from "https://deno.land/std@0.159.0/path/mod.ts";
+} from "https://deno.land/std@0.160.0/path/mod.ts";
 export {
   assert,
   assertEquals,
-} from "https://deno.land/std@0.159.0/testing/asserts.ts";
-export { exists } from "https://deno.land/std@0.159.0/fs/mod.ts";
-export { format } from "https://deno.land/std@0.159.0/datetime/mod.ts";
+} from "https://deno.land/std@0.160.0/testing/asserts.ts";
+export { exists } from "https://deno.land/std@0.160.0/fs/mod.ts";
+export { format } from "https://deno.land/std@0.160.0/datetime/mod.ts";
 export {
   bold,
   green,
   yellow,
-} from "https://deno.land/std@0.159.0/fmt/colors.ts";
+} from "https://deno.land/std@0.160.0/fmt/colors.ts";
 
 /** Cliffy */
 export {
@@ -35,7 +35,7 @@ export { Client as MySQLClient } from "https://deno.land/x/mysql@v2.10.2/mod.ts"
 /** PostgreSQL */
 export {
   Client as PostgreSQLClient,
-} from "https://deno.land/x/postgres@v0.16.1/mod.ts";
+} from "https://deno.land/x/postgres@v0.17.0/mod.ts";
 
 /** SQLite */
 export { DB as SQLiteClient } from "https://deno.land/x/sqlite@v3.5.0/mod.ts";
