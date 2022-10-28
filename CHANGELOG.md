@@ -1,5 +1,11 @@
 # Nessie Change Log
 
+## Version 2.0.10 - 2022-10-28
+
+- Deno v1.27.0
+- Deno std v0.161.0
+- MySQL v2.10.3
+
 ## Version 2.0.9 - 2022-10-25
 
 - Deno v1.26.2
