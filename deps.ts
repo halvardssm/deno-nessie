@@ -30,7 +30,7 @@ export {
 export type { IAction as CliffyIAction } from "https://deno.land/x/cliffy@v0.25.2/mod.ts";
 
 /** MySQL */
-export { Client as MySQLClient } from "https://deno.land/x/mysql@v2.10.2/mod.ts";
+export { Client as MySQLClient } from "https://deno.land/x/mysql@v2.10.3/mod.ts";
 
 /** PostgreSQL */
 export {
