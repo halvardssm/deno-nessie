@@ -6,18 +6,18 @@ export {
   relative,
   resolve,
   toFileUrl,
-} from "https://deno.land/std@0.160.0/path/mod.ts";
+} from "https://deno.land/std@0.161.0/path/mod.ts";
 export {
   assert,
   assertEquals,
-} from "https://deno.land/std@0.160.0/testing/asserts.ts";
-export { exists } from "https://deno.land/std@0.160.0/fs/mod.ts";
-export { format } from "https://deno.land/std@0.160.0/datetime/mod.ts";
+} from "https://deno.land/std@0.161.0/testing/asserts.ts";
+export { exists } from "https://deno.land/std@0.161.0/fs/mod.ts";
+export { format } from "https://deno.land/std@0.161.0/datetime/mod.ts";
 export {
   bold,
   green,
   yellow,
-} from "https://deno.land/std@0.160.0/fmt/colors.ts";
+} from "https://deno.land/std@0.161.0/fmt/colors.ts";
 
 /** Cliffy */
 export {
