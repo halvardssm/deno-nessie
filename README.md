@@ -49,6 +49,8 @@ supporting the future development. See
 [this issue](https://github.com/halvardssm/deno-nessie/issues/130) for more
 information.
 
+> ⚠️ With the native Prisma support for Deno, I no longer use Nessie for my projects. This means that Nessie will be unmaintained in the near future. See the related [issue](https://github.com/halvardssm/deno-nessie/issues/165) for more information. 
+
 🎉 **Version 2 is released**: To migrate from version 1 follow the steps in the
 [migration section](#migrate-from-version-1) bellow.
 
