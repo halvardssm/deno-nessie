@@ -3,7 +3,7 @@
     "test:unit": "deno test -A --unstable --coverage=coverage tests/unit",
     "test:integration:cli": "deno test -A --unstable --coverage=coverage tests/integration/cli",
     "test:integration:update_timestamp": "deno test -A --unstable --coverage=coverage tests/integration/update_timestamps",
-    "bump_version": "deno run --allow-read --allow-write helpers/prepare_release.ts && deno fmt --ignore=coverage"
+    "bump_version": "deno run --allow-read --allow-write helpers/prepare_release.ts && deno fmt"
   },
   "fmt": {
     "exclude": [
