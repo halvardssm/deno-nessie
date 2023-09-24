@@ -1,6 +1,6 @@
 # Nessie Change Log
 
-## Version Next
+## Version 2.0.11 - 2023-09-24
 
 - Deno v1.37.0
 - Deno std v0.202.0

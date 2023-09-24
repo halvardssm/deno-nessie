@@ -28,7 +28,7 @@ const setEggConfig = async (versions: Versions) => {
     const eggFile = JSON.parse(await Deno.readTextFile(FILE_JSON_EGG)) as any;
 
     eggFile.version = format(versions.nessie);
-    eggFile.stable = !versions.nessie.prerelease;
+    eggFile.stable = !versions.nessie.prerelease.length;
 
     await Deno.writeTextFile(
       FILE_JSON_EGG,
@@ -60,12 +60,12 @@ const setProgram = async (versions: Versions) => {
 
     const res = cli.replace(
       REG_EXP_PROGRAM_NESSIE_VERSION,
-      `export const VERSION = "${versions.nessie}";`,
+      `export const VERSION = "${format(versions.nessie)}";`,
     );
 
     await Deno.writeTextFile(FILE_PROGRAM, res);
 
-    console.info(`consts.ts updated to ${versions.nessie}`);
+    console.info(`consts.ts updated to ${format(versions.nessie)}`);
   }
 };
 
@@ -77,15 +77,15 @@ const setCI = async (versions: Versions) => {
       if (versions.deno) {
         res = res.replace(
           REG_EXP_CI_DENO_VERSION,
-          `DENO_VERSION: ${versions.deno}`,
+          `DENO_VERSION: ${format(versions.deno)}`,
+        );
+
+        console.info(
+          `${file} updated to Deno: ${format(versions.deno)}`,
         );
       }
 
       await Deno.writeTextFile(file, res);
-
-      console.info(
-        `${file} updated to Deno: ${versions.deno}`,
-      );
     }
   }
 };
@@ -97,21 +97,23 @@ const setMakefile = async (versions: Versions) => {
     if (versions.nessie) {
       res = res.replace(
         REG_EXP_MAKEFILE_NESSIE_VERSION,
-        `NESSIE_VERSION=${versions.nessie}`,
+        `NESSIE_VERSION=${format(versions.nessie)}`,
       );
     }
 
     if (versions.deno) {
       res = res.replace(
         REG_EXP_MAKEFILE_DENO_VERSION,
-        `DENO_VERSION=${versions.deno}`,
+        `DENO_VERSION=${format(versions.deno)}`,
       );
     }
 
     await Deno.writeTextFile(FILE_MAKEFILE, res);
 
     console.info(
-      `${FILE_MAKEFILE} updated to Nessie: ${versions.nessie} and Deno: ${versions.deno}`,
+      `${FILE_MAKEFILE} updated to Nessie: ${
+        versions.nessie && format(versions.nessie)
+      } and Deno: ${versions.deno && format(versions.deno)}`,
     );
   }
 };

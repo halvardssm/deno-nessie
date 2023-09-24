@@ -1,4 +1,5 @@
 import {
+  format,
   gte,
   parse,
   SemVer,
@@ -62,7 +63,7 @@ async function generateTagsArray() {
   const latestStable = tags.find((tag) => !tag.prerelease);
   const latestNext = tags.find((tag) => !!tag.prerelease);
 
-  const outputArray = [`${IMAGE}:${current}`];
+  const outputArray = [`${IMAGE}:${format(current)}`];
 
   try {
     if (
