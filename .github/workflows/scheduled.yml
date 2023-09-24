@@ -21,8 +21,11 @@ jobs:
         with: 
           deno-version: ${{ matrix.version }}
 
-      - name: Run test for format and lint
-        run: make test_fmt
+      - name: Check fmt
+        run: deno fmt --check
+  
+      - name: Check lint
+        run: deno lint
 
   unit:
     strategy:
@@ -41,7 +44,8 @@ jobs:
           deno-version: ${{ matrix.version }}
 
       - name: Run unit tests
-        run: make test_unit
+        run: deno task test:unit
+  
 
       - name: Generate lcov
         run: deno coverage --unstable --lcov ./coverage > coverage.lcov

@@ -281,3 +281,4 @@ $RECYCLE.BIN/
 .vscode
 data
 /db
+deno.lock

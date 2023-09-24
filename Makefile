@@ -11,15 +11,14 @@ test_all: test_fmt test_unit db_all_restart test_integration_cli db_all_restart 
 test: test_all
 
 test_fmt:
-	deno lint --unstable --ignore=tests,examples,cli/templates
-	deno fmt --check --ignore=coverage
-
+	deno lint
+	deno fmt --check
 test_unit:
-	deno test -A --unstable --coverage=coverage tests/unit
+	deno task test:unit
 test_integration_cli:
-	deno test -A --unstable --coverage=coverage tests/integration/cli
+	deno task test:integration:cli
 test_integration_update_timestamps:
-	deno test -A --unstable --coverage=coverage tests/integration/update_timestamps
+	deno task test:integration:update_timestamp
 
 db_all_restart: db_all_stop db_all_start
 db_all_start: db_pg_start db_mysql_start db_sqlite_start
@@ -77,7 +76,3 @@ image_test_clean:
 	rm -rf tests/image/*
 image_run:
 	docker run --rm -v `pwd`/tests/image:/nessie $(DOCKER_IMAGE) help
-
-bump_%: # version number and deno version separated by `:` e.g. 1.2.3:1.2.3
-	deno run --allow-read --allow-write helpers/prepare_release.ts $*
-	deno fmt --ignore=coverage

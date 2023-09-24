@@ -116,14 +116,16 @@ const setMakefile = async (versions: VERSIONS) => {
 };
 
 async function runProgram() {
-  const versionsRaw = Deno.args[0];
+  const versionsRaw = Deno.env.get("NESSIE_BUMP_VERSION");
 
   // versions should be separated by `:` e.g. `[nessieVersion]:[denoVersion]`
   // and will not allow any other form than `1.2.3` or `` on the right side
   // and `1.2.3`, `1.2.3-rf4` or `` on the left side.
   // If this is not fulfilled, the version will not upgrade
-  if (!versionsRaw.includes(":")) {
-    console.info("separator not included");
+  if (!versionsRaw || !versionsRaw.includes(":")) {
+    console.error(
+      "Separator not included. Must use format [nessieVersion]:[denoVersion]. E.g. NESSIE_BUMP_VERSION=1.2.3:1.2.3",
+    );
     Deno.exit(1);
   }
 
