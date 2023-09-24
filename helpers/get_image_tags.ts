@@ -1,5 +1,10 @@
-import * as semver from "https://deno.land/x/semver@v1.4.0/mod.ts";
-import { REG_EXP_VERSION_NEXT, REG_EXP_VERSION_STABLE } from "./commons.ts";
+import {
+  format,
+  gte,
+  parse,
+  SemVer,
+} from "https://deno.land/std@0.202.0/semver/mod.ts";
+import { tryParse } from "https://deno.land/std@0.202.0/semver/try_parse.ts";
 
 async function getTags() {
   const decoder = new TextDecoder();
@@ -21,7 +26,9 @@ async function getTags() {
     Deno.exit(code);
   }
 
-  return result.split("\n").filter((tag) => !tag.startsWith("v"));
+  return result.split("\n").map((tag) => tryParse(tag)).filter((tag) =>
+    !!tag
+  ) as SemVer[];
 }
 
 async function getCurrentTag() {
@@ -44,7 +51,7 @@ async function getCurrentTag() {
     Deno.exit(code);
   }
 
-  return result.trim();
+  return parse(result.trim());
 }
 
 async function generateTagsArray() {
@@ -53,20 +60,19 @@ async function generateTagsArray() {
   const tags = await getTags();
   const current = await getCurrentTag();
 
-  const latestStable =
-    tags.filter((tag) => REG_EXP_VERSION_STABLE.test(tag))[0];
-  const latestNext = tags.filter((tag) => REG_EXP_VERSION_NEXT.test(tag))[0];
+  const latestStable = tags.find((tag) => !tag.prerelease);
+  const latestNext = tags.find((tag) => !!tag.prerelease);
 
-  const outputArray = [`${IMAGE}:${current}`];
+  const outputArray = [`${IMAGE}:${format(current)}`];
 
   try {
     if (
-      REG_EXP_VERSION_STABLE.test(current) && semver.gte(current, latestStable)
+      !current.prerelease.length && latestStable && gte(current, latestStable)
     ) {
       outputArray.push(`${IMAGE}:latest`);
     }
 
-    if (semver.gte(current, latestNext)) {
+    if (latestNext && gte(current, latestNext)) {
       outputArray.push(`${IMAGE}:next`);
     }
 

@@ -1,5 +1,13 @@
 # Nessie Change Log
 
+## Version 2.0.11 - 2023-09-24
+
+- Deno v1.37.0
+- Deno std v0.202.0
+- Cliffy v0.25.7
+- MySQL v2.12.1
+- SQLite v3.8
+
 ## Version 2.0.10 - 2022-10-28
 
 - Deno v1.27.0
