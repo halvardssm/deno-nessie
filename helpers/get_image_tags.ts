@@ -3,9 +3,8 @@ import { REG_EXP_VERSION_NEXT, REG_EXP_VERSION_STABLE } from "./commons.ts";
 
 async function getTags() {
   const decoder = new TextDecoder();
-  const processTags = Deno.run({
-    cmd: [
-      "git",
+  const processTags = new Deno.Command("git", {
+    args: [
       "tag",
       "--sort",
       "-version:refname",
@@ -13,26 +12,22 @@ async function getTags() {
     stdout: "piped",
   });
 
-  const { code } = await processTags.status();
-  const rawOutput = await processTags.output();
+  const { success, code, stdout } = await processTags.output();
 
-  const result = decoder.decode(rawOutput);
+  const result = decoder.decode(stdout);
 
-  if (code !== 0) {
+  if (!success) {
     console.error(result);
     Deno.exit(code);
   }
-
-  processTags.close();
 
   return result.split("\n").filter((tag) => !tag.startsWith("v"));
 }
 
 async function getCurrentTag() {
   const decoder = new TextDecoder();
-  const processTags = Deno.run({
-    cmd: [
-      "git",
+  const processTags = new Deno.Command("git", {
+    args: [
       "describe",
       "--tags",
       "--abbrev=0",
@@ -40,17 +35,14 @@ async function getCurrentTag() {
     stdout: "piped",
   });
 
-  const { code } = await processTags.status();
-  const rawOutput = await processTags.output();
+  const { code, success, stdout } = await processTags.output();
 
-  const result = decoder.decode(rawOutput);
+  const result = decoder.decode(stdout);
 
-  if (code !== 0) {
+  if (!success) {
     console.error(result);
     Deno.exit(code);
   }
-
-  processTags.close();
 
   return result.trim();
 }
