@@ -45,7 +45,6 @@ jobs:
 
       - name: Run unit tests
         run: deno task test:unit
-  
 
       - name: Generate lcov
         run: deno coverage --unstable --lcov ./coverage > coverage.lcov
