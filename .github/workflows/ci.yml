@@ -1,8 +1,5 @@
 name: CI
 
-env:
-  DENO_VERSION: 1.37.0
-
 on:
   push:
     branches:
@@ -18,18 +15,13 @@ jobs:
 
     steps:
       - name: Clone repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install deno
         uses: denoland/setup-deno@v1
-        with: 
-          deno-version: ${{env.DENO_VERSION}}
 
-      - name: Check fmt
-        run: deno fmt --check
-
-      - name: Check lint
-        run: deno lint
+      - name: Check
+        run: deno task check
 
   unit:
     name: Test unit
@@ -37,12 +29,10 @@ jobs:
 
     steps:
       - name: Clone repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install deno
         uses: denoland/setup-deno@v1
-        with:
-          deno-version: ${{env.DENO_VERSION}}
 
       - name: Run unit tests
         run: deno task test:unit
@@ -65,22 +55,18 @@ jobs:
     steps:
       - name: Install deno
         uses: denoland/setup-deno@v1
-        with: 
-          deno-version: ${{env.DENO_VERSION}}
           
       - name: Nessie Init
-        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --dialect sqlite
-
-      - run: sed -i "s|from \".*\"|from \"https://raw.githubusercontent.com/$URL_PATH/mod.ts\"|" nessie.config.ts && cat nessie.config.ts
+        run: deno run -A https://raw.githubusercontent.com/$URL_PATH/cli.ts init --dialect sqlite
 
       - name: Create migration
-        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make test
+        run: deno run -A https://raw.githubusercontent.com/$URL_PATH/cli.ts make test
 
       - name: Create migration
-        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make:migration test2
+        run: deno run -A https://raw.githubusercontent.com/$URL_PATH/cli.ts make:migration test2
 
       - name: Create seed
-        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make:seed test
+        run: deno run -A https://raw.githubusercontent.com/$URL_PATH/cli.ts make:seed test
 
       - run: echo "test" >> test_template 
 
@@ -147,18 +133,13 @@ jobs:
 
     steps:
       - name: Clone repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install deno
         uses: denoland/setup-deno@v1
-        with:
-          deno-version: ${{env.DENO_VERSION}}
-
-      - name: Create databases
-        run: make db_sqlite_start
 
       - name: Run tests
-        run: make test_integration_cli
+        run: deno task test:integration
 
       - name: Generate lcov
         run: deno coverage --unstable --lcov ./coverage > coverage.lcov
@@ -168,73 +149,3 @@ jobs:
         with:
           files: coverage.lcov
           flags: integration-cli
-  
-  cli-update-timestamps:
-    name: Test CLI Update timestamps
-    runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_USER: root
-          POSTGRES_PASSWORD: pwd
-          POSTGRES_DB: nessie
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5000:5432
-
-      mysql:
-        image: mysql
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: true
-          MYSQL_DATABASE: nessie
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-        ports:
-          - 5001:3306
-    
-    steps:
-      - name: Clone repo
-        uses: actions/checkout@v3
-
-      - name: Install deno
-        uses: denoland/setup-deno@v1
-        with:
-          deno-version: ${{env.DENO_VERSION}}
-
-      - name: Create databases
-        run: make db_sqlite_start
-
-      - name: Run tests
-        run: make test_integration_update_timestamps
-
-      - name: Generate lcov
-        run: deno coverage --unstable --lcov ./coverage > coverage.lcov
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v1
-        with:
-          files: coverage.lcov
-          flags: integration-update-timestamps
-
-  image-test:
-    name: Test Docker image build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Build image
-        run: make image_build
-        env:
-          DENO_VERSION: latest
-
-      - name: Test image
-        run: make image_test

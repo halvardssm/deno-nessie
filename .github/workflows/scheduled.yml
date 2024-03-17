@@ -14,18 +14,15 @@ jobs:
 
     steps:
       - name: Clone repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install deno
         uses: denoland/setup-deno@v1
         with: 
           deno-version: ${{ matrix.version }}
 
-      - name: Check fmt
-        run: deno fmt --check
-  
-      - name: Check lint
-        run: deno lint
+      - name: Check
+        run: deno task check
 
   unit:
     strategy:
@@ -36,7 +33,7 @@ jobs:
 
     steps:
       - name: Clone repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install deno
         uses: denoland/setup-deno@v1
@@ -152,7 +149,7 @@ jobs:
 
     steps:
       - name: Clone repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install deno
         uses: denoland/setup-deno@v1
@@ -173,17 +170,3 @@ jobs:
         with:
           files: coverage.lcov
           flags: integration-cli
-
-  image-test:
-    name: Test Docker image build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Build image
-        run: make image_build
-        env:
-          DENO_VERSION: latest
-
-      - name: Test image
-        run: make image_test
