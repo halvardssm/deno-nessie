@@ -13,7 +13,6 @@
     "test": "deno task test:unit && deno task test:integration",
     "test:unit": "deno test -A --coverage --filter='unit ' lib/",
     "test:integration": "deno task db:restart && deno test -A --unstable-ffi --filter 'integration ' lib/ tests/ && deno task db:stop",
-    "bump_version": "deno run --allow-read --allow-write helpers/prepare_release.ts && deno fmt",
     "db:restart": "deno task db:stop && deno task db:start",
     "db:start": "deno task db:sqlite:start && docker compose up -d --remove-orphans --wait && sleep 2",
     "db:stop": "deno task db:sqlite:stop && docker compose down --remove-orphans --volumes",
