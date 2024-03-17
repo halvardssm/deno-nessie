@@ -1,20 +1,22 @@
 import {
-  AbstractClient,
   AbstractMigration,
+  AbstractMigrationClient,
   AbstractSeed,
-  ClientPostgreSQL,
-} from "https://deno.land/x/nessie/mod.ts";
+  PostgresMigrationClient,
+} from "../mod.ts";
 
 // This is a custom abstract migration class which can be used in the migration files
-export class CustomAbstractMigration<T extends AbstractClient<any> = any>
-  extends AbstractMigration<T> {
+export abstract class CustomAbstractMigration<
+  T extends AbstractMigrationClient<any> = any,
+> extends AbstractMigration<T> {
   someHelperFunction() {
     console.log("Hey, I am available to all child classes!");
   }
 }
 
 // I want to always use postres client in this class
-export class CustomAbstractSeed extends AbstractSeed<ClientPostgreSQL> {
+export abstract class CustomAbstractSeed
+  extends AbstractSeed<PostgresMigrationClient> {
   someHelperFunction() {
     console.log("Hey, I am available to all child classes!");
   }
