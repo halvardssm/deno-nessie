@@ -1,35 +1,25 @@
-import type { AbstractClient } from "./clients/AbstractClient.ts";
-import { DB_DIALECTS } from "./consts.ts";
-/** Supported dialects */
-export type DBDialects = DB_DIALECTS | string;
+import { AbstractMigrationClient, DBDialects } from "./mod.ts";
 
 /** Exposed object in migration files. available in `up`/`down` methods.
  * queryBuilder is available when passing `exposeQueryBuilder: true` to the config file.
  */
-export type Info<T = undefined> = {
+export type Context<T = undefined> = {
   dialect: DBDialects;
 };
 
 /** Logger function. */
 // deno-lint-ignore no-explicit-any
 export type LoggerFn = (output?: any, title?: string) => void;
-/** Handy type to cover printf. */
-export type QueryWithString = (string: string) => string;
 /** Amount type for migrations. */
 export type AmountMigrateT = number | undefined;
 /** Amount type for rollbacks. */
 export type AmountRollbackT = AmountMigrateT | "all";
-/** Query type. */
-export type QueryT = string | string[];
-/** Query handler function. */
-// deno-lint-ignore no-explicit-any
-export type QueryHandler = (query: QueryT) => Promise<any>;
 
 /** Nessie config options. */
 export interface NessieConfig {
   /** Can be any class which extends `AbstractClient`. */
   // deno-lint-ignore no-explicit-any
-  client: AbstractClient<any>;
+  client: AbstractMigrationClient<any>;
   /**
    * The folders where migration files are located.
    * Can be a relative path or an absolute path.
@@ -62,43 +52,10 @@ export interface NessieConfig {
   debug?: boolean;
 }
 
-export interface AbstractClientOptions<Client> {
-  client: Client;
-}
-
 export type FileEntryT = {
   name: string;
   path: string;
 };
-
-export type CommandOptions = {
-  debug: boolean;
-  config: string;
-};
-
-export interface CommandOptionsInit extends CommandOptions {
-  mode?: "config" | "folders";
-  dialect?: DB_DIALECTS;
-}
-
-export interface CommandOptionsStatus extends CommandOptions {
-  fileNames?: boolean;
-  output?: "log" | "json";
-}
-
-export interface CommandOptionsMakeSeed extends CommandOptions {
-  seedTemplate?: string;
-}
-
-export interface CommandOptionsMakeMigration extends CommandOptions {
-  migrationTemplate?: string;
-}
-
-export type AllCommandOptions =
-  & CommandOptionsInit
-  & CommandOptionsStatus
-  & CommandOptionsMakeSeed
-  & CommandOptionsMakeMigration;
 
 export interface StateOptions {
   debug: boolean;

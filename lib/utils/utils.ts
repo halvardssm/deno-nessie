@@ -1,15 +1,18 @@
-import { MAX_FILE_NAME_LENGTH, REGEXP_MIGRATION_FILE_NAME } from "../consts.ts";
-import { LoggerFn } from "../types.ts";
+import {
+  LoggerFn,
+  MAX_FILE_NAME_LENGTH,
+  REGEXP_MIGRATION_FILE_NAME,
+} from "../mod.ts";
 
-export const isUrl = (path: string) => {
+export const isUrl = (path: string): boolean => {
   return isRemoteUrl(path) || isFileUrl(path);
 };
 
-export const isFileUrl = (path: string) => {
+export const isFileUrl = (path: string): boolean => {
   return path.startsWith("file://");
 };
 
-export const isRemoteUrl = (path: string) => {
+export const isRemoteUrl = (path: string): boolean => {
   return path.startsWith("http://") ||
     path.startsWith("https://");
 };

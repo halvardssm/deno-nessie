@@ -1,33 +1,31 @@
-import {
-  basename,
-  CliffySelect,
-  CliffyToggle,
-  exists,
-  format,
-  fromFileUrl,
-  resolve,
-} from "../deps.ts";
+import { basename, fromFileUrl, resolve } from "@std/path";
+import { exists } from "@std/fs";
+import { format } from "@std/datetime";
+import { Select, Toggle } from "@cliffy/prompt";
 import {
   arrayIsUnique,
+  DEFAULT_MIGRATION_FOLDER,
+  DEFAULT_SEED_FOLDER,
+  FileEntryT,
   getLogger,
+  getMigrationTemplate,
+  getSeedTemplate,
   isFileUrl,
   isMigrationFile,
   isUrl,
-} from "./utils.ts";
-import type {
-  AllCommandOptions,
-  FileEntryT,
   LoggerFn,
   NessieConfig,
-  StateOptions,
-} from "../types.ts";
-import {
-  DEFAULT_MIGRATION_FOLDER,
-  DEFAULT_SEED_FOLDER,
+  NessieError,
   REGEXP_FILE_NAME,
-} from "../consts.ts";
-import { getMigrationTemplate, getSeedTemplate } from "./templates.ts";
-import { NessieError } from "./errors.ts";
+  StateOptions,
+} from "../mod.ts";
+
+export type StateInitOptions = {
+  debug: boolean;
+  config: string;
+  seedTemplate?: string;
+  migrationTemplate?: string;
+};
 
 /** The main state for the application.
  *
@@ -66,7 +64,7 @@ export class State {
   }
 
   /** Initializes the state with a client */
-  static async init(options: AllCommandOptions) {
+  static async init(options: StateInitOptions): Promise<State> {
     if (options.debug) console.log("Checking config path");
 
     const path = isUrl(options.config)
@@ -307,10 +305,10 @@ export class State {
   }
 
   private async _folderPrompt(folders: string[]) {
-    let promptSelection = 0;
+    let promptSelection = folders[0];
 
     if (folders.length > 1) {
-      const promptResult = await CliffySelect.prompt({
+      const promptResult = await Select.prompt({
         message:
           `You have multiple folder sources, where do you want to create the new file?`,
         options: folders.map((folder, i) => ({
@@ -319,16 +317,16 @@ export class State {
         })),
       });
 
-      promptSelection = parseInt(promptResult);
+      promptSelection = promptResult.name;
     }
 
     this.logger(promptSelection, "Prompt input final");
 
-    return folders[promptSelection];
+    return promptSelection;
   }
 
   private async _fileExistsPrompt(file: string): Promise<boolean> {
-    const result: boolean = await CliffyToggle.prompt(
+    const result: boolean = await Toggle.prompt(
       `The file ${file} already exists, do you want to overwrite the existing file?`,
     );
 
