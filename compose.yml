@@ -1,0 +1,29 @@
+services:
+  postgres:
+    image: postgres
+    restart: always
+    ports:
+      - 5100:5432
+    environment:
+      POSTGRES_DB: nessie
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: pwd
+    healthcheck:
+      test: ["CMD-SHELL", "sh -c 'pg_isready -U root -d pwd'"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  mysql:
+    image: mysql
+    restart: always
+    ports:
+      - 5101:3306
+    environment:
+      MYSQL_DATABASE: nessie
+      MYSQL_ALLOW_EMPTY_PASSWORD: true
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "--user", "root"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
