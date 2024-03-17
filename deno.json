@@ -1,9 +1,24 @@
 {
+  "name": "@halvardm/nessie",
+  "version": "2.0.11",
+  "exports": {
+    ".": "./mod.ts",
+    "./cli": "./cli.ts"
+  },
   "tasks": {
-    "test:unit": "deno test -A --unstable --coverage=coverage tests/unit",
-    "test:integration:cli": "deno test -A --unstable --coverage=coverage tests/integration/cli",
-    "test:integration:update_timestamp": "deno test -A --unstable --coverage=coverage tests/integration/update_timestamps",
-    "bump_version": "deno run --allow-read --allow-write helpers/prepare_release.ts && deno fmt"
+    "check": "deno task format:check && deno task lint:check && deno task type:check",
+    "lint:check": "deno lint",
+    "format:check": "deno fmt --check",
+    "type:check": "deno check mod.ts cli.ts",
+    "test": "deno task test:unit && deno task test:integration",
+    "test:unit": "deno test -A --coverage --filter='unit ' lib/",
+    "test:integration": "deno task db:restart && deno test -A --unstable-ffi --filter 'integration ' lib/ tests/ && deno task db:stop",
+    "bump_version": "deno run --allow-read --allow-write helpers/prepare_release.ts && deno fmt",
+    "db:restart": "deno task db:stop && deno task db:start",
+    "db:start": "deno task db:sqlite:start && docker compose up -d --remove-orphans --wait && sleep 2",
+    "db:stop": "deno task db:sqlite:stop && docker compose down --remove-orphans --volumes",
+    "db:sqlite:start": "mkdir -p tests/data && touch tests/data/sqlite.db",
+    "db:sqlite:stop": "rm -rf tests/data/sqlite.db"
   },
   "fmt": {
     "exclude": [
@@ -13,8 +28,19 @@
   "lint": {
     "exclude": [
       "tests",
-      "examples",
-      "cli/templates"
+      "examples"
     ]
+  },
+  "imports": {
+    "@std/assert": "jsr:@std/assert@^0.219.1",
+    "@std/datetime": "jsr:@std/datetime@^0.219.1",
+    "@std/fmt": "jsr:@std/fmt@^0.219.1",
+    "@std/fs": "jsr:@std/fs@^0.219.1",
+    "@std/path": "jsr:@std/path@^0.219.1",
+    "@std/semver": "jsr:@std/semver@^0.219.1",
+    "@std/testing": "jsr:@std/testing@^0.219.1",
+    "@cliffy/command": "https://deno.land/x/cliffy@v1.0.0-rc.3/command/mod.ts",
+    "@cliffy/prompt": "https://deno.land/x/cliffy@v1.0.0-rc.3/prompt/mod.ts",
+    "@db/sqlx": "jsr:@halvardm/sqlx@0.0.0-1"
   }
 }
