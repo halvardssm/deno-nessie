@@ -16,19 +16,28 @@ export const DEFAULT_MIGRATION_FOLDER = "./db/migrations";
 export const DEFAULT_SEED_FOLDER = "./db/seeds";
 
 export const MAX_FILE_NAME_LENGTH = 100;
-export const TABLE_MIGRATIONS = "nessie_migrations";
-export const COL_FILE_NAME = "file_name";
-export const COL_CREATED_AT = "created_at";
 /** RegExp to validate the file name */
 export const REGEXP_MIGRATION_FILE_NAME = /^\d{14}_[a-z\d]+(_[a-z\d]+)*.ts$/;
 export const REGEXP_FILE_NAME = /^[a-z\d]+(_[a-z\d]+)*$/;
 
-export const DbDialects = {
-  Postgres: "Postgres",
-  MySql: "MySql",
-  SqLite: "SqLite",
-} as const;
-export type DbDialects = typeof DbDialects[keyof typeof DbDialects];
+export const TEMPLATE_CONFIG = `import {
+  MySqlMigrationClient,
+  PostgresMigrationClient,
+  SqLiteMigrationClient,
+  NessieConfig,
+} from "${MODULE_NAME}";
 
-/** Supported dialects */
-export type DBDialects = DbDialects | string;
+/** Select one of the supported clients */
+// const client = new PostgresMigrationClient("postgres://root:pwd@localhost:5432/nessie");
+// const client = new MySqlMigrationClient("mysql://root@0.0.0.0:3306/nessie");
+// const client = new SqLiteMigrationClient("./sqlite.db");
+
+/** This is the final config object */
+const config: NessieConfig = {
+  client,
+  migrationFolders: ["./db/migrations"],
+  seedFolders: ["./db/seeds"],
+};
+
+export default config;
+`;

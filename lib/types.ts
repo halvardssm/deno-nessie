@@ -1,11 +1,10 @@
-import { AbstractMigrationClient, DBDialects } from "./mod.ts";
+import { MigrationClient } from "./mod.ts";
 
 /** Exposed object in migration files. available in `up`/`down` methods.
  * queryBuilder is available when passing `exposeQueryBuilder: true` to the config file.
  */
-export type Context<T = undefined> = {
-  dialect: DBDialects;
-};
+// deno-lint-ignore ban-types
+export type Context<T = undefined> = {};
 
 /** Logger function. */
 // deno-lint-ignore no-explicit-any
@@ -19,7 +18,7 @@ export type AmountRollbackT = AmountMigrateT | "all";
 export interface NessieConfig {
   /** Can be any class which extends `AbstractClient`. */
   // deno-lint-ignore no-explicit-any
-  client: AbstractMigrationClient<any>;
+  client: MigrationClient<any>;
   /**
    * The folders where migration files are located.
    * Can be a relative path or an absolute path.

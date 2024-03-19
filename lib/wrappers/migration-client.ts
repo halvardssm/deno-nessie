@@ -5,65 +5,230 @@ import {
   AbstractSeedProps,
   AmountMigrateT,
   AmountRollbackT,
-  COL_FILE_NAME,
   Context,
-  DBDialects,
   FileEntryT,
   getDurationFromTimestamp,
   LoggerFn,
+  MAX_FILE_NAME_LENGTH,
   NessieError,
-  TABLE_MIGRATIONS,
 } from "../mod.ts";
 import { green } from "@std/fmt/colors";
 import { AbstractConnection, Row } from "@db/sqlx";
+import { RequiredPartialBy } from "@halvardm/js-helpers";
 
-export interface MigrationTable extends Row {
+/**
+ * Internal helper type for the connection instance.
+ */
+// deno-lint-ignore no-explicit-any
+type AbstractConnectionInstance = AbstractConnection<any, any, any, any>;
+
+/**
+ * Internal helper type for the connection instance class.
+ */
+type AbstractConnectionClass = new (
+  // deno-lint-ignore no-explicit-any
+  ...args: any
+) => AbstractConnectionInstance;
+
+/**
+ * The context for the migration table query.
+ */
+export type MigrationTableQueryContext = {
+  /**
+   * The name of the migration table.
+   */
+  table: string;
+  /**
+   * The name of the column for the migration id.
+   */
+  columnId: string;
+  /**
+   * The name of the column for the migration file name.
+   */
+  columnFileName: string;
+  /**
+   * The name of the column for the migration run date.
+   */
+  columnCreatedAt: string;
+  /**
+   * The maximum length of the migration file name.
+   */
+  maxFileNameLength: number;
+  /**
+   * The migration file name to insert or delete.
+   *
+   * Only available for `insertMigration` and `deleteMigration` queries.
+   */
+  migrationFileName: string;
+};
+
+/**
+ * Query function for interacting with the migration table.
+ */
+export type MigrationTableQuery = (ctx: MigrationTableQueryContext) => string;
+
+/**
+ * The migration table.
+ */
+export interface MigrationTable extends Row<unknown> {
+  /**
+   * The id of the migration.
+   */
   id: number;
+  /**
+   * The name of the migration file.
+   */
   file_name: string;
+  /**
+   * The date the migration was run.
+   */
   created_at: string;
 }
 
-export interface MigrationClientOptions<Client> {
-  dialect: DBDialects;
+/**
+ * The queries used by the migration client.
+ */
+export type MigrationClientQueries = {
+  /**
+   * Query to check if the migration table exists.
+   *
+   * Must return 0 rows if the table does not exist.
+   * If the table exists, it must return 1 or more rows.
+   */
+  migrationTableExists: MigrationTableQuery;
+  /**
+   * Query to create the migration table.
+   */
+  createMigrationTable: MigrationTableQuery;
+  /**
+   * Query to get the latest migration.
+   */
+  getLatestMigration: MigrationTableQuery;
+  /**
+   * Query to get all migrations.
+   */
+  getAllMigrations: MigrationTableQuery;
+  /**
+   * Query to insert a migration.
+   */
+  insertMigration: MigrationTableQuery;
+  /**
+   * Query to delete a migration.
+   */
+  deleteMigration: MigrationTableQuery;
+};
+
+/**
+ * The options for the migration client.
+ */
+export interface MigrationClientOptions<
+  Client extends AbstractConnectionInstance,
+> {
+  /**
+   * The dialect of the migration client.
+   */
+  dialect: string;
+  /**
+   * The database connection to be used by the migration client.
+   */
   client: Client;
+  /**
+   * Dialect specific queries to be used by the migration client.
+   */
+  queries: RequiredPartialBy<
+    MigrationClientQueries,
+    "migrationTableExists" | "createMigrationTable"
+  >;
 }
 
-/** The migration client which handles most of the logic related to database communication. */
-export abstract class AbstractMigrationClient<
-  // deno-lint-ignore no-explicit-any
-  Client extends AbstractConnection<any, any, any>,
+/**
+ * The options for the migration client.
+ * Used by inherited classes as these should be set by the inheriting class.
+ */
+export type InheritedMigrationClientOptions<
+  Client extends AbstractConnectionClass,
+> =
+  & Omit<
+    Partial<
+      MigrationClientOptions<InstanceType<Client>>
+    >,
+    "client" | "queries"
+  >
+  & {
+    /**
+     * The client to be used by the migration client.
+     * Optionally, it takes the constructor parameters for the client as an array.
+     *
+     * @example
+     * ```ts
+     * const client = new PostgresConnection({ client: new PostgresConnection("url", connectionOptions) });
+     * const client = new PostgresConnection({ client: ["url", connectionOptions] });
+     * ```
+     */
+    client: InstanceType<Client> | ConstructorParameters<Client>;
+    /**
+     * Dialect specific queries to be used by the migration client. Overrides the default queries.
+     */
+    queries?: Partial<MigrationClientOptions<InstanceType<Client>>["queries"]>;
+  };
+
+/**
+ * The migration client which handles most of the logic related to database communication.
+ *
+ * This class is meant to be inherited by the dialect specific migration clients.
+ */
+export class MigrationClient<
+  Client extends AbstractConnectionClass,
 > {
-  client: Client;
+  client: InstanceType<Client>;
   /** Migration files read from the migration folders */
   migrationFiles: FileEntryT[] = [];
   /** Seed files read from the seed folders */
   seedFiles: FileEntryT[] = [];
 
-  /** The current dialect, given by the Client e.g. pg, mysql, sqlite */
-  readonly dialect?: DBDialects | string;
   protected logger: LoggerFn = () => undefined;
 
-  abstract readonly QUERY_MIGRATION_TABLE_EXISTS: string;
-  abstract readonly QUERY_CREATE_MIGRATION_TABLE: string;
+  readonly queries: MigrationClientQueries;
 
-  readonly QUERY_GET_LATEST: string =
-    `SELECT * FROM ${TABLE_MIGRATIONS} ORDER BY ${COL_FILE_NAME} DESC LIMIT 1;`;
-  readonly QUERY_GET_ALL: string =
-    `SELECT * FROM ${TABLE_MIGRATIONS} ORDER BY ${COL_FILE_NAME} DESC;`;
-
-  protected QUERY_MIGRATION_INSERT = (fileName: string): string =>
-    `INSERT INTO ${TABLE_MIGRATIONS} (${COL_FILE_NAME}) VALUES ('${fileName}');`;
-  protected QUERY_MIGRATION_DELETE = (fileName: string): string =>
-    `DELETE FROM ${TABLE_MIGRATIONS} WHERE ${COL_FILE_NAME} = '${fileName}';`;
-
-  constructor(options: MigrationClientOptions<Client>) {
-    this.dialect = options.dialect;
+  constructor(options: MigrationClientOptions<InstanceType<Client>>) {
     this.client = options.client;
+
+    const defaultQueries: Omit<
+      MigrationClientQueries,
+      "migrationTableExists" | "createMigrationTable"
+    > = {
+      getLatestMigration: (ctx) =>
+        `SELECT * FROM ${ctx.table} ORDER BY ${ctx.columnFileName} DESC LIMIT 1;`,
+      getAllMigrations: (ctx) =>
+        `SELECT * FROM ${ctx.table} ORDER BY ${ctx.columnFileName} DESC;`,
+      insertMigration: (ctx) =>
+        `INSERT INTO ${ctx.table} (${ctx.columnFileName}) VALUES ('${ctx.migrationFileName}');`,
+      deleteMigration: (ctx) =>
+        `DELETE FROM ${ctx.table} WHERE ${ctx.columnFileName} = '${ctx.migrationFileName}';`,
+    };
+
+    this.queries = {
+      ...defaultQueries,
+      ...options.queries,
+    };
   }
 
   /** Sets the logger for the client. Given by the State. */
   setLogger(fn: LoggerFn) {
     this.logger = fn;
+  }
+
+  protected _getMigrationTableQueryContext(
+    fileName?: string,
+  ): MigrationTableQueryContext {
+    return {
+      table: "nessie_migrations",
+      columnId: "id",
+      columnFileName: "file_name",
+      columnCreatedAt: "created_at",
+      maxFileNameLength: MAX_FILE_NAME_LENGTH,
+      migrationFileName: fileName || "",
+    };
   }
 
   protected _parseAmount(
@@ -103,10 +268,7 @@ export abstract class AbstractMigrationClient<
     file: FileEntryT,
     isDown = false,
   ) {
-    // deno-lint-ignore no-explicit-any
-    const exposedObject: Context<any> = {
-      dialect: this.dialect!,
-    };
+    const exposedObject: Context<unknown> = {};
 
     const MigrationClass: new (
       props: AbstractMigrationProps<this>,
@@ -116,23 +278,35 @@ export abstract class AbstractMigrationClient<
 
     if (isDown) {
       await migration.down(exposedObject);
-      await this.client.execute(this.QUERY_MIGRATION_DELETE(file.name));
+      await this.client.execute(
+        this.queries.deleteMigration(
+          this._getMigrationTableQueryContext(file.name),
+        ),
+      );
     } else {
       await migration.up(exposedObject);
-      await this.client.execute(this.QUERY_MIGRATION_INSERT(file.name));
+      await this.client.execute(
+        this.queries.insertMigration(
+          this._getMigrationTableQueryContext(file.name),
+        ),
+      );
     }
   }
 
   async prepare(): Promise<void> {
     await this.client.connect();
     const queryResult = await this.client.query(
-      this.QUERY_MIGRATION_TABLE_EXISTS,
+      this.queries.migrationTableExists(this._getMigrationTableQueryContext()),
     );
 
     const migrationTableExists = queryResult.length > 0;
 
     if (!migrationTableExists) {
-      await this.client.execute(this.QUERY_CREATE_MIGRATION_TABLE);
+      await this.client.execute(
+        this.queries.createMigrationTable(
+          this._getMigrationTableQueryContext(),
+        ),
+      );
       console.info("Database setup complete");
     }
   }
@@ -140,7 +314,7 @@ export abstract class AbstractMigrationClient<
   /** Runs the `up` method on all available migrations after filtering and sorting. */
   async migrate(amount: AmountMigrateT): Promise<void> {
     const latestMigration = await this.client.query<MigrationTable>(
-      this.QUERY_GET_LATEST,
+      this.queries.getLatestMigration(this._getMigrationTableQueryContext()),
     );
     const latestMigrationName = latestMigration[0]?.file_name;
 
@@ -253,10 +427,7 @@ export abstract class AbstractMigrationClient<
     const t1 = performance.now();
 
     for await (const file of files) {
-      // deno-lint-ignore no-explicit-any
-      const exposedObject: Context<any> = {
-        dialect: this.dialect!,
-      };
+      const exposedObject: Context<unknown> = {};
 
       console.info(`Seeding ${file.name}`);
 
@@ -282,7 +453,7 @@ export abstract class AbstractMigrationClient<
 
   async getAllMigrations(): Promise<string[]> {
     const allMigrations = await this.client.query<MigrationTable>(
-      this.QUERY_GET_ALL,
+      this.queries.getAllMigrations(this._getMigrationTableQueryContext()),
     );
 
     const parsedMigrations: string[] = allMigrations

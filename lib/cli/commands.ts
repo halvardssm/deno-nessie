@@ -14,7 +14,6 @@ import {
   ValidationError,
 } from "@cliffy/command";
 import {
-  DbDialects,
   DEFAULT_CONFIG_FILE,
   DEFAULT_MIGRATION_FOLDER,
   DEFAULT_SEED_FOLDER,
@@ -27,9 +26,6 @@ const enumTypeMode: EnumType<"config" | "folders"> = new EnumType([
   "config",
   "folders",
 ]);
-const enumTypeDialect: EnumType<DbDialects> = new EnumType(
-  Object.values(DbDialects),
-);
 const enumTypeOutput: EnumType<"log" | "json"> = new EnumType(["log", "json"]);
 
 /** Initializes Nessie */
@@ -40,24 +36,18 @@ export const initCommand: Command<
   [],
   {
     mode?: typeof enumTypeMode | undefined;
-    dialect?: typeof enumTypeDialect | undefined;
   }
 > = new Command<GlobalCommandOptions>()
   .description("Generates the config file.")
   .type("mode", enumTypeMode)
-  .type("dialect", enumTypeDialect)
   .option(
     "--mode <mode:mode>",
     "Select the mode for what to create, can be one of 'config' or 'folders'. If not sumbitted, it will create both the config file and folders.",
   )
-  .option(
-    "--dialect <dialect:dialect>",
-    `Set the database dialect for the config file. If not submitted, a general config file will be generated.`,
-  )
   .action(async (
     options,
   ) => {
-    const template = getConfigTemplate(options.dialect);
+    const template = getConfigTemplate();
 
     if (options.mode !== "folders") {
       const filePath = resolve(Deno.cwd(), DEFAULT_CONFIG_FILE);

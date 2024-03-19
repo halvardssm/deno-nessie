@@ -258,7 +258,7 @@ export class State {
 
     const template = this.#config.migrationTemplate
       ? await Deno.readTextFile(this.#config.migrationTemplate)
-      : getMigrationTemplate(this.client.dialect);
+      : getMigrationTemplate();
 
     const filePath = resolve(selectedFolder, fileName);
 
@@ -290,7 +290,7 @@ export class State {
 
     const template = this.#config.seedTemplate
       ? await Deno.readTextFile(this.#config.seedTemplate)
-      : getSeedTemplate(this.client.dialect);
+      : getSeedTemplate();
 
     const filePath = resolve(selectedFolder, fileName);
 
