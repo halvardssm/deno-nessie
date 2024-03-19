@@ -1,13 +1,17 @@
 import { join, resolve } from "@std/path";
-import { DbDialects } from "../mod.ts";
-import { describe, it } from "@std/testing/bdd";
+import { beforeAll, describe, it } from "@std/testing/bdd";
 import { assertCommandOutput } from "../lib/utils/assert.ts";
+import { emptyDirSync, ensureDirSync } from "@std/fs";
+
+async function commandRunner(options: Deno.CommandOptions) {
+  return await new Deno.Command(Deno.execPath(), options).output();
+}
 
 describe("integration cli", () => {
-  describe("command flow", () => {
-    const fileDir = resolve("./tests/cli");
+  describe("migrations", () => {
+    const fileDir = resolve("./tests/migrations");
 
-    async function commandFlowTest(dialect: DbDialects) {
+    async function commandFlowTest(dialect: "pg" | "mysql" | "sqlite") {
       const configFilePath = join(fileDir, `${dialect}.config.ts`);
 
       const argsPre = [
@@ -22,18 +26,18 @@ describe("integration cli", () => {
         // "-d",
       ];
 
-      async function commandRunner(args: string[]) {
-        return await new Deno.Command(Deno.execPath(), {
+      async function commandRunnerLocal(args: string[]) {
+        return commandRunner({
           args: [
             ...argsPre,
             ...args,
             ...argsPost,
           ],
-        }).output();
+        });
       }
 
       assertCommandOutput(
-        await commandRunner(["status", "--file-names"]),
+        await commandRunnerLocal(["status", "--file-names"]),
         {
           stdoutIncludes: [
             "Database setup complete",
@@ -52,7 +56,7 @@ describe("integration cli", () => {
       );
 
       assertCommandOutput(
-        await commandRunner(["status", "--output=json"]),
+        await commandRunnerLocal(["status", "--output=json"]),
         {
           stdoutIncludes:
             `{"totalAvailableMigrationFiles":3,"completedMigrations":0,"newAvailableMigrations":3}`,
@@ -60,7 +64,7 @@ describe("integration cli", () => {
       );
 
       assertCommandOutput(
-        await commandRunner(["status", "--file-names", "--output=json"]),
+        await commandRunnerLocal(["status", "--file-names", "--output=json"]),
         {
           stdoutIncludes:
             `{"totalAvailableMigrationFiles":3,"completedMigrations":0,"newAvailableMigrations":3,"totalAvailableMigrationFileNames":["20210508115213_test1.ts","20210508125213_test2.ts","20210508135213_test3.ts"],"completedMigrationNames":[],"newAvailableMigrationNames":["20210508115213_test1.ts","20210508125213_test2.ts","20210508135213_test3.ts"]}`,
@@ -68,7 +72,7 @@ describe("integration cli", () => {
       );
 
       assertCommandOutput(
-        await commandRunner(["status"]),
+        await commandRunnerLocal(["status"]),
         {
           stdoutIncludes: [
             "Status",
@@ -80,14 +84,14 @@ describe("integration cli", () => {
       );
 
       assertCommandOutput(
-        await commandRunner(["rollback", "all"]),
+        await commandRunnerLocal(["rollback", "all"]),
         {
           stdoutIncludes: ["Nothing to rollback"],
         },
       );
 
       assertCommandOutput(
-        await commandRunner(["migrate", "1"]),
+        await commandRunnerLocal(["migrate", "1"]),
         {
           stdoutIncludes: [
             "Starting migration of 3 files",
@@ -99,7 +103,7 @@ describe("integration cli", () => {
       );
 
       assertCommandOutput(
-        await commandRunner(["status"]),
+        await commandRunnerLocal(["status"]),
         {
           stdoutIncludes: [
             "Status",
@@ -111,7 +115,7 @@ describe("integration cli", () => {
       );
 
       assertCommandOutput(
-        await commandRunner(["migrate"]),
+        await commandRunnerLocal(["migrate"]),
         {
           stdoutIncludes: [
             "Starting migration of 2 files",
@@ -124,7 +128,7 @@ describe("integration cli", () => {
       );
 
       assertCommandOutput(
-        await commandRunner(["status"]),
+        await commandRunnerLocal(["status"]),
         {
           stdoutIncludes: [
             "Status",
@@ -136,7 +140,7 @@ describe("integration cli", () => {
       );
 
       assertCommandOutput(
-        await commandRunner(["seed", "seed.ts"]),
+        await commandRunnerLocal(["seed", "seed.ts"]),
         {
           stdoutIncludes: [
             "Starting seeding of 1 files",
@@ -148,14 +152,14 @@ describe("integration cli", () => {
       );
 
       assertCommandOutput(
-        await commandRunner(["migrate"]),
+        await commandRunnerLocal(["migrate"]),
         {
           stdoutIncludes: ["Nothing to migrate"],
         },
       );
 
       assertCommandOutput(
-        await commandRunner(["rollback", "2"]),
+        await commandRunnerLocal(["rollback", "2"]),
         {
           stdoutIncludes: [
             "Starting rollback of 2 files",
@@ -168,7 +172,7 @@ describe("integration cli", () => {
       );
 
       assertCommandOutput(
-        await commandRunner(["status"]),
+        await commandRunnerLocal(["status"]),
         {
           stdoutIncludes: [
             "Status",
@@ -180,7 +184,7 @@ describe("integration cli", () => {
       );
 
       assertCommandOutput(
-        await commandRunner(["migrate", "2"]),
+        await commandRunnerLocal(["migrate", "2"]),
         {
           stdoutIncludes: [
             "Starting migration of 2 files",
@@ -193,7 +197,7 @@ describe("integration cli", () => {
       );
 
       assertCommandOutput(
-        await commandRunner(["status"]),
+        await commandRunnerLocal(["status"]),
         {
           stdoutIncludes: [
             "Status",
@@ -205,7 +209,7 @@ describe("integration cli", () => {
       );
 
       assertCommandOutput(
-        await commandRunner(["rollback", "all"]),
+        await commandRunnerLocal(["rollback", "all"]),
         {
           stdoutIncludes: [
             "Starting rollback of 3 files",
@@ -219,7 +223,7 @@ describe("integration cli", () => {
       );
 
       assertCommandOutput(
-        await commandRunner(["status"]),
+        await commandRunnerLocal(["status"]),
         {
           stdoutIncludes: [
             "Status",
@@ -231,7 +235,7 @@ describe("integration cli", () => {
       );
 
       assertCommandOutput(
-        await commandRunner(["rollback"]),
+        await commandRunnerLocal(["rollback"]),
         {
           stdoutIncludes: ["Nothing to rollback"],
         },
@@ -239,15 +243,15 @@ describe("integration cli", () => {
     }
 
     it("command flow Postgres", async () => {
-      await commandFlowTest(DbDialects.Postgres);
+      await commandFlowTest("pg");
     });
 
     it("command flow MySql", async () => {
-      await commandFlowTest(DbDialects.MySql);
+      await commandFlowTest("mysql");
     });
 
     it("command flow SqLite", async () => {
-      await commandFlowTest(DbDialects.SqLite);
+      await commandFlowTest("sqlite");
     });
   });
 });
