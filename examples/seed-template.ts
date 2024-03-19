@@ -3,7 +3,8 @@ import { Context } from "../mod.ts";
 import { CustomAbstractSeed } from "./abstract-classes-extended.ts";
 
 export default class extends CustomAbstractSeed {
-  async run({ dialect }: Context): Promise<void> {
+  // deno-lint-ignore require-await
+  async run(_ctx: Context): Promise<void> {
     this.someHelperFunction();
   }
 }
