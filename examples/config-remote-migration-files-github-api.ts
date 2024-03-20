@@ -28,7 +28,7 @@ const migrationFiles = body.filter((el) => isMigrationFile(el.name))
   .map((el) => el.download_url);
 
 const config: NessieConfig = {
-  client: new SqLiteMigrationClient("sqlite.db"),
+  client: new SqLiteMigrationClient({ client: ["sqlite.db"] }),
   additionalMigrationFiles: migrationFiles,
 };
 

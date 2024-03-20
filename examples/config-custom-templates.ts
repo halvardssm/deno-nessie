@@ -1,7 +1,7 @@
 import { NessieConfig, SqLiteMigrationClient } from "../mod.ts";
 
 const config: NessieConfig = {
-  client: new SqLiteMigrationClient("sqlite.db"),
+  client: new SqLiteMigrationClient({ client: ["sqlite.db"] }),
   migrationTemplate: "./migration-template.ts",
   seedTemplate: "./seed-template.ts",
 };
