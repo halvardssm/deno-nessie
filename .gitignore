@@ -282,3 +282,4 @@ $RECYCLE.BIN/
 data
 /db
 deno.lock
+tests/init
