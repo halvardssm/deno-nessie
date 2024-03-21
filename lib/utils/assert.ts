@@ -1,4 +1,5 @@
-import { assertEquals, assertStringIncludes } from "@std/assert";
+import { assert, assertEquals, assertStringIncludes } from "@std/assert";
+import { exists, ExistsOptions } from "@std/fs";
 
 export interface AssertCommandOutputResult
   extends Omit<Deno.CommandOutput, "stdout" | "stderr"> {
@@ -87,4 +88,14 @@ export function assertCommandOutput(
     stdout,
     stderr,
   };
+}
+
+export async function assertFsExists(
+  path: string | URL,
+  options?: ExistsOptions,
+) {
+  assert(
+    await exists(path, options),
+    `Path ${path} does not exist with options isReadable=${options?.isReadable}, isFile: ${options?.isFile}`,
+  );
 }
