@@ -11,7 +11,7 @@
     "format:check": "deno fmt --check",
     "type:check": "deno check mod.ts cli.ts",
     "doc:check": "deno doc --lint lib examples",
-    "test": "deno task db:restart && deno test -A --unstable-ffi lib tests; deno task db:stop",
+    "test": "deno task db:restart && deno test -A --unstable-ffi --coverage lib tests; deno task db:stop",
     "db:restart": "deno task db:stop && deno task db:start",
     "db:start": "deno task db:sqlite:start && docker compose up -d --remove-orphans --wait && sleep 2",
     "db:stop": "deno task db:sqlite:stop && docker compose down --remove-orphans --volumes",
@@ -20,7 +20,8 @@
   },
   "fmt": {
     "exclude": [
-      "coverage"
+      "coverage",
+      "tests/init"
     ]
   },
   "lint": {

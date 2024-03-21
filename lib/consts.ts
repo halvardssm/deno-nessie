@@ -19,25 +19,3 @@ export const MAX_FILE_NAME_LENGTH = 100;
 /** RegExp to validate the file name */
 export const REGEXP_MIGRATION_FILE_NAME = /^\d{14}_[a-z\d]+(_[a-z\d]+)*.ts$/;
 export const REGEXP_FILE_NAME = /^[a-z\d]+(_[a-z\d]+)*$/;
-
-export const TEMPLATE_CONFIG = `import {
-  MySqlMigrationClient,
-  PostgresMigrationClient,
-  SqLiteMigrationClient,
-  NessieConfig,
-} from "${MODULE_NAME}";
-
-/** Select one of the supported clients */
-// const client = new PostgresMigrationClient("postgres://root:pwd@localhost:5432/nessie");
-// const client = new MySqlMigrationClient("mysql://root@0.0.0.0:3306/nessie");
-// const client = new SqLiteMigrationClient("./sqlite.db");
-
-/** This is the final config object */
-const config: NessieConfig = {
-  client,
-  migrationFolders: ["./db/migrations"],
-  seedFolders: ["./db/seeds"],
-};
-
-export default config;
-`;
