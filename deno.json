@@ -12,6 +12,7 @@
     "type:check": "deno check mod.ts cli.ts",
     "doc:check": "deno doc --lint lib examples",
     "test": "deno task db:restart && deno test -A --unstable-ffi --coverage lib tests; deno task db:stop",
+    "coverage:lcov": "deno coverage --exclude=vendor --exclude=examples --lcov > coverage.lcov",
     "db:restart": "deno task db:stop && deno task db:start",
     "db:start": "deno task db:sqlite:start && docker compose up -d --remove-orphans --wait && sleep 2",
     "db:stop": "deno task db:sqlite:stop && docker compose down --remove-orphans --volumes",

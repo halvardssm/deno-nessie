@@ -41,7 +41,7 @@ jobs:
         run: deno task test
 
       - name: Generate lcov
-        run: deno coverage --unstable --lcov coverage > coverage.lcov
+        run: deno task coverage:lcov
 
       - name: Upload coverage
         uses: codecov/codecov-action@v1
