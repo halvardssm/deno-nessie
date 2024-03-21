@@ -1,8 +1,8 @@
 import {
-  ClientSQLite,
   isMigrationFile,
   NessieConfig,
-} from "https://deno.land/x/nessie/mod.ts";
+  SqLiteMigrationClient,
+} from "../mod.ts";
 
 /**
  * This example uses the github api to get the the folder content of a repository.
@@ -28,7 +28,7 @@ const migrationFiles = body.filter((el) => isMigrationFile(el.name))
   .map((el) => el.download_url);
 
 const config: NessieConfig = {
-  client: new ClientSQLite("sqlite.db"),
+  client: new SqLiteMigrationClient({ client: ["sqlite.db"] }),
   additionalMigrationFiles: migrationFiles,
 };
 

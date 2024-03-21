@@ -1,21 +1,16 @@
 <h1 align="center">Nessie</h1>
 
 <p align="center">
-  <a href="https://deno.land/x/nessie">
+  <a href="jsr:@halvardm/nessie">
     <img alt="GitHub release (latest SemVer)" src="https://img.shields.io/github/v/release/halvardssm/deno-nessie?label=Nessie%20stable&style=for-the-badge&logo=data:image/png;base64,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" />
   </a>
-  <a href="https://deno.land/x/nessie">
+  <a href="jsr:@halvardm/nessie">
     <img alt="GitHub release (latest by date including pre-releases)" src="https://img.shields.io/github/v/release/halvardssm/deno-nessie?include_prereleases&label=Nessie%20Next&style=for-the-badge&logo=data:image/png;base64,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" />
   </a>
-  <a href="https://doc.deno.land/https/deno.land/x/nessie/mod.ts">
+  <a href="https://jsr.io/@halvardm/nessie">
     <img alt="Docs" src="https://img.shields.io/badge/Nessie-doc-informational.svg?style=for-the-badge&logo=data:image/png;base64,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" />
   </a>
-  <a href="https://deno.land">
-    <img alt="Deno Version" src="https://img.shields.io/badge/deno-v1.37.0-green.svg?style=for-the-badge&logo=deno"/>
-  </a>
-  <a href="https://github.com/halvardssm/deno-nessie/actions?query=branch%3Amain+workflow%3ACI">
-    <img alt="GitHub Workflow Status (branch)" src="https://img.shields.io/github/workflow/status/halvardssm/deno-nessie/CI/main?style=for-the-badge&logo=github">
-  </a>
+  <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/halvardssm/deno-nessie/scheduled.yml?style=for-the-badge">
   <a href="https://app.codecov.io/gh/halvardssm/deno-nessie">
     <img alt="Codecov" src="https://img.shields.io/codecov/c/gh/halvardssm/deno-nessie?logo=codecov&style=for-the-badge&token=O59WOJ5W00" />
   </a>
@@ -25,15 +20,12 @@
   <a href="https://discord.gg/8WXfG2tvfr">
     <img alt="Discord" src="https://img.shields.io/badge/chat-on%20discord-green.svg?style=for-the-badge&logo=discord" />
   </a>
-  <a href="https://hub.docker.com/repository/docker/halvardm/nessie">
-    <img alt="Docker Image Size (tag)" src="https://img.shields.io/docker/image-size/halvardm/nessie/latest?logo=docker&style=for-the-badge" />
-  </a>
   <br>
-  <a href="https://deno.land/x/nessie">
+  <a href="jsr:@halvardm/nessie">
     <img alt="deno.land" src="https://img.shields.io/badge/Published%20on-deno.land-blue?logo=deno&labelColor=272727&color=272727&style=for-the-badge" />
   </a>
-  <a href="https://nest.land/package/Nessie">
-    <img alt="nest.land" src="https://nest.land/badge-large.svg">
+  <a href="https://jsr.io/@halvardm/nessie">
+    <img alt="Static Badge" src="https://img.shields.io/badge/jrs-jsr?style=for-the-badge&logo=deno&labelColor=555555&color=F6DF42">
   </a>
 </p>
 
@@ -49,20 +41,6 @@ supporting the future development. See
 [this issue](https://github.com/halvardssm/deno-nessie/issues/130) for more
 information.
 
-> ⚠️ With the native Prisma support for Deno, I no longer use Nessie for my
-> projects. This means that Nessie will be unmaintained in the near future. See
-> the related [issue](https://github.com/halvardssm/deno-nessie/issues/165) for
-> more information.
-
-🎉 **Version 2 is released**: To migrate from version 1 follow the steps in the
-[migration section](#migrate-from-version-1) bellow.
-
-> See documentation for the
-> [clients](https://doc.deno.land/https/deno.land/x/nessie/mod.ts).
-
-> Even though all examples in this readme applies unversioned usage, you should
-> always use a version when using Nessie.
-
 ---
 
 ## Contents
@@ -75,20 +53,17 @@ information.
   - [Config file](#config-file)
   - [Remote Migration or Seed files](#remote-migration-or-seed-files)
   - [Custom Migration or Seed templates](#custom-migration-or-seed-templates)
-- [Docker usage](#docker-usage)
 - [Uses](#uses)
 - [Examples](#examples)
 - [Clients](#clients)
   - [How to make a client](#how-to-make-a-client)
-- [Migrate from version 1](#migrate-from-version-1)
 - [Contributing](#contributing)
 
 ## Available Via
 
+- https://jsr.io/@halvardm/nessie
 - https://deno.land/x/nessie
 - https://raw.githubusercontent.com/halvardssm/deno-nessie
-- https://nest.land/package/Nessie
-- https://hub.docker.com/repository/docker/halvardm/nessie
 
 ## CLI Usage
 
@@ -96,7 +71,7 @@ information.
 > to only the permissions its needs. An example of this is:
 >
 > ```shell
-> deno install --unstable --allow-net=<db hostname/ip>:<db port> --allow-read=. --allow-write=nessie.config.ts,db -f  https://deno.land/x/nessie/cli.ts
+> deno install --unstable --allow-net=<db hostname/ip>:<db port> --allow-read=. --allow-write=nessie.config.ts,db -f jsr:@halvardm/nessie/cli
 > ```
 
 - `init`: Generates a `nessie.config.ts` file and also the `db` folder where
@@ -112,15 +87,15 @@ information.
     three dialects, otherwise it will include only the selected one.
 
   ```shell
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts init
+  deno run -A --unstable jsr:@halvardm/nessie/cli init
 
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts init --mode folders
+  deno run -A --unstable jsr:@halvardm/nessie/cli init --mode folders
 
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts init --mode config --dialect pg
+  deno run -A --unstable jsr:@halvardm/nessie/cli init --mode config --dialect pg
 
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts init --mode config --dialect sqlite
+  deno run -A --unstable jsr:@halvardm/nessie/cli init --mode config --dialect sqlite
 
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts init --mode config --dialect mysql
+  deno run -A --unstable jsr:@halvardm/nessie/cli init --mode config --dialect mysql
   ```
 
 - `make:migration [name]` & `make [name]`: Create migration, `name` has to be
@@ -130,11 +105,11 @@ information.
   to use when generating a new migration.
 
   ```shell
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts make:migration create_users
+  deno run -A --unstable jsr:@halvardm/nessie/cli make:migration create_users
 
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts make create_users
+  deno run -A --unstable jsr:@halvardm/nessie/cli make create_users
 
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts make --migrationTemplate some_custom_template create_users
+  deno run -A --unstable jsr:@halvardm/nessie/cli make --migrationTemplate some_custom_template create_users
   ```
 
 - `make:seed [name]`: Create seed, `name` has to be snake- and lowercase, it can
@@ -144,9 +119,9 @@ information.
   migration.
 
   ```shell
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts make:seed add_users
+  deno run -A --unstable jsr:@halvardm/nessie/cli make:seed add_users
 
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts make:seed --seedTemplate some_custom_template add_users
+  deno run -A --unstable jsr:@halvardm/nessie/cli make:seed --seedTemplate some_custom_template add_users
   ```
 
 - `migrate [amount?]`: Run migration - will migrate your migrations in your
@@ -154,33 +129,33 @@ information.
   db. Amount defines how many migrations, defaults to all available if not set.
 
   ```shell
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts migrate
+  deno run -A --unstable jsr:@halvardm/nessie/cli migrate
 
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts migrate 1
+  deno run -A --unstable jsr:@halvardm/nessie/cli migrate 1
 
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts migrate -c ./nessie.config.ts
+  deno run -A --unstable jsr:@halvardm/nessie/cli migrate -c ./nessie.config.ts
   ```
 
 - `rollback [amount?]`: Rollback - will rollback your migrations. Amount defines
   how many migrations, defaults to 1 if not set.
 
   ```shell
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts rollback
+  deno run -A --unstable jsr:@halvardm/nessie/cli rollback
 
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts rollback 2
+  deno run -A --unstable jsr:@halvardm/nessie/cli rollback 2
 
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts rollback all
+  deno run -A --unstable jsr:@halvardm/nessie/cli rollback all
   ```
 
 - `seed [matcher?]`: Seed - will seed your database. Optional matcher will match
   all files in your seed folder by string literal or RegExp.
 
   ```shell
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts seed
+  deno run -A --unstable jsr:@halvardm/nessie/cli seed
 
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts seed seed_file.js
+  deno run -A --unstable jsr:@halvardm/nessie/cli seed seed_file.js
 
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts seed ".+.ts"
+  deno run -A --unstable jsr:@halvardm/nessie/cli seed ".+.ts"
   ```
 
 - `status`: Outputs the status of Nessie. Will output detailed information about
@@ -195,31 +170,23 @@ information.
   `--file-names` adds the file names to each of the outputs.
 
   ```shell
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts status
+  deno run -A --unstable jsr:@halvardm/nessie/cli status
   totalAvailableMigrationFiles: 1
   completedMigrations: 0
   newAvailableMigrations: 1
 
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts status --output json
+  deno run -A --unstable jsr:@halvardm/nessie/cli status --output json
   {"totalAvailableMigrationFiles":1,"completedMigrations":0,"newAvailableMigrations":1}
 
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts status --file-names
+  deno run -A --unstable jsr:@halvardm/nessie/cli status --file-names
   totalAvailableMigrationFiles: 1
     20210508115213_test1.ts
   completedMigrations: 0
   newAvailableMigrations: 1
     20210508115213_test1.ts
 
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts status --file-names --output json
+  deno run -A --unstable jsr:@halvardm/nessie/cli status --file-names --output json
   {"totalAvailableMigrationFiles":1,"completedMigrations":0,"newAvailableMigrations":1,"totalAvailableMigrationFileNames":["20210508115213_test1.ts"],"completedMigrationNames":[],"newAvailableMigrationNames":["20210508115213_test1.ts"]}
-  ```
-
-- `update_timestamps`: Update timestamps - will update timestamps to the new
-  format. Will only update timestamps where the value is less than 1672531200000
-  (2023-01-01) so that the timestamps won't be updated multiple times.
-
-  ```shell
-  deno run -A --unstable https://deno.land/x/nessie/cli.ts update_timestamps
   ```
 
 ### Flags
@@ -234,11 +201,9 @@ information.
 ### Deno flags and Permissions
 
 While the examples simply show `-A` as the permission flag, you can also limit
-the permissions according to your needs. Bellow you will see what Nessie
-actually needs.
+the permissions according to your needs. Below you will see what Nessie actually
+needs.
 
-- `--unstable`: Needed by [std/fs/copy](https://deno.land/std@0.90.0/fs/copy.ts)
-  as it uses `Deno.utimeSync` and `Deno.utime` which are still unstable.
 - `--allow-read`: Nessie needs read access to be able to read the migration and
   seed folders, it also checks for the presence of the config file.
 - `--allow-write`: When initiating Nessie or creating a new migration or seed
@@ -321,13 +286,9 @@ your future migrations and seeds.
 
 See the [example folder](./examples) for more examples.
 
-## Docker usage
-
-See the specific [Nessie image docs](./image/README.md) for using Nessie with a
-docker image.
-
 ## Uses
 
+- [SQLx](https://jsr.io/@halvardm/sqlx)
 - [Cliffy](https://deno.land/x/cliffy/)
 - [Deno Postgres](https://deno.land/x/postgres/)
 - [Deno MySQL](https://deno.land/x/mysql/)
@@ -347,21 +308,12 @@ seeds and allows a more complex workflow.
 `nessie.config.ts` with all default values
 
 ```ts
-import {
-  ClientPostgreSQL,
-  NessieConfig,
-} from "https://deno.land/x/nessie/mod.ts";
+import { ClientSqLite, NessieConfig } from "jsr:@halvardm/nessie";
 
-const clientPg = new ClientPostgreSQL({
-  database: "nessie",
-  hostname: "localhost",
-  port: 5432,
-  user: "root",
-  password: "pwd",
-});
+const client = new ClientSqLite("./sqlite.db");
 
 const config: NessieConfig = {
-  client: clientPg,
+  client: client,
   migrationFolders: ["./db/migrations"],
   seedFolders: ["./db/seeds"],
   additionalMigrationFiles: [],
@@ -377,19 +329,15 @@ export default config;
 Minimal example of a migration file
 
 ```ts
-import {
-  AbstractMigration,
-  ClientPostgreSQL,
-  Info,
-} from "https://deno.land/x/nessie/mod.ts";
+import { AbstractMigration, ClientSqLite, Context } from "jsr:@halvardm/nessie";
 
-export default class extends AbstractMigration<ClientPostgreSQL> {
-  async up({ dialect }: Info): Promise<void> {
-    await this.client.queryArray("CREATE TABLE table1 (id int)");
+export default class extends AbstractMigration<ClientSqLite> {
+  async up({ dialect }: Context): Promise<void> {
+    await this.client.query("CREATE TABLE table1 (id int)");
   }
 
-  async down({ dialect }: Info): Promise<void> {
-    await this.client.queryArray("DROP TABLE table1");
+  async down({ dialect }: Context): Promise<void> {
+    await this.client.query("DROP TABLE table1");
   }
 }
 ```
@@ -397,15 +345,11 @@ export default class extends AbstractMigration<ClientPostgreSQL> {
 Seed file
 
 ```ts
-import {
-  AbstractSeed,
-  ClientPostgreSQL,
-  Info,
-} from "https://deno.land/x/nessie/mod.ts";
+import { AbstractSeed, ClientSqLite, Context } from "jsr:@halvardm/nessie";
 
-export default class extends AbstractSeed<ClientPostgreSQL> {
-  async run({ dialect }: Info): Promise<void> {
-    await this.client.queryArray("INSERT INTO table1 VALUES (1234)");
+export default class extends AbstractSeed<ClientSqLite> {
+  async run({ dialect }: Context): Promise<void> {
+    await this.client.query("INSERT INTO table1 VALUES (1234)");
   }
 }
 ```
@@ -416,72 +360,41 @@ See the [example folder](./examples) for more
 
 Provided clients are
 
-- [PostgreSQL](./clients/ClientPostgreSQL.ts) (also works for CockroachDB)
-- [MySQL](./clients/ClientMySQL.ts) & [MySQL 5.5](./clients/ClientMySQL55.ts)
-  - Currently it works with password for 5.*, but for >=8 you have to send a
+- [PostgreSQL](./lib/clients/ClientPostgreSQL.ts) (also works for CockroachDB)
+- [MySQL](./lib/clients/ClientMySQL.ts) &
+  [MySQL 5.5](./lib/clients/ClientMySQL55.ts)
+  - Currently it works with password for 5.\*, but for >=8 you have to send a
     blank password, see
     [issue 37](https://github.com/manyuanrong/deno_mysql/issues/37)
-- [SQLite](./clients/ClientSQLite.ts)
+- [SQLite](./lib/clients/ClientSQLite.ts)
 
 > If you would like to see your DB flavor supported, take a look at how to make
-> a client plugin with examples in the [clients folder](./clients) or in the
-> next section .
+> a migration client with examples in the [clients folder](./lib/clients) or in
+> the next section.
 
 ### How to make a client
 
-A client needs to extend [AbstractClient](./clients/AbstractClient.ts).
+A migration client needs to extend the base
+[AbstractMigrationClient](./lib/clients/migration-client.ts).
 
-`query`: Takes a query string or array of query strings and sends them of to the
-database for execution. Should return whatever the database responds.
+The constructor takes the dialect (identifier of the database), and the database
+client. The database client must extend
+[AbstractConnection](https://jsr.io/@halvardm/sqlx/doc/~/AbstractConnection)
+from [SQLx](https://jsr.io/@halvardm/sqlx).
 
-`prepare`: Will be run when the migration or rollback commands are executed.
-This should create the connection, set up the `nessie_migrations` table and
-prepare the database for incoming migrations.
+It must define the following properties:
 
-`migrate`: Takes a number as an optional input, will default to all files if not
-set. Will run `Math.min(amount, numberOfFiles)` migration files. Only handles
-the `up` method.
+- `QUERY_MIGRATION_TABLE_EXISTS`: The query to check if the migration table
+  exists. This should return 0 rows if not exists, or 1 row if exists.
+- `QUERY_CREATE_MIGRATION_TABLE`: Query to create the migration table.
 
-`rollback`: Takes a number as an optional input, will default to 1 if not set.
-Will run `Math.min(amount, numberOfFiles)` migration files. Only handles the
-`down` method.
+The Migration table should have the following columns:
 
-`seed`: Takes an optional matcher as input. Matcher can be regex or string. Will
-seed the database. Handles the `run` method in seed files.
+- `id`: int, primary key with auto increment.
+- `file_name`: string with a length of 100, unique
+- `created_at`: timestamp, default of current timestamp
 
-`close`: Will be the last method run before the program is finished. This should
-close the database connection.
-
-See the existing examples in the [clients](./clients) folder for reference.
-
-## Migrate from version 1
-
-If you are migrating from version 1, and starting from scratch is not an option,
-there are a couple of steps to perform. If you have any questions regarding the
-steps, please open a new discussion (not an issue).
-
-> ⚠️ The contributors of Nessie takes no responsibility for any dataloss which
-> might occur, so make sure to back up all existing data in your databases
-> before migrating and test it locally before executing any changes to your
-> production environment.
-
-1. Back up existing data
-2. Update the `nessie.config.ts` file to the new syntax (see the
-   [examples](./examples) folder)
-3. (Skip this step if you already updated the timestamps) Run the
-   `update_timestamps` command from the CLI to update the migration file names
-   and database entries (only the `nessie_migrations` table). Use the latest
-   version of Nessie e.g.
-
-   ```shell
-   deno run -A --unstable https://deno.land/x/nessie@2.0.0/cli.ts update_timestamps
-   ```
-4. Update all imports of Nessie to the latest version in your migration and seed
-   files
-5. Update the migration and seed files to use the new format (class based
-   migration files)
-
-If you come across any issues, you can open a new discussion on GitHub.
+See the existing examples in the [clients](./lib/clients) folder for reference.
 
 ## Contributing
 

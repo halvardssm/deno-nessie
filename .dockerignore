@@ -1,9 +1,0 @@
-**
-!cli
-!clients
-!wrappers
-!cli.ts
-!consts.ts
-!deps.ts
-!mod.ts
-!types.ts

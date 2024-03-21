@@ -1,8 +1,5 @@
 name: CI
 
-env:
-  DENO_VERSION: 1.37.0
-
 on:
   push:
     branches:
@@ -10,34 +7,36 @@ on:
   pull_request:
     branches:
       - main
+  schedule:
+    - cron: "24 8 * * 0,3,5"
+
+env:
+  DENO_VERSION: vx.x.x
 
 jobs:
-  fmt:
-    name: Test format and lint
+  check:
+    name: Check format and lint
     runs-on: ubuntu-latest
 
     steps:
       - name: Clone repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install deno
         uses: denoland/setup-deno@v1
-        with: 
+        with:
           deno-version: ${{env.DENO_VERSION}}
 
-      - name: Check fmt
-        run: deno fmt --check
+      - name: Check
+        run: deno task check
 
-      - name: Check lint
-        run: deno lint
-
-  unit:
-    name: Test unit
+  tests:
+    name: Run tests
     runs-on: ubuntu-latest
 
     steps:
       - name: Clone repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Install deno
         uses: denoland/setup-deno@v1
@@ -45,196 +44,32 @@ jobs:
           deno-version: ${{env.DENO_VERSION}}
 
       - name: Run unit tests
-        run: deno task test:unit
+        run: deno task test
 
       - name: Generate lcov
-        run: deno coverage --unstable --lcov ./coverage > coverage.lcov
+        run: deno task coverage:lcov
 
       - name: Upload coverage
         uses: codecov/codecov-action@v1
         with:
           files: coverage.lcov
-          flags: unit
+          flags: tests-stable
 
-  cli:
-    name: Test CLI
-    runs-on: ubuntu-latest
-    env:
-      URL_PATH: ${{github.event.pull_request.head.repo.full_name||github.repository}}/${{github.event.pull_request.head.ref||'main'}}
-
-    steps:
-      - name: Install deno
-        uses: denoland/setup-deno@v1
-        with: 
-          deno-version: ${{env.DENO_VERSION}}
-          
-      - name: Nessie Init
-        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --dialect sqlite
-
-      - run: sed -i "s|from \".*\"|from \"https://raw.githubusercontent.com/$URL_PATH/mod.ts\"|" nessie.config.ts && cat nessie.config.ts
-
-      - name: Create migration
-        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make test
-
-      - name: Create migration
-        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make:migration test2
-
-      - name: Create seed
-        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make:seed test
-
-      - run: echo "test" >> test_template 
-
-      - name: Create migration from custom template
-        run: |
-          deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make:migration --migrationTemplate test_template test_migration_template
-          TEMPLATE_PATH=$(find db/migrations -type f -name "*test_migration_template.ts")
-          TEMPLATE_CONTENT=$(cat $TEMPLATE_PATH)
-          if [[ $TEMPLATE_CONTENT != "test" ]]; then echo "File $TEMPLATE_PATH was not correct, was:\n$TEMPLATE_CONTENT" && exit 1; fi
-
-      - name: Create seed from custom template
-        run: |
-          deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make:seed --seedTemplate test_template test_seed_template
-          TEMPLATE_PATH=$(find db/seeds -type f -name "test_seed_template.ts")
-          TEMPLATE_CONTENT=$(cat $TEMPLATE_PATH)
-          if [[ $TEMPLATE_CONTENT != "test" ]]; then echo "File $TEMPLATE_PATH was not correct, was:\n$TEMPLATE_CONTENT" && exit 1; fi
-
-      - name: Clean files and folders
-        run: rm -rf db && rm -rf nessie.config.ts
-
-      - name: Init with mode and pg
-        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --mode config --dialect pg
-
-      - name: Init with mode and mysql
-        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --mode config --dialect mysql
-
-      - name: Init with mode and sqlite
-        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --mode config --dialect sqlite
-
-      - name: Init with folders only
-        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --mode folders
-
-  cli-migrations:
-    name: Test CLI Migrations
+  publish:
     runs-on: ubuntu-latest
 
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_USER: root
-          POSTGRES_PASSWORD: pwd
-          POSTGRES_DB: nessie
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5000:5432
-
-      mysql:
-        image: mysql
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: true
-          MYSQL_DATABASE: nessie
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-        ports:
-          - 5001:3306
+    permissions:
+      contents: read
+      id-token: write
 
     steps:
-      - name: Clone repo
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Install deno
         uses: denoland/setup-deno@v1
         with:
           deno-version: ${{env.DENO_VERSION}}
 
-      - name: Create databases
-        run: make db_sqlite_start
-
-      - name: Run tests
-        run: make test_integration_cli
-
-      - name: Generate lcov
-        run: deno coverage --unstable --lcov ./coverage > coverage.lcov
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v1
-        with:
-          files: coverage.lcov
-          flags: integration-cli
-  
-  cli-update-timestamps:
-    name: Test CLI Update timestamps
-    runs-on: ubuntu-latest
-
-    services:
-      postgres:
-        image: postgres
-        env:
-          POSTGRES_USER: root
-          POSTGRES_PASSWORD: pwd
-          POSTGRES_DB: nessie
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        ports:
-          - 5000:5432
-
-      mysql:
-        image: mysql
-        env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: true
-          MYSQL_DATABASE: nessie
-        options: >-
-          --health-cmd="mysqladmin ping"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
-        ports:
-          - 5001:3306
-    
-    steps:
-      - name: Clone repo
-        uses: actions/checkout@v3
-
-      - name: Install deno
-        uses: denoland/setup-deno@v1
-        with:
-          deno-version: ${{env.DENO_VERSION}}
-
-      - name: Create databases
-        run: make db_sqlite_start
-
-      - name: Run tests
-        run: make test_integration_update_timestamps
-
-      - name: Generate lcov
-        run: deno coverage --unstable --lcov ./coverage > coverage.lcov
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v1
-        with:
-          files: coverage.lcov
-          flags: integration-update-timestamps
-
-  image-test:
-    name: Test Docker image build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-
-      - name: Build image
-        run: make image_build
-        env:
-          DENO_VERSION: latest
-
-      - name: Test image
-        run: make image_test
+      - name: Publish (dry run)
+        run: deno publish --dry-run

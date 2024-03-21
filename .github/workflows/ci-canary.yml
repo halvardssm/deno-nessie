@@ -1,0 +1,69 @@
+name: CI
+
+on:
+  schedule:
+    - cron: "24 8 * * 0,3,5"
+
+env:
+  DENO_VERSION: "canary"
+
+jobs:
+  check:
+    name: Check format and lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v4
+
+      - name: Install deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: ${{env.DENO_VERSION}}
+
+      - name: Check
+        run: deno task check
+
+  tests:
+    name: Run tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone repo
+        uses: actions/checkout@v4
+
+      - name: Install deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: ${{env.DENO_VERSION}}
+
+      - name: Run unit tests
+        run: deno task test
+
+      - name: Generate lcov
+        run: deno task coverage:lcov
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1
+        with:
+          files: coverage.lcov
+          flags: tests-canary
+
+  publish:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install deno
+        uses: denoland/setup-deno@v1
+        with:
+          deno-version: ${{env.DENO_VERSION}}
+
+      - name: Publish (dry run)
+        run: deno publish --dry-run
