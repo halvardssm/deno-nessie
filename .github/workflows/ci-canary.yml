@@ -2,7 +2,7 @@ name: CI
 
 on:
   schedule:
-    - cron:  '24 8 * * 0,3,5'
+    - cron: "24 8 * * 0,3,5"
 
 env:
   DENO_VERSION: "canary"
@@ -18,8 +18,8 @@ jobs:
 
       - name: Install deno
         uses: denoland/setup-deno@v1
-        with: 
-          deno-version: $DENO_VERSION
+        with:
+          deno-version: ${{env.DENO_VERSION}}
 
       - name: Check
         run: deno task check
@@ -34,8 +34,8 @@ jobs:
 
       - name: Install deno
         uses: denoland/setup-deno@v1
-        with: 
-          deno-version: $DENO_VERSION
+        with:
+          deno-version: ${{env.DENO_VERSION}}
 
       - name: Run unit tests
         run: deno task test
@@ -62,8 +62,8 @@ jobs:
 
       - name: Install deno
         uses: denoland/setup-deno@v1
-        with: 
-          deno-version: $DENO_VERSION
+        with:
+          deno-version: ${{env.DENO_VERSION}}
 
       - name: Publish (dry run)
         run: deno publish --dry-run
