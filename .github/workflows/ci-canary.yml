@@ -1,17 +1,11 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
   schedule:
     - cron:  '24 8 * * 0,3,5'
 
 env:
-  DENO_VERSION: "vx.x.x"
+  DENO_VERSION: "canary"
 
 jobs:
   check:
