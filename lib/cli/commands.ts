@@ -22,6 +22,21 @@ import {
   VERSION,
 } from "../mod.ts";
 
+export type GlobalCommandOptions = {
+  debug: boolean;
+  config: string | (StringType & string);
+  seedTemplate?: (StringType & string) | undefined;
+  migrationTemplate?: (StringType & string) | undefined;
+};
+
+export type GlobalCommand = Command<
+  void,
+  void,
+  void,
+  [],
+  GlobalCommandOptions
+>;
+
 const enumTypeMode: EnumType<"config" | "folders"> = new EnumType([
   "config",
   "folders",
@@ -281,21 +296,6 @@ export const statusCommand: GlobalCommand = new Command<GlobalCommandOptions>()
         break;
     }
   });
-
-export type GlobalCommandOptions = {
-  debug: boolean;
-  config: string | (StringType & string);
-  seedTemplate?: (StringType & string) | undefined;
-  migrationTemplate?: (StringType & string) | undefined;
-};
-
-export type GlobalCommand = Command<
-  void,
-  void,
-  void,
-  [],
-  GlobalCommandOptions
->;
 
 /** Main Command */
 export const mainCommand: GlobalCommand = new Command()
