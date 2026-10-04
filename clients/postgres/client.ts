@@ -2,7 +2,7 @@ import {
   type ClientOptions,
   type Queryable,
   SqlClient,
-} from "@stdext/database/sql";
+} from "@stdx/database/sql";
 import {
   type PostgresConnectionOptions,
   PostgresDriver,
@@ -20,7 +20,7 @@ import {
 } from "../_migration_table.ts";
 
 /**
- * The options of a {@linkcode PostgresClient}: the `@stdext/database` client
+ * The options of a {@linkcode PostgresClient}: the `@stdx/database` client
  * options, with the Postgres specific `connectionOptions` and
  * `transactionOptions`.
  */
@@ -29,7 +29,7 @@ export interface PostgresClientOptions
     ClientOptions<PostgresConnectionOptions, PostgresTransactionOptions> {}
 
 /**
- * The Postgres client: the standard `@stdext/database` client with the
+ * The Postgres client: the standard `@stdx/database` client with the
  * {@linkcode PostgresDriver}, which also implements {@linkcode NessieClient},
  * so nessie can keep its migration table in the database.
  *

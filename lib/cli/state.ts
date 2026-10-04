@@ -11,7 +11,7 @@ import {
 } from "../utils/utils.ts";
 import { MigrationClient } from "../wrappers/migration-client.ts";
 
-/** The methods nessie needs on top of an `@stdext/database` client */
+/** The methods nessie needs on top of an `@stdx/database` client */
 const NESSIE_CLIENT_METHODS = [
   "createMigrationTable",
   "getAppliedMigrations",

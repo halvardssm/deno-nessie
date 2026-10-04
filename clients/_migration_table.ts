@@ -1,4 +1,4 @@
-import type { Dialect, Queryable } from "@stdext/database/sql";
+import type { Dialect, Queryable } from "@stdx/database/sql";
 import { MAX_FILE_NAME_LENGTH } from "../lib/consts.ts";
 import type { AppliedMigration } from "../lib/types.ts";
 

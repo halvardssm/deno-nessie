@@ -1,10 +1,10 @@
 /**
  * SQLite client for nessie, see
- * {@link https://jsr.io/@stdext/database | @stdext/database}.
+ * {@link https://jsr.io/@stdx/database | @stdx/database}.
  *
  * @module
  */
-export * from "@stdext/database/drivers/sqlite";
-// Replaces the plain client of `@stdext/database` with one which also
+export * from "@stdx/database/drivers/sqlite";
+// Replaces the plain client of `@stdx/database` with one which also
 // implements the nessie client interface.
 export { SqliteClient } from "./sqlite/client.ts";

@@ -2,7 +2,7 @@ import {
   type ClientOptions,
   type Queryable,
   SqlClient,
-} from "@stdext/database/sql";
+} from "@stdx/database/sql";
 import {
   type MysqlConnectionOptions,
   MysqlDriver,
@@ -22,7 +22,7 @@ import {
 } from "../_migration_table.ts";
 
 /**
- * The options of a {@linkcode MysqlClient}: the `@stdext/database` client
+ * The options of a {@linkcode MysqlClient}: the `@stdx/database` client
  * options, with the MySQL specific `connectionOptions` and
  * `transactionOptions`.
  */
@@ -30,7 +30,7 @@ export interface MysqlClientOptions
   extends ClientOptions<MysqlConnectionOptions, MysqlTransactionOptions> {}
 
 /**
- * The MySQL client: the standard `@stdext/database` client with the
+ * The MySQL client: the standard `@stdx/database` client with the
  * {@linkcode MysqlDriver}, which also implements {@linkcode NessieClient}, so
  * nessie can keep its migration table in the database. It works with MariaDB
  * too.
