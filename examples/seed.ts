@@ -1,10 +1,8 @@
-import {
-  AbstractSeed,
-  ClientPostgreSQL,
-  Info,
-} from "https://deno.land/x/nessie/mod.ts";
-export default class extends AbstractSeed<ClientPostgreSQL> {
-  async run({ dialect }: Info): Promise<void> {
-    await this.client.queryArray("INSERT INTO table1 VALUES (1234)");
-  }
-}
+import type { Seed } from "../mod.ts";
+
+/** A seed is the default export of a file in a seed folder */
+export default {
+  async run({ client }) {
+    await client.execute("INSERT INTO users (id, name) VALUES (1, 'Alice')");
+  },
+} satisfies Seed;

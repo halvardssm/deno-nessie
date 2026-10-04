@@ -1,7 +1,10 @@
-import { ClientSQLite, NessieConfig } from "https://deno.land/x/nessie/mod.ts";
+import type { NessieConfig } from "../mod.ts";
+import { SqliteClient } from "../clients/sqlite.ts";
+
+const client = new SqliteClient("./sqlite.db");
 
 const config: NessieConfig = {
-  client: new ClientSQLite("./sqlite.db"),
+  client,
   migrationFolders: ["./db/migrations"],
   seedFolders: ["./db/seeds"],
 };

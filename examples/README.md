@@ -1,31 +1,20 @@
 # Examples
 
-This folder contains examples of how to use this library.
+The examples import from this repository, so they are type checked with it
+(`deno task type:check`) and the migrations and seed are run on SQLite, Postgres
+and MySQL by the tests. In your own project, import from `jsr:@halvardm/nessie`
+instead of `../mod.ts`.
 
-## Config files
+| File                                                                             | Shows                                                                           |
+| -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| [config-sqlite.ts](./config-sqlite.ts)                                           | A config file for SQLite.                                                       |
+| [config-postgres.ts](./config-postgres.ts)                                       | A config file for Postgres, with a URL from the environment and driver options. |
+| [config-mysql.ts](./config-mysql.ts)                                             | A config file for MySQL and MariaDB.                                            |
+| [config-remote-and-custom-templates.ts](./config-remote-and-custom-templates.ts) | Migrations and seeds from URLs, and custom templates for the `make` commands.   |
+| [migration.ts](./migration.ts)                                                   | A migration, with `up` and `down`.                                              |
+| [migration-dialects.ts](./migration-dialects.ts)                                 | SQL that differs between databases, and `transaction`.                          |
+| [seed.ts](./seed.ts)                                                             | A seed.                                                                         |
+| [custom-client.ts](./custom-client.ts)                                           | A client implementing `NessieClient`, with its own migration table.             |
+| [library.ts](./library.ts)                                                       | Using `MigrationClient` without the CLI.                                        |
 
-The following are minimal example config files:
-
-- [PostgreSQL](./config-postgres.ts)
-- [MySQL](./config-mysql.ts)
-- [SQLite](./config-sqlite.ts)
-
-If you want to include external migrations, check out these examples:
-
-- [With url](./config-remote-migration-files.ts)
-- [With GitHub API](./config-remote-migration-files-github-api.ts) - this
-  example uses the github api to get the folder content and parse migration
-  files from it.
-- [With custom templates](./config-custom-templates.ts) - this example uses
-  custom templates and shows how to deal with custom abstract classes.
-
-## Migration files
-
-- [Basic migration](./migration.ts)
-- [Migration using Dex](./migration-dex.ts)
-- [Custom AbstractMigration](./abstract-classes-extended.ts)
-
-## Seed files
-
-- [Basic seed](./seed.ts)
-- [Custom AbstractSeed](./abstract-classes-extended.ts)
+Use a config file with `-c`, e.g. `nessie migrate -c examples/config-sqlite.ts`.

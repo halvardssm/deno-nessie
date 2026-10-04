@@ -2,188 +2,101 @@ name: Scheduled
 
 on:
   schedule:
-    - cron:  '24 8 * * 0,3,5'
+    - cron: "24 8 * * 0,3,5"
 
 jobs:
-  fmt:
+  check:
     strategy:
       matrix:
-        version: [vx.x.x, canary]
-    name: Test format and lint
+        version: [v2.x, canary]
+    name: Check format, lint and types
     runs-on: ubuntu-latest
-
     steps:
-      - name: Clone repo
-        uses: actions/checkout@v3
-
-      - name: Install deno
-        uses: denoland/setup-deno@v1
-        with: 
-          deno-version: ${{ matrix.version }}
-
-      - name: Check fmt
-        run: deno fmt --check
-  
-      - name: Check lint
-        run: deno lint
-
-  unit:
-    strategy:
-      matrix:
-        version: [vx.x.x, canary]
-    name: Test unit
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Clone repo
-        uses: actions/checkout@v3
-
-      - name: Install deno
-        uses: denoland/setup-deno@v1
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
         with:
           deno-version: ${{ matrix.version }}
+      - run: deno task check
 
-      - name: Run unit tests
-        run: deno task test:unit
-
-      - name: Generate lcov
-        run: deno coverage --unstable --lcov ./coverage > coverage.lcov
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v1
-        with:
-          files: coverage.lcov
-          flags: unit
-
-  cli:
+  test:
     strategy:
       matrix:
-        version: [vx.x.x, canary]
-    name: Test CLI
+        version: [v2.x, canary]
+    name: Test
     runs-on: ubuntu-latest
-    env:
-      URL_PATH: ${{github.repository}}/main
-
-    steps:
-      - name: Install deno
-        uses: denoland/setup-deno@v1
-        with: 
-          deno-version: ${{ matrix.version }}
-          
-      - name: Nessie Init
-        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --dialect sqlite
-
-      - run: sed -i "s|from \".*\"|from \"https://raw.githubusercontent.com/$URL_PATH/mod.ts\"|" nessie.config.ts && cat nessie.config.ts
-
-      - name: Create migration
-        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make test
-
-      - name: Create migration
-        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make:migration test2
-
-      - name: Create seed
-        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make:seed test
-
-      - run: echo "test" >> test_template 
-
-      - name: Create migration from custom template
-        run: |
-          deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make:migration --migrationTemplate test_template test_migration_template
-          TEMPLATE_PATH=$(find db/migrations -type f -name "*test_migration_template.ts")
-          TEMPLATE_CONTENT=$(cat $TEMPLATE_PATH)
-          if [[ $TEMPLATE_CONTENT != "test" ]]; then echo "File $TEMPLATE_PATH was not correct, was:\n$TEMPLATE_CONTENT" && exit 1; fi
-
-      - name: Create seed from custom template
-        run: |
-          deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts make:seed --seedTemplate test_template test_seed_template
-          TEMPLATE_PATH=$(find db/seeds -type f -name "test_seed_template.ts")
-          TEMPLATE_CONTENT=$(cat $TEMPLATE_PATH)
-          if [[ $TEMPLATE_CONTENT != "test" ]]; then echo "File $TEMPLATE_PATH was not correct, was:\n$TEMPLATE_CONTENT" && exit 1; fi
-
-      - name: Clean files and folders
-        run: rm -rf db && rm -rf nessie.config.ts
-
-      - name: Init with mode and pg
-        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --mode config --dialect pg
-
-      - name: Init with mode and mysql
-        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --mode config --dialect mysql
-
-      - name: Init with mode and sqlite
-        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --mode config --dialect sqlite
-
-      - name: Init with folders only
-        run: deno run -A --unstable https://raw.githubusercontent.com/$URL_PATH/cli.ts init --mode folders
-
-  cli-migrations:
-    strategy:
-      matrix:
-        version: [vx.x.x, canary]
-    name: Test CLI Migrations
-    runs-on: ubuntu-latest
-
     services:
       postgres:
-        image: postgres
+        image: postgres:17
         env:
           POSTGRES_USER: root
           POSTGRES_PASSWORD: pwd
           POSTGRES_DB: nessie
         options: >-
-          --health-cmd pg_isready
+          --health-cmd "pg_isready -U root -d nessie"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
         ports:
-          - 5000:5432
-
+          - 5100:5432
       mysql:
-        image: mysql
+        image: mysql:8
         env:
-          MYSQL_ALLOW_EMPTY_PASSWORD: true
+          MYSQL_ALLOW_EMPTY_PASSWORD: "true"
           MYSQL_DATABASE: nessie
         options: >-
           --health-cmd="mysqladmin ping"
           --health-interval=10s
           --health-timeout=5s
-          --health-retries=3
+          --health-retries=5
         ports:
-          - 5001:3306
-
+          - 5101:3306
     steps:
-      - name: Clone repo
-        uses: actions/checkout@v3
-
-      - name: Install deno
-        uses: denoland/setup-deno@v1
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
         with:
           deno-version: ${{ matrix.version }}
-
-      - name: Create databases
-        run: make db_sqlite_start
-
-      - name: Run tests
-        run: make test_integration_cli
-
-      - name: Generate lcov
-        run: deno coverage --unstable --lcov ./coverage > coverage.lcov
-
-      - name: Upload coverage
-        uses: codecov/codecov-action@v1
+      - run: deno task test
+      - run: deno task coverage:lcov
+      - uses: codecov/codecov-action@v4
         with:
           files: coverage.lcov
-          flags: integration-cli
+          fail_ci_if_error: false
 
-  image-test:
-    name: Test Docker image build
+  cli:
+    strategy:
+      matrix:
+        version: [v2.x, canary]
+    name: Test CLI
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: ${{ matrix.version }}
+      - name: Run the CLI from the checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          nessie() { deno run -A --config "$GITHUB_WORKSPACE/deno.json" "$GITHUB_WORKSPACE/cli.ts" "$@"; }
+          mkdir "$RUNNER_TEMP/project" && cd "$RUNNER_TEMP/project"
 
-      - name: Build image
-        run: make image_build
-        env:
-          DENO_VERSION: latest
+          nessie init --dialect sqlite
+          # Use the checkout instead of the published package
+          perl -pi -e 's#jsr:\@halvardm/nessie\@[^/"]+/clients/([a-z]+)#file://$ENV{GITHUB_WORKSPACE}/clients/$1.ts#; s#jsr:\@halvardm/nessie\@[^"]+#file://$ENV{GITHUB_WORKSPACE}/mod.ts#' nessie.config.ts
+          nessie make --name test
+          nessie make:migration --name test2
+          nessie make:seed --name test
 
-      - name: Test image
-        run: make image_test
+          echo "test" > test_template
+          nessie make:migration --migration-template test_template --name test_migration_template
+          nessie make:seed --seed-template test_template --name test_seed_template
+          for file in db/migrations/*test_migration_template.ts db/seeds/test_seed_template.ts; do
+            [[ "$(cat "$file")" == "test" ]] || { echo "$file was not created from the template"; exit 1; }
+          done
+
+          rm -rf db nessie.config.ts
+          for dialect in postgres mysql sqlite; do
+            nessie init --mode config --dialect $dialect
+            rm nessie.config.ts
+          done
+          nessie init --mode folders

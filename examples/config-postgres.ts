@@ -1,21 +1,12 @@
-import {
-  ClientPostgreSQL,
-  NessieConfig,
-} from "https://deno.land/x/nessie/mod.ts";
-import type { ConnectionOptions } from "https://deno.land/x/postgres@v0.11.2/mod.ts";
+import type { NessieConfig } from "../mod.ts";
+import { PostgresClient } from "../clients/postgres.ts";
 
-const connectionConfig: ConnectionOptions = {
-  database: "nessie",
-  hostname: "localhost",
-  port: 5432,
-  user: "root",
-  password: "pwd",
-};
+const client = new PostgresClient(
+  Deno.env.get("DATABASE_URL") ?? "postgres://root:pwd@localhost:5432/nessie",
+  // Driver specific options, e.g. TLS
+  { connectionOptions: { driverOptions: { ssl: false } } },
+);
 
-const config: NessieConfig = {
-  client: new ClientPostgreSQL(connectionConfig),
-  migrationFolders: ["./db/migrations"],
-  seedFolders: ["./db/seeds"],
-};
+const config: NessieConfig = { client };
 
 export default config;
