@@ -2,23 +2,23 @@
 
 ## Unreleased - Version 3.0.0
 
-Nessie is rewritten on [`@stdext/database`](https://jsr.io/@stdext/database).
-This is a breaking release, see "Migrating from 2.x" in the README.
+Nessie is rewritten on [`@stdx/database`](https://jsr.io/@stdx/database). This
+is a breaking release, see "Migrating from 2.x" in the README.
 
 - New `PostgresClient`, `MysqlClient` and `SqliteClient`, implementing the
-  `@stdext/database` driver interface (`npm:postgres`, `npm:mysql2` and
+  `@stdx/database` driver interface (`npm:postgres`, `npm:mysql2` and
   `node:sqlite`).
 - Migrations and seeds are default exported objects receiving
   `{ client, dialect }`, instead of classes. Migrations run in a transaction
   with their state entry, opt out with `transaction: false`.
-- New CLI on `@stdext/cli`. **Breaking:** arguments are flags, and the
-  positional forms are rejected: `make:migration --name`, `make:seed --name`,
+- New CLI on `@stdx/cli`. **Breaking:** arguments are flags, and the positional
+  forms are rejected: `make:migration --name`, `make:seed --name`,
   `migrate --amount`, `rollback --amount` and `seed --matcher`, with the aliases
   `-n`, `-a` and `-m`. `--folder` and `--force` replace prompts, and the
   template flags are `--migration-template` and `--seed-template`.
 - Clients implement a `NessieClient` interface which keeps the migration table,
   so the library has no SQL or dialect specific code. The plain clients of
-  `@stdext/database` are not accepted as `client` anymore.
+  `@stdx/database` are not accepted as `client` anymore.
 - Warns, on `migrate` and `status`, when a migration file was edited after it
   was applied. Checksums are stored in a new `checksum` column, which is added
   to existing `nessie_migrations` tables.

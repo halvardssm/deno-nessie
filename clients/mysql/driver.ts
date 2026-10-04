@@ -18,7 +18,7 @@ import {
   type QueryParameters,
   TransactionError,
   type TransactionOptions,
-} from "@stdext/database/sql";
+} from "@stdx/database/sql";
 
 /** Options used when connecting to MySQL */
 export interface MysqlConnectionOptions extends ConnectionOptions {
@@ -152,7 +152,7 @@ export const mysqlDialect: Dialect = {
 };
 
 /**
- * The MySQL driver of `@stdext/database`, backed by
+ * The MySQL driver of `@stdx/database`, backed by
  * {@link https://sidorares.github.io/node-mysql2 | mysql2}. It implements the
  * driver level of the specification: connections to a database. Applications
  * use a {@linkcode MysqlClient}, which adds pooling, transactions and result

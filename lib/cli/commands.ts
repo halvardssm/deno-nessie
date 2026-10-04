@@ -2,7 +2,7 @@ import { format } from "@std/datetime/format";
 import { green } from "@std/fmt/colors";
 import { exists } from "@std/fs/exists";
 import { resolve } from "@std/path";
-import { defineCommand, UsageError } from "@stdext/cli";
+import { defineCommand, UsageError } from "@stdx/cli";
 import {
   DEFAULT_CONFIG_FILE,
   DEFAULT_MIGRATION_FOLDER,

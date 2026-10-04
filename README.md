@@ -2,7 +2,7 @@
 
 <p align="center">
   A database migration tool for Deno, built on
-  <a href="https://jsr.io/@stdext/database">@stdext/database</a>.
+  <a href="https://jsr.io/@stdx/database">@stdx/database</a>.
 </p>
 
 <p align="center">
@@ -12,8 +12,8 @@
 </p>
 
 Nessie runs versioned `up`/`down` migrations and seeds on SQLite, Postgres and
-MySQL. Migrations receive a standard `@stdext/database` client, so any SQL,
-query builder or helper written for that interface works inside them.
+MySQL. Migrations receive a standard `@stdx/database` client, so any SQL, query
+builder or helper written for that interface works inside them.
 
 > **Upgrading from 2.x?** See [Migrating from 2.x](#migrating-from-2x).
 
@@ -131,7 +131,7 @@ export default {
 } satisfies Migration;
 ```
 
-`client` is an `@stdext/database` `Queryable` (`execute`, `query`,
+`client` is an `@stdx/database` `Queryable` (`execute`, `query`,
 `executeScript`, `prepare`, nested `transaction`s) and `dialect` describes the
 database (`dialect.name`, `dialect.placeholder(i)`,
 `dialect.quoteIdentifier()`), for SQL that differs between databases.
@@ -164,7 +164,7 @@ export default {
 
 | Database | Import                                  | Backed by                                                       |
 | -------- | --------------------------------------- | --------------------------------------------------------------- |
-| SQLite   | `jsr:@halvardm/nessie/clients/sqlite`   | `node:sqlite` via `@stdext/database`                            |
+| SQLite   | `jsr:@halvardm/nessie/clients/sqlite`   | `node:sqlite` via `@stdx/database`                              |
 | Postgres | `jsr:@halvardm/nessie/clients/postgres` | [postgres](https://github.com/porsager/postgres)                |
 | MySQL    | `jsr:@halvardm/nessie/clients/mysql`    | [mysql2](https://sidorares.github.io/node-mysql2), also MariaDB |
 
@@ -179,7 +179,7 @@ new MysqlClient("mysql://user:pwd@localhost:3306/db");
 new SqliteClient("./sqlite.db");
 ```
 
-The Postgres and MySQL clients implement the `@stdext/database` driver interface
+The Postgres and MySQL clients implement the `@stdx/database` driver interface
 and pass its conformance suite. Notes:
 
 - `BIGINT` is read as a `number` when it is a safe integer and as a `bigint`
@@ -191,7 +191,7 @@ and pass its conformance suite. Notes:
 
 ### Writing a client
 
-The `client` must implement `NessieClient`: an `@stdext/database` `Client` which
+The `client` must implement `NessieClient`: an `@stdx/database` `Client` which
 also keeps the table of applied migrations. Nessie itself contains no SQL, so
 everything database specific lives in the client:
 
@@ -207,8 +207,8 @@ interface NessieClient extends Client {
 
 `db` is the connection or transaction nessie is running the migration on, so the
 record is committed together with the migration. To support another database,
-extend its `@stdext/database` client and implement these five methods, as the
-clients in [clients/](./clients) do. The plain clients of `@stdext/database` do
+extend its `@stdx/database` client and implement these five methods, as the
+clients in [clients/](./clients) do. The plain clients of `@stdx/database` do
 not implement the interface, and are rejected with an error that says so. See
 [examples/custom-client.ts](./examples/custom-client.ts) for a complete client.
 
@@ -249,7 +249,7 @@ See [examples/library.ts](./examples/library.ts) for a runnable version.
 
 ## Migrating from 2.x
 
-Nessie 3 is a rewrite on `@stdext/database`, and is a breaking change.
+Nessie 3 is a rewrite on `@stdx/database`, and is a breaking change.
 
 - **Clients:** `ClientPostgreSQL`, `ClientMySQL`, `ClientMySQL55` and
   `ClientSQLite` are replaced by `PostgresClient`, `MysqlClient` and
@@ -258,9 +258,9 @@ Nessie 3 is a rewrite on `@stdext/database`, and is a breaking change.
   such as authentication plugins, go in `connectionOptions.driverOptions`.
 - **Migrations and seeds:** classes extending `AbstractMigration` /
   `AbstractSeed` are replaced by default exported objects with `up`/`down`/`run`
-  that receive `{ client, dialect }`. The client is the `@stdext/database`
+  that receive `{ client, dialect }`. The client is the `@stdx/database`
   interface, not the underlying library's.
-- **CLI:** built on `@stdext/cli`. Arguments are now flags, and the positional
+- **CLI:** built on `@stdx/cli`. Arguments are now flags, and the positional
   forms are rejected (see the table below). Prompts are replaced by `--folder`
   and `--force`, `--migrationTemplate` is `--migration-template`, and
   `--seedTemplate` is `--seed-template`. `update_timestamps` and the Docker

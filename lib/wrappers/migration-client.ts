@@ -1,5 +1,5 @@
 import { green } from "@std/fmt/colors";
-import type { Connection } from "@stdext/database/sql";
+import type { Connection } from "@stdx/database/sql";
 import type {
   AmountMigrate,
   AmountRollback,

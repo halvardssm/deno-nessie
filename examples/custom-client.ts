@@ -1,9 +1,9 @@
-import { SqliteDriver } from "@stdext/database/drivers/sqlite";
-import { type Queryable, SqlClient } from "@stdext/database/sql";
+import { SqliteDriver } from "@stdx/database/drivers/sqlite";
+import { type Queryable, SqlClient } from "@stdx/database/sql";
 import type { AppliedMigration, NessieClient, NessieConfig } from "../mod.ts";
 
 /**
- * A client is an `@stdext/database` client which also keeps the table of
+ * A client is an `@stdx/database` client which also keeps the table of
  * applied migrations. Nessie has no SQL of its own, so everything about the
  * table is decided here: this one stores the migrations in `schema_history`
  * instead of `nessie_migrations`.

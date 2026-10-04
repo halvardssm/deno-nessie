@@ -4,7 +4,7 @@ import type {
   Preparable,
   Queryable,
   Transactionable,
-} from "@stdext/database/sql";
+} from "@stdx/database/sql";
 
 /**
  * A function for debug output, enabled with `--debug` or `debug: true`.
@@ -176,7 +176,7 @@ export interface AppliedMigration {
 }
 
 /**
- * The client nessie runs on: an `@stdext/database` {@linkcode Client} which
+ * The client nessie runs on: an `@stdx/database` {@linkcode Client} which
  * also keeps the table of applied migrations.
  *
  * Nessie itself has no SQL. How the table is created, and what it looks like,
@@ -184,7 +184,7 @@ export interface AppliedMigration {
  * these five methods. `SqliteClient`, `PostgresClient` and `MysqlClient` from
  * `@halvardm/nessie/clients/*` implement this interface, and so can your own
  * client, to support another database or to store the migrations elsewhere. A
- * plain `@stdext/database` client does not implement it, and is rejected.
+ * plain `@stdx/database` client does not implement it, and is rejected.
  *
  * Each method gets the `Queryable` to use as `db`. Always use it instead of
  * the client itself: nessie passes the connection, or the transaction, that is

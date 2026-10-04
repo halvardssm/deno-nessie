@@ -1,8 +1,8 @@
 import {
   type SqliteClientOptions,
   SqliteDriver,
-} from "@stdext/database/drivers/sqlite";
-import { type Queryable, SqlClient } from "@stdext/database/sql";
+} from "@stdx/database/drivers/sqlite";
+import { type Queryable, SqlClient } from "@stdx/database/sql";
 import type { AppliedMigration, NessieClient } from "../../lib/types.ts";
 import {
   CHECKSUM_TYPE,
@@ -17,16 +17,16 @@ import {
 } from "../_migration_table.ts";
 
 /**
- * The SQLite client: the `SqliteClient` of `@stdext/database`, which also
+ * The SQLite client: the `SqliteClient` of `@stdx/database`, which also
  * implements {@linkcode NessieClient}, so nessie can keep its migration table
- * in the database. It replaces the client of `@stdext/database` for nessie, as
+ * in the database. It replaces the client of `@stdx/database` for nessie, as
  * that one does not implement the interface.
  *
  * The connection URL is a file path, a `file:` URL or `:memory:`. SQLite takes
  * one connection, so migrations and seeds run one at a time. An in-memory
  * database is gone when the client is closed, which makes it useful in tests,
  * but not for a CLI config. Parameters are `?` placeholders, or `:name` for
- * named parameters. Options are those of the `@stdext/database` client.
+ * named parameters. Options are those of the `@stdx/database` client.
  *
  * @example
  * ```ts
@@ -48,7 +48,7 @@ export class SqliteClient extends SqlClient<SqliteDriver, SqliteClientOptions>
    * Creates the client. It connects when it is first used.
    *
    * @param connectionUrl a file path, a `file:` URL or `:memory:`
-   * @param options the `@stdext/database` client options, such as
+   * @param options the `@stdx/database` client options, such as
    * `connectionOptions: { readOnly: true }`
    */
   constructor(connectionUrl: string | URL, options?: SqliteClientOptions) {
