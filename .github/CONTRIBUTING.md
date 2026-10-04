@@ -43,7 +43,7 @@ created, until then you can use the issues.
 
 Before pushing commits, go through this checklist:
 
-- You have run `deno fmt`
+- You have run `deno task fix` and `deno task check`
 - All tests are running successfully locally (will save you time)
 
 For a PR to be accepted, the following needs to be applied:
@@ -55,8 +55,20 @@ For a PR to be accepted, the following needs to be applied:
 
 ## Testing
 
-If you have `make` and `Docker` available, you can simply run `make test` (or
-`make test_clean` if you have already started the docker containers, this will
-be optimized in the future), otherwise boot up your databases and change the
-connections accordingly (do not commit these changes). If you have `Docker` but
-not `make`, you can look at the `Makefile` to see the commands to run.
+The tests need Postgres and MySQL, which `tests/compose.yml` starts. Docker or
+Podman is used, whichever is installed:
+
+```sh
+deno task test:all  # starts the databases, runs the tests, and removes them
+```
+
+or, to keep the databases running between runs:
+
+```sh
+deno task db:start  # Postgres on 5100, MySQL on 5101
+deno task test
+deno task db:stop
+```
+
+Use other databases by setting `NESSIE_TEST_POSTGRES` and `NESSIE_TEST_MYSQL` to
+connection URLs. Before pushing, run `deno task fix` and `deno task check`.

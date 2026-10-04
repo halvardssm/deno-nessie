@@ -1,15 +1,14 @@
-import {
-  AbstractMigration,
-  ClientPostgreSQL,
-  Info,
-} from "https://deno.land/x/nessie/mod.ts";
+import type { Migration } from "../mod.ts";
 
-export default class extends AbstractMigration<ClientPostgreSQL> {
-  async up({ dialect }: Info): Promise<void> {
-    await this.client.queryArray("CREATE TABLE table1 (id int)");
-  }
+/** A migration is the default export of a file named `<yyyyMMddHHmmss>_<name>.ts` */
+export default {
+  async up({ client }) {
+    await client.execute(
+      "CREATE TABLE users (id INTEGER PRIMARY KEY, name VARCHAR(100) NOT NULL)",
+    );
+  },
 
-  async down({ dialect }: Info): Promise<void> {
-    await this.client.queryArray("DROP TABLE table1");
-  }
-}
+  async down({ client }) {
+    await client.execute("DROP TABLE users");
+  },
+} satisfies Migration;

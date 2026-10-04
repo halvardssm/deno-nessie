@@ -1,20 +1,50 @@
 {
+  "name": "@halvardm/nessie",
+  "version": "3.0.0-rc.1",
+  "lock": false,
+  "minimumDependencyAge": 0,
+  "exports": {
+    ".": "./mod.ts",
+    "./cli": "./cli.ts",
+    "./clients/mysql": "./clients/mysql.ts",
+    "./clients/postgres": "./clients/postgres.ts",
+    "./clients/sqlite": "./clients/sqlite.ts"
+  },
   "tasks": {
-    "test:unit": "deno test -A --unstable --coverage=coverage tests/unit",
-    "test:integration:cli": "deno test -A --unstable --coverage=coverage tests/integration/cli",
-    "test:integration:update_timestamp": "deno test -A --unstable --coverage=coverage tests/integration/update_timestamps",
-    "bump_version": "deno run --allow-read --allow-write helpers/prepare_release.ts && deno fmt"
+    "check": "deno task format:check && deno task lint:check && deno task type:check",
+    "fix": "deno fmt && deno lint --fix",
+    "lint:check": "deno lint",
+    "format:check": "deno fmt --check",
+    "type:check": "deno check mod.ts cli.ts clients/*.ts examples/*.ts",
+    "doc:check": "deno doc --lint mod.ts clients/*.ts",
+    "test": "deno test -A --doc --coverage mod.ts lib clients tests",
+    "test:all": "deno task db:start && deno task test; status=$?; deno task db:stop; exit $status",
+    "coverage:lcov": "deno coverage --exclude=examples --lcov > coverage.lcov",
+    "docker": "sh -c 'if command -v docker >/dev/null 2>&1; then docker \"$@\"; elif command -v podman >/dev/null 2>&1; then podman \"$@\"; else echo \"ERROR: neither docker nor podman found\" >&2; exit 1; fi' --",
+    "db:start": "deno task docker compose -f tests/compose.yml up -d --remove-orphans --wait",
+    "db:stop": "deno task docker compose -f tests/compose.yml down --remove-orphans --volumes"
   },
+  "exclude": ["coverage"],
   "fmt": {
-    "exclude": [
-      "coverage"
-    ]
+    "exclude": ["tests/init", ".github/*.svg"]
   },
-  "lint": {
-    "exclude": [
-      "tests",
-      "examples",
-      "cli/templates"
-    ]
+  "publish": {
+    "exclude": [".github", "tests", "examples"]
+  },
+  "imports": {
+    "@halvardm/nessie": "./mod.ts",
+    "@halvardm/nessie/clients/sqlite": "./clients/sqlite.ts",
+    "@halvardm/nessie/clients/postgres": "./clients/postgres.ts",
+    "@halvardm/nessie/clients/mysql": "./clients/mysql.ts",
+    "mysql2": "npm:mysql2@^3.11.0",
+    "postgres": "npm:postgres@^3.4.0",
+    "@std/assert": "jsr:@std/assert@^1",
+    "@std/datetime": "jsr:@std/datetime@^0.225.7",
+    "@std/fmt": "jsr:@std/fmt@^1",
+    "@std/fs": "jsr:@std/fs@^1",
+    "@std/path": "jsr:@std/path@^1",
+    "@stdext/cli": "jsr:@stdext/cli@^0.0.2",
+    "@stdext/database": "jsr:@stdext/database@^0.1.0",
+    "@stdext/types": "jsr:@stdext/types@^0.1.1"
   }
 }

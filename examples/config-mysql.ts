@@ -1,17 +1,10 @@
-import { ClientMySQL, NessieConfig } from "https://deno.land/x/nessie/mod.ts";
-import type { ClientConfig } from "https://deno.land/x/mysql@v2.8.0/mod.ts";
+import type { NessieConfig } from "../mod.ts";
+import { MysqlClient } from "../clients/mysql.ts";
 
-const connectionConfig: ClientConfig = {
-  hostname: "localhost",
-  port: 3306,
-  username: "root",
-  db: "nessie",
-};
+const client = new MysqlClient(
+  Deno.env.get("DATABASE_URL") ?? "mysql://root:pwd@localhost:3306/nessie",
+);
 
-const config: NessieConfig = {
-  client: new ClientMySQL(connectionConfig),
-  migrationFolders: ["./db/migrations"],
-  seedFolders: ["./db/seeds"],
-};
+const config: NessieConfig = { client };
 
 export default config;
