@@ -1,4 +1,8 @@
-import postgres from "postgres";
+import postgres, {
+  type Options,
+  type PostgresType,
+  type ReservedSql,
+} from "postgres";
 import {
   ConnectionError,
   type ConnectionOptions,
@@ -19,12 +23,10 @@ import {
 } from "@stdx/database/sql";
 
 /** The options of {@link https://github.com/porsager/postgres | postgres} */
-export type PostgresOptions = NonNullable<Parameters<typeof postgres>[1]>;
+export type PostgresOptions = Options<Record<string, PostgresType>>;
 
 /** A reserved connection of {@link https://github.com/porsager/postgres | postgres} */
-export type PostgresReservedSql = Awaited<
-  ReturnType<ReturnType<typeof postgres>["reserve"]>
->;
+export type PostgresReservedSql = ReservedSql;
 
 /** Options used when connecting to Postgres */
 export interface PostgresConnectionOptions extends ConnectionOptions {

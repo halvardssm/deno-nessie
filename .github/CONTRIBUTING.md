@@ -71,4 +71,6 @@ deno task db:stop
 ```
 
 Use other databases by setting `NESSIE_TEST_POSTGRES` and `NESSIE_TEST_MYSQL` to
-connection URLs. Before pushing, run `deno task fix` and `deno task check`.
+connection URLs. Before pushing, run `deno task fix`, which fixes what lint can
+and formats, and `deno task check`, which checks the format, lint, types of the
+code and the tests, the JSDoc, and that the package can be published.

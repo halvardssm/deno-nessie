@@ -11,12 +11,13 @@
     "./clients/sqlite": "./clients/sqlite.ts"
   },
   "tasks": {
-    "check": "deno task format:check && deno task lint:check && deno task type:check",
-    "fix": "deno fmt && deno lint --fix",
+    "check": "deno task format:check && deno task lint:check && deno task type:check && deno task doc:check && deno task publish:check",
+    "fix": "deno lint --fix && deno fmt",
     "lint:check": "deno lint",
     "format:check": "deno fmt --check",
-    "type:check": "deno check mod.ts cli.ts clients/*.ts examples/*.ts",
-    "doc:check": "deno doc --lint mod.ts clients/*.ts",
+    "type:check": "deno check mod.ts cli.ts \"clients/**/*.ts\" \"lib/**/*.ts\" \"examples/*.ts\" \"tests/**/*.ts\"",
+    "doc:check": "deno doc --lint mod.ts cli.ts clients/*.ts",
+    "publish:check": "deno publish --dry-run --allow-dirty",
     "test": "deno test -A --doc --coverage mod.ts lib clients tests",
     "test:all": "deno task db:start && deno task test; status=$?; deno task db:stop; exit $status",
     "coverage:lcov": "deno coverage --exclude=examples --lcov > coverage.lcov",
