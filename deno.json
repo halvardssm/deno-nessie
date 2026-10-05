@@ -32,10 +32,6 @@
     "exclude": [".github", "tests", "examples"]
   },
   "imports": {
-    "@halvardm/nessie": "./mod.ts",
-    "@halvardm/nessie/clients/sqlite": "./clients/sqlite.ts",
-    "@halvardm/nessie/clients/postgres": "./clients/postgres.ts",
-    "@halvardm/nessie/clients/mysql": "./clients/mysql.ts",
     "mysql2": "npm:mysql2@^3.11.0",
     "postgres": "npm:postgres@^3.4.0",
     "@std/assert": "jsr:@std/assert@^1",
