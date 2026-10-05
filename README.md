@@ -292,8 +292,8 @@ deno task test
 deno task db:stop
 deno task test:all   # all three of the above
 
-deno task check      # format, lint and types
-deno task fix        # format, and fix what lint can
+deno task check      # format, lint, types (tests too), docs, and a JSR publish dry run
+deno task fix        # fix what lint can, then format
 ```
 
 Set `NESSIE_TEST_POSTGRES` and `NESSIE_TEST_MYSQL` to use other databases.
