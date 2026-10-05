@@ -1,4 +1,4 @@
-import { runCommand } from "@stdext/cli";
+import { runCommand } from "@stdx/cli";
 import { yellow } from "@std/fmt/colors";
 import { cli } from "./commands.ts";
 import { NessieError } from "../utils/errors.ts";

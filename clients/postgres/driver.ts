@@ -1,4 +1,8 @@
-import postgres from "postgres";
+import postgres, {
+  type Options,
+  type PostgresType,
+  type ReservedSql,
+} from "postgres";
 import {
   ConnectionError,
   type ConnectionOptions,
@@ -16,15 +20,13 @@ import {
   type QueryParameters,
   TransactionError,
   type TransactionOptions,
-} from "@stdext/database/sql";
+} from "@stdx/database/sql";
 
 /** The options of {@link https://github.com/porsager/postgres | postgres} */
-export type PostgresOptions = NonNullable<Parameters<typeof postgres>[1]>;
+export type PostgresOptions = Options<Record<string, PostgresType>>;
 
 /** A reserved connection of {@link https://github.com/porsager/postgres | postgres} */
-export type PostgresReservedSql = Awaited<
-  ReturnType<ReturnType<typeof postgres>["reserve"]>
->;
+export type PostgresReservedSql = ReservedSql;
 
 /** Options used when connecting to Postgres */
 export interface PostgresConnectionOptions extends ConnectionOptions {
@@ -143,7 +145,7 @@ export const postgresDialect: Dialect = {
 };
 
 /**
- * The Postgres driver of `@stdext/database`, backed by
+ * The Postgres driver of `@stdx/database`, backed by
  * {@link https://github.com/porsager/postgres | postgres}. It implements the
  * driver level of the specification: connections to a database. Applications
  * use a {@linkcode PostgresClient}, which adds pooling, transactions and

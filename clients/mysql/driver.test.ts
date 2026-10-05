@@ -4,12 +4,12 @@ import {
   QueryError,
   sql as tag,
   TransactionError,
-} from "@stdext/database/sql";
+} from "@stdx/database/sql";
 import {
   testClient,
   testDriver,
   type TestSql,
-} from "@stdext/database/sql/testing";
+} from "@stdx/database/sql/testing";
 import { MysqlClient, MysqlDriver } from "../mysql.ts";
 
 const URL = Deno.env.get("NESSIE_TEST_MYSQL") ??

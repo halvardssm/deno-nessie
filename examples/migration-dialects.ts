@@ -2,7 +2,7 @@ import type { Migration } from "../mod.ts";
 
 /**
  * The context has the dialect of the database, for SQL which differs between
- * databases, and the client has the standard `@stdext/database` interface.
+ * databases, and the client has the standard `@stdx/database` interface.
  */
 export default {
   // MySQL commits DDL statements implicitly, so they can not be rolled back.

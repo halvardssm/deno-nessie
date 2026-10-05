@@ -1,6 +1,6 @@
 /**
  * Nessie, a database migration tool for Deno, built on
- * {@link https://jsr.io/@stdext/database | @stdext/database}.
+ * {@link https://jsr.io/@stdx/database | @stdx/database}.
  *
  * Migrations are files with an `up` and a `down`, run in the order of their
  * names, and recorded in the database. They run from the command line (see

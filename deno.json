@@ -1,6 +1,6 @@
 {
   "name": "@halvardm/nessie",
-  "version": "3.0.0-rc.1",
+  "version": "3.0.0-rc.3",
   "lock": false,
   "minimumDependencyAge": 0,
   "exports": {
@@ -11,12 +11,13 @@
     "./clients/sqlite": "./clients/sqlite.ts"
   },
   "tasks": {
-    "check": "deno task format:check && deno task lint:check && deno task type:check",
-    "fix": "deno fmt && deno lint --fix",
+    "check": "deno task format:check && deno task lint:check && deno task type:check && deno task doc:check && deno task publish:check",
+    "fix": "deno lint --fix && deno fmt",
     "lint:check": "deno lint",
     "format:check": "deno fmt --check",
-    "type:check": "deno check mod.ts cli.ts clients/*.ts examples/*.ts",
-    "doc:check": "deno doc --lint mod.ts clients/*.ts",
+    "type:check": "deno check mod.ts cli.ts \"clients/**/*.ts\" \"lib/**/*.ts\" \"examples/*.ts\" \"tests/**/*.ts\"",
+    "doc:check": "deno doc --lint mod.ts cli.ts clients/*.ts",
+    "publish:check": "deno publish --dry-run --allow-dirty",
     "test": "deno test -A --doc --coverage mod.ts lib clients tests",
     "test:all": "deno task db:start && deno task test; status=$?; deno task db:stop; exit $status",
     "coverage:lcov": "deno coverage --exclude=examples --lcov > coverage.lcov",
@@ -32,10 +33,6 @@
     "exclude": [".github", "tests", "examples"]
   },
   "imports": {
-    "@halvardm/nessie": "./mod.ts",
-    "@halvardm/nessie/clients/sqlite": "./clients/sqlite.ts",
-    "@halvardm/nessie/clients/postgres": "./clients/postgres.ts",
-    "@halvardm/nessie/clients/mysql": "./clients/mysql.ts",
     "mysql2": "npm:mysql2@^3.11.0",
     "postgres": "npm:postgres@^3.4.0",
     "@std/assert": "jsr:@std/assert@^1",
@@ -43,8 +40,7 @@
     "@std/fmt": "jsr:@std/fmt@^1",
     "@std/fs": "jsr:@std/fs@^1",
     "@std/path": "jsr:@std/path@^1",
-    "@stdext/cli": "jsr:@stdext/cli@^0.0.2",
-    "@stdext/database": "jsr:@stdext/database@^0.1.0",
-    "@stdext/types": "jsr:@stdext/types@^0.1.1"
+    "@stdx/cli": "jsr:@stdx/cli@^0.1.1",
+    "@stdx/database": "jsr:@stdx/database@^0.1.1"
   }
 }

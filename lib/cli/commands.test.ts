@@ -1,6 +1,6 @@
 import { assertEquals, assertRejects, assertStringIncludes } from "@std/assert";
 import { join, toFileUrl } from "@std/path";
-import { runCommand } from "@stdext/cli";
+import { runCommand } from "@stdx/cli";
 import { cli } from "./commands.ts";
 import { NessieError } from "../utils/errors.ts";
 
@@ -202,10 +202,10 @@ Deno.test("status and migrate warn about modified migrations", async () => {
 Deno.test("a client without the nessie interface is rejected", async () => {
   await inTempDir(async (run) => {
     await run("init", "--mode", "folders");
-    // The plain client of `@stdext/database` does not keep the migration table
+    // The plain client of `@stdx/database` does not keep the migration table
     await Deno.writeTextFile(
       "nessie.config.ts",
-      `import { SqliteClient } from "@stdext/database/drivers/sqlite";
+      `import { SqliteClient } from "@stdx/database/drivers/sqlite";
        export default { client: new SqliteClient(":memory:") };`,
     );
     await assertRejects(
