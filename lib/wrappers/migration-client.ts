@@ -24,9 +24,17 @@ export interface MigrationClientOptions {
    * The migration files. They run in the order of their names, so the names
    * start with a timestamp. Each `path` is loaded with `import()`, and read for
    * its checksum. Defaults to none.
+   *
+   * Use {@linkcode listMigrationFiles} to scan a local folder, which is the
+   * same scanning the CLI does. Remote folders can not be scanned: give
+   * remote files explicit entries.
    */
   migrationFiles?: FileEntry[];
-  /** The seed files, loaded with `import()`. Defaults to none. */
+  /**
+   * The seed files, loaded with `import()`. Defaults to none. Scan a local
+   * folder with {@linkcode listMigrationFiles} and its `accept` option, e.g.
+   * `accept: (name) => name.endsWith(".ts")`.
+   */
   seedFiles?: FileEntry[];
   /** Receives debug output. Defaults to printing nothing. */
   logger?: LoggerFn;

@@ -22,6 +22,12 @@ is a breaking release, see "Migrating from 2.x" in the README.
 - Warns, on `migrate` and `status`, when a migration file was edited after it
   was applied. Checksums are stored in a new `checksum` column, which is added
   to existing `nessie_migrations` tables.
+- New `listMigrationFiles`, the folder scanning the CLI uses, so a
+  `MigrationClient` can be configured from a folder without hand-rolling a
+  `readDir` loop. It sorts by name, skips file names which are not valid
+  migration names, and throws on a missing folder unless
+  `onMissingFolder: "empty"`. Remote files can not be scanned and need explicit
+  entries.
 - Abandoning a MySQL result cancels the query on the server.
 - Published to JSR. New layout under `lib/`.
 - Removed the `update_timestamps` command, the Docker image, `ClientMySQL55` and

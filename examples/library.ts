@@ -9,7 +9,10 @@ import { SqliteClient } from "../clients/sqlite.ts";
  * Run with: deno run -A examples/library.ts
  */
 
-// Migration files are anything `import()` accepts, here a file URL
+// Migration files are anything `import()` accepts, here a file URL. A local
+// folder can be scanned instead, with `listMigrationFiles`, which is the
+// same scanning the CLI does:
+//   migrationFiles: await listMigrationFiles("./db/migrations")
 const migrationFiles = [
   {
     name: "20240101000000_create_users.ts",

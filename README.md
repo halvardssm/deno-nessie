@@ -227,13 +227,14 @@ The CLI is a thin layer over `MigrationClient`, which can be used directly, for
 example to migrate on startup or in tests:
 
 ```ts
-import { MigrationClient } from "jsr:@halvardm/nessie";
+import { listMigrationFiles, MigrationClient } from "jsr:@halvardm/nessie";
 import { SqliteClient } from "jsr:@halvardm/nessie/clients/sqlite";
 
 await using client = new SqliteClient("./sqlite.db");
 const migrations = new MigrationClient(client, {
-  // Anything `import()` accepts: { name: "<yyyyMMddHHmmss>_<name>.ts", path: "file:///..." }
-  migrationFiles,
+  // A folder, scanned the same way the CLI does. Or anything `import()`
+  // accepts: { name: "<yyyyMMddHHmmss>_<name>.ts", path: "file:///..." }
+  migrationFiles: await listMigrationFiles("./db/migrations"),
   info: (message) => console.info(message),
   warn: (message) => console.warn(message),
 });
@@ -244,6 +245,12 @@ await migrations.getApplied(); // names, newest first
 await migrations.getModified(); // applied, but the file has been edited since
 await migrations.seed("users"); // a name or a RegExp
 ```
+
+`listMigrationFiles` sorts the files by name, skips file names which are not
+valid migration names, and throws when the folder does not exist (pass
+`onMissingFolder: "empty"` for an empty list). Remote files can not be scanned:
+give them explicit entries. Seed folders work with its `accept` option, e.g.
+`accept: (name) => name.endsWith(".ts")`.
 
 See [examples/library.ts](./examples/library.ts) for a runnable version.
 

@@ -8,6 +8,7 @@ import {
   isFileUrl,
   isMigrationFile,
   isUrl,
+  listMigrationFiles,
 } from "../utils/utils.ts";
 import { MigrationClient } from "../wrappers/migration-client.ts";
 
@@ -172,16 +173,10 @@ async function findFiles(
 
   for (const folder of folders) {
     try {
-      for await (const entry of Deno.readDir(folder)) {
-        if (entry.isFile && accept(entry.name)) {
-          files.push({
-            name: entry.name,
-            path: toFileUrl(resolve(folder, entry.name)).href,
-          });
-        }
-      }
+      files.push(...await listMigrationFiles(folder, { accept }));
     } catch (e) {
-      if (e instanceof Deno.errors.NotFound) {
+      // listMigrationFiles throws NessieError only for a missing folder
+      if (e instanceof NessieError) {
         throw new NessieError(
           `The ${kind} folder ${folder} does not exist, run 'nessie init' to create it`,
         );
