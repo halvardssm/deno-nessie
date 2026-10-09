@@ -37,7 +37,7 @@ const common = {
   },
 } as const;
 
-const makeOptions = {
+const makeFlags = {
   ...common,
   folder: {
     type: "string",
@@ -135,7 +135,7 @@ async function makeFile(
 const init = defineCommand({
   name: "init",
   description: "Generates the config file and the migration and seed folders.",
-  options: {
+  flags: {
     mode: {
       type: "string",
       description:
@@ -196,8 +196,8 @@ const init = defineCommand({
 const makeMigrationDefinition = {
   description:
     "Creates a migration file named <timestamp>_<name>.ts. The name is lower snake case with digits, e.g. some_migration_1.",
-  options: {
-    ...makeOptions,
+  flags: {
+    ...makeFlags,
     migrationTemplate: {
       type: "string",
       description: "Path or URL to a custom migration template.",
@@ -269,8 +269,8 @@ const makeSeed = defineCommand({
   name: "make:seed",
   description:
     "Creates a seed file named <name>.ts. The name is lower snake case with digits, e.g. some_seed_1.",
-  options: {
-    ...makeOptions,
+  flags: {
+    ...makeFlags,
     seedTemplate: {
       type: "string",
       description: "Path or URL to a custom seed template.",
@@ -307,7 +307,7 @@ const seed = defineCommand({
   name: "seed",
   description:
     "Seeds the database with the seed files in the seed folders. All files, unless --matcher is given, which is a file name or a RegExp.",
-  options: {
+  flags: {
     ...common,
     matcher: {
       type: "string",
@@ -327,7 +327,7 @@ const migrate = defineCommand({
   name: "migrate",
   description:
     "Runs pending migrations, oldest first. All pending migrations, unless --amount is given.",
-  options: {
+  flags: {
     ...common,
     amount: {
       type: "string",
@@ -347,7 +347,7 @@ const rollback = defineCommand({
   name: "rollback",
   description:
     "Rolls back applied migrations, newest first. One migration, unless --amount is given.",
-  options: {
+  flags: {
     ...common,
     amount: {
       type: "string",
@@ -367,7 +367,7 @@ const status = defineCommand({
   name: "status",
   description:
     "Outputs the state of the migrations: available, completed, new and modified since they were applied.",
-  options: {
+  flags: {
     ...common,
     output: {
       type: "string",

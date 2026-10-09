@@ -40,7 +40,7 @@
     "@std/fmt": "jsr:@std/fmt@^1",
     "@std/fs": "jsr:@std/fs@^1",
     "@std/path": "jsr:@std/path@^1",
-    "@stdx/cli": "jsr:@stdx/cli@^0.1.1",
+    "@stdx/cli": "jsr:@stdx/cli@^0.1.2",
     "@stdx/database": "jsr:@stdx/database@^0.1.1"
   }
 }

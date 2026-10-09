@@ -28,6 +28,10 @@ is a breaking release, see "Migrating from 2.x" in the README.
   migration names, and throws on a missing folder unless
   `onMissingFolder: "empty"`. Remote files can not be scanned and need explicit
   entries.
+- `@stdx/cli` 0.1.2, which renames the `options` of a command to `flags`.
+  Without it every command was broken, as 0.1.2 ignores the `options` nessie
+  passed: no flag was parsed, no default applied, and `nessie seed` (and the
+  other commands) failed before reaching the client.
 - Abandoning a MySQL result cancels the query on the server.
 - Published to JSR. New layout under `lib/`.
 - Removed the `update_timestamps` command, the Docker image, `ClientMySQL55` and
