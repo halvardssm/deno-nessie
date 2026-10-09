@@ -8,7 +8,7 @@ Fixes #
 ## Checklist:
 
 Please review the
-[guidelines for contributing](https://github.com/halvardssm/deno-nessie/blob/master/.github/CONTRIBUTING.md)
+[guidelines for contributing](https://github.com/lmxrd/deno-nessie/blob/master/.github/CONTRIBUTING.md)
 to this repository.
 
 - [ ] Updated JSDoc (for methods changed/added)

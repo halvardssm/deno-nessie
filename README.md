@@ -7,8 +7,8 @@
 
 <p align="center">
   <a href="https://jsr.io/@halvardm/nessie"><img alt="JSR" src="https://jsr.io/badges/@halvardm/nessie"></a>
-  <a href="https://github.com/halvardssm/deno-nessie/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/halvardssm/deno-nessie/actions/workflows/ci.yml/badge.svg"></a>
-  <a href="./LICENSE"><img alt="License" src="https://img.shields.io/github/license/halvardssm/deno-nessie"></a>
+  <a href="https://github.com/lmxrd/deno-nessie/actions/workflows/ci.yml"><img alt="CI" src="https://github.com/lmxrd/deno-nessie/actions/workflows/ci.yml/badge.svg"></a>
+  <a href="./LICENSE"><img alt="License" src="https://img.shields.io/github/license/lmxrd/deno-nessie"></a>
 </p>
 
 Nessie runs versioned `up`/`down` migrations and seeds on SQLite, Postgres and
